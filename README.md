@@ -1,2 +1,7 @@
 # Automatizacion_bodega
-Automatizacion Bodega 
+
+### Grupo 6 - Integrantes:
+- Bastian Vargas
+- Diego Neves
+- Oscar Ynchaustegui
+- Sebastian Carmona
