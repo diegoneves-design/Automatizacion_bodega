@@ -8,6 +8,25 @@ MVP web para reducir errores de digitacion y perdida de trazabilidad en el despa
 - Oscar Ynchaustegui
 - Sebastian Carmona
 
+## Contexto del Proyecto: Automatizacion_bodega (USACH)
+
+### Rol
+Actúa como desarrollador senior en Python e Ingeniero Industrial.
+
+### Reglas de Arquitectura
+- App monolítica modular en Streamlit (`app.py`).
+- Base de datos local SQLite (`bodega.db`) con migraciones/seed automáticos.
+- Dependencias estrictas en `requirements.txt` (streamlit, pandas).
+- No modificar archivos de configuración de Git ni eliminar código funcional previo sin confirmación.
+
+### Lógica del Negocio
+- Flujo: Carga masiva de >50 SKUs, validación contra inventario, reemplazo de última hora con log de auditoría (timestamp, responsable, motivo) y emisión de guía de despacho.
+- Tipos de movimiento: Despacho convencional/alternativo y Retiro preventivo/por falla.
+
+### Protocolo de Verificación
+- Validar sintaxis antes de finalizar cualquier edición.
+- No asumir dependencias no instaladas.
+
 ## Problema que resuelve
 
 - El jefe de bodega digita a mano mas de 50 SKUs por guia -> alto riesgo de error humano.
@@ -16,7 +35,7 @@ MVP web para reducir errores de digitacion y perdida de trazabilidad en el despa
 
 ## Funcionalidad (3 vistas)
 
-1. **Carga masiva** — Pega o sube hasta 50 SKUs (uno por linea), elige tipo de movimiento (Despacho/Retiro) y modalidad (Convencional/Alternativo). Deduplica automaticamente y bloquea la carga si se excede el limite.
+1. **Carga masiva** — Pega o sube hasta 50 SKUs (uno por linea), elige tipo de movimiento (Despacho: Convencional/Alternativo — Retiro: Preventivo/Por falla). Deduplica automaticamente, bloquea la carga si se excede el limite y emite una guia de despacho descargable al confirmar.
 2. **Validador** — Cruza los SKUs de una orden contra el inventario simulado en SQLite y marca cada fila como `OK`, `SIN STOCK DISPONIBLE` o `SKU NO EXISTE EN INVENTARIO`, con metricas y exportacion a CSV.
 3. **Ajuste de ultima hora** — Reemplaza un SKU ya cargado por otro. El SKU original se archiva (no se borra) y el cambio queda registrado en un log con fecha, hora y responsable, tambien exportable a CSV.
 
@@ -25,7 +44,7 @@ MVP web para reducir errores de digitacion y perdida de trazabilidad en el despa
 Todo el MVP vive en [app.py](app.py) (Streamlit + SQLite, sin dependencias externas complejas):
 
 - **Capa de datos**: funciones `insertar_ordenes`, `obtener_orden`, `reemplazar_sku`, etc. sobre 3 tablas SQLite (`inventario`, `ordenes`, `log_cambios`). `bodega.db` se crea solo en el primer arranque.
-- **Logica de negocio pura** (testeable sin Streamlit): `deduplicar_skus`, `clasificar_fila`, `validar_orden`.
+- **Logica de negocio pura** (testeable sin Streamlit): `deduplicar_skus`, `clasificar_fila`, `validar_orden`, `generar_guia_despacho`.
 - **Vistas**: una funcion por pantalla (`vista_carga_masiva`, `vista_validador`, `vista_ajuste_ultima_hora`), navegables desde la barra lateral.
 
 ## Instalacion y ejecucion

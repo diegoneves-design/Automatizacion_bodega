@@ -14,6 +14,11 @@ import streamlit as st
 DB_PATH = "bodega.db"
 MAX_SKUS = 50
 
+MODALIDADES_POR_TIPO = {
+    "Despacho": ["Convencional", "Alternativo"],
+    "Retiro": ["Preventivo", "Por falla"],
+}
+
 
 # ---------------------------------------------------------------------------
 # Capa de datos
@@ -202,6 +207,30 @@ def validar_orden(folio):
     return merged
 
 
+def generar_guia_despacho(folio, tipo_movimiento, modalidad, skus, descripciones):
+    """Genera el texto plano de la guia de despacho/retiro para una orden recien cargada."""
+    fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ancho_sku, ancho_desc = 15, 40
+
+    lineas = [
+        "GUIA DE DESPACHO / RETIRO",
+        f"Folio: {folio}",
+        f"Tipo de movimiento: {tipo_movimiento}",
+        f"Modalidad: {modalidad}",
+        f"Fecha de emision: {fecha}",
+        "",
+        f"{'SKU':<{ancho_sku}}{'Descripcion':<{ancho_desc}}",
+        "-" * (ancho_sku + ancho_desc),
+    ]
+    for sku in skus:
+        descripcion = descripciones.get(sku, "SKU no encontrado en inventario")
+        lineas.append(f"{sku:<{ancho_sku}}{descripcion:<{ancho_desc}}")
+    lineas.append("-" * (ancho_sku + ancho_desc))
+    lineas.append(f"Total de equipos: {len(skus)}")
+
+    return "\n".join(lineas)
+
+
 # ---------------------------------------------------------------------------
 # Vistas
 # ---------------------------------------------------------------------------
@@ -214,9 +243,9 @@ def vista_carga_masiva():
 
     col1, col2 = st.columns(2)
     with col1:
-        tipo_movimiento = st.selectbox("Tipo de movimiento", ["Despacho", "Retiro"])
+        tipo_movimiento = st.selectbox("Tipo de movimiento", list(MODALIDADES_POR_TIPO.keys()))
     with col2:
-        modalidad = st.selectbox("Modalidad", ["Convencional", "Alternativo"])
+        modalidad = st.selectbox("Modalidad", MODALIDADES_POR_TIPO[tipo_movimiento])
 
     texto_skus = st.text_area(
         "Pega los SKUs (uno por linea)",
@@ -246,8 +275,25 @@ def vista_carga_masiva():
         if not folio.strip():
             st.warning("Debes ingresar un folio antes de cargar la orden.")
         else:
-            insertar_ordenes(folio.strip(), skus_unicos, tipo_movimiento, modalidad)
-            st.success(f"Orden '{folio}' cargada con {len(skus_unicos)} SKUs.")
+            folio_limpio = folio.strip()
+            insertar_ordenes(folio_limpio, skus_unicos, tipo_movimiento, modalidad)
+            st.success(f"Orden '{folio_limpio}' cargada con {len(skus_unicos)} SKUs.")
+
+            inventario_df = obtener_inventario()
+            descripciones = dict(zip(inventario_df["sku"], inventario_df["descripcion"]))
+            st.session_state["guia_folio"] = folio_limpio
+            st.session_state["guia_texto"] = generar_guia_despacho(
+                folio_limpio, tipo_movimiento, modalidad, skus_unicos, descripciones
+            )
+
+    if st.session_state.get("guia_texto"):
+        st.download_button(
+            "Descargar guia de despacho",
+            data=st.session_state["guia_texto"].encode("utf-8"),
+            file_name=f"guia_{st.session_state['guia_folio']}.txt",
+            mime="text/plain",
+            key="descargar_guia_despacho",
+        )
 
 
 def vista_validador():

@@ -163,3 +163,34 @@ def test_validar_orden_mixta_cuenta_correctamente(db):
     assert conteo.get("OK") == 1
     assert conteo.get("SIN STOCK DISPONIBLE") == 1
     assert conteo.get("SKU NO EXISTE EN INVENTARIO") == 1
+
+
+# ---------------------------------------------------------------------------
+# MODALIDADES_POR_TIPO (tipos de movimiento del contexto de negocio)
+# ---------------------------------------------------------------------------
+
+def test_modalidades_por_tipo_define_despacho_y_retiro():
+    assert app.MODALIDADES_POR_TIPO["Despacho"] == ["Convencional", "Alternativo"]
+    assert app.MODALIDADES_POR_TIPO["Retiro"] == ["Preventivo", "Por falla"]
+
+
+# ---------------------------------------------------------------------------
+# generar_guia_despacho
+# ---------------------------------------------------------------------------
+
+def test_generar_guia_despacho_incluye_datos_clave():
+    descripciones = {"EXC-001": "Excavadora CAT 320"}
+    guia = app.generar_guia_despacho(
+        "GUIA-001", "Despacho", "Convencional", ["EXC-001"], descripciones
+    )
+    assert "GUIA-001" in guia
+    assert "Despacho" in guia
+    assert "Convencional" in guia
+    assert "EXC-001" in guia
+    assert "Excavadora CAT 320" in guia
+    assert "Total de equipos: 1" in guia
+
+
+def test_generar_guia_despacho_marca_sku_sin_descripcion():
+    guia = app.generar_guia_despacho("GUIA-001", "Retiro", "Por falla", ["SKU-FANTASMA"], {})
+    assert "SKU no encontrado en inventario" in guia
