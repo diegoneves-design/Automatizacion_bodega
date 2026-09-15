@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.Python
+build/
+dist/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Base de datos local (se genera en runtime)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Tests / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

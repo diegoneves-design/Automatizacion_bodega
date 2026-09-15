@@ -173,6 +173,36 @@ def obtener_log_cambios():
 
 
 # ---------------------------------------------------------------------------
+# Logica de negocio pura (sin dependencias de Streamlit) - facil de testear
+# ---------------------------------------------------------------------------
+
+def deduplicar_skus(skus):
+    """Limpia espacios, descarta vacios y elimina duplicados preservando el orden."""
+    return list(dict.fromkeys(s.strip() for s in skus if s and s.strip()))
+
+
+def clasificar_fila(row):
+    """Determina el resultado de validacion de una fila orden+inventario ya cruzada."""
+    if row["_merge"] == "left_only":
+        return "SKU NO EXISTE EN INVENTARIO"
+    if row["stock_disponible"] <= 0:
+        return "SIN STOCK DISPONIBLE"
+    return "OK"
+
+
+def validar_orden(folio):
+    """Cruza los SKUs activos de un folio contra el inventario y clasifica cada fila."""
+    orden_df = obtener_orden(folio)
+    if orden_df.empty:
+        return orden_df
+
+    inventario_df = obtener_inventario()
+    merged = orden_df.merge(inventario_df, on="sku", how="left", indicator=True)
+    merged["resultado"] = merged.apply(clasificar_fila, axis=1)
+    return merged
+
+
+# ---------------------------------------------------------------------------
 # Vistas
 # ---------------------------------------------------------------------------
 
@@ -196,15 +226,14 @@ def vista_carga_masiva():
 
     archivo = st.file_uploader("O carga un archivo .txt / .csv con un SKU por linea", type=["txt", "csv"])
 
-    skus = []
+    skus_crudos = []
     if texto_skus.strip():
-        skus.extend([s.strip() for s in texto_skus.splitlines() if s.strip()])
+        skus_crudos.extend(texto_skus.splitlines())
     if archivo is not None:
         contenido = archivo.read().decode("utf-8", errors="ignore")
-        skus.extend([s.strip() for s in contenido.splitlines() if s.strip()])
+        skus_crudos.extend(contenido.splitlines())
 
-    # Elimina duplicados conservando el orden
-    skus_unicos = list(dict.fromkeys(skus))
+    skus_unicos = deduplicar_skus(skus_crudos)
 
     if skus_unicos:
         st.write(f"**SKUs detectados:** {len(skus_unicos)}")
@@ -231,25 +260,11 @@ def vista_validador():
         return
 
     folio = st.selectbox("Selecciona un folio", folios)
-    orden_df = obtener_orden(folio)
-    inventario_df = obtener_inventario()
+    merged = validar_orden(folio)
 
-    if orden_df.empty:
+    if merged.empty:
         st.info("Esta orden no tiene SKUs activos (posiblemente todos fueron reemplazados).")
         return
-
-    merged = orden_df.merge(
-        inventario_df, on="sku", how="left", indicator=True
-    )
-
-    def clasificar(row):
-        if row["_merge"] == "left_only":
-            return "SKU NO EXISTE EN INVENTARIO"
-        if row["stock_disponible"] <= 0:
-            return "SIN STOCK DISPONIBLE"
-        return "OK"
-
-    merged["resultado"] = merged.apply(clasificar, axis=1)
 
     total = len(merged)
     ok = (merged["resultado"] == "OK").sum()
@@ -275,6 +290,13 @@ def vista_validador():
         st.error(f"Se encontraron {discrepancias} discrepancia(s). Revisa antes de despachar.")
     else:
         st.success("Todos los SKUs fueron validados correctamente contra el inventario.")
+
+    st.download_button(
+        "Descargar validacion (CSV)",
+        data=merged[columnas_mostrar].to_csv(index=False).encode("utf-8"),
+        file_name=f"validacion_{folio}.csv",
+        mime="text/csv",
+    )
 
 
 def vista_ajuste_ultima_hora():
@@ -312,11 +334,13 @@ def vista_ajuste_ultima_hora():
         enviar = st.form_submit_button("Registrar reemplazo", type="primary")
 
     if enviar:
+        sku_original = seleccion.split(" - ", 1)[1]
         if not responsable.strip():
             st.warning("Debes indicar el responsable del cambio.")
+        elif sku_nuevo == sku_original:
+            st.warning("El SKU de reemplazo debe ser distinto al original.")
         else:
             orden_id = opciones[seleccion]
-            sku_original = seleccion.split(" - ", 1)[1]
             reemplazar_sku(orden_id, folio, sku_original, sku_nuevo, responsable.strip(), motivo.strip())
             st.success(
                 f"SKU '{sku_original}' reemplazado por '{sku_nuevo}' en la orden '{folio}'."
@@ -329,6 +353,12 @@ def vista_ajuste_ultima_hora():
         st.caption("Sin cambios registrados todavia.")
     else:
         st.dataframe(log_df, use_container_width=True, hide_index=True)
+        st.download_button(
+            "Descargar log de cambios (CSV)",
+            data=log_df.to_csv(index=False).encode("utf-8"),
+            file_name="log_cambios.csv",
+            mime="text/csv",
+        )
 
 
 # ---------------------------------------------------------------------------
