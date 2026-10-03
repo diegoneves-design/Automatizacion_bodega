@@ -2,16 +2,17 @@
 MVP - Automatizacion de Bodega
 Control de carga masiva de SKUs, validacion contra inventario y ajustes de ultima hora.
 
-Ejecutar con: streamlit run app.py
+Ejecutar con: streamlit run src/app.py
 """
 
+import os
 import sqlite3
 from datetime import datetime
 
 import pandas as pd
 import streamlit as st
 
-DB_PATH = "bodega.db"
+DB_PATH = os.getenv("BODEGA_DB_PATH") or "bodega.db"
 MAX_SKUS = 50
 
 MODALIDADES_POR_TIPO = {

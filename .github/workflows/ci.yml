@@ -25,8 +25,8 @@ jobs:
       - name: Instalar dependencias
         run: pip install -r requirements-dev.txt
 
-      - name: Verificar sintaxis de app.py
-        run: python -m py_compile app.py
+      - name: Verificar sintaxis de src/app.py
+        run: python -m py_compile src/app.py
 
       - name: Ejecutar tests
         run: pytest -v

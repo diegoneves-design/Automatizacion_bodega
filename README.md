@@ -1,99 +1,86 @@
 # Automatizacion_bodega
 
-MVP web para reducir errores de digitacion y perdida de trazabilidad en el despacho/retiro de maquinaria de arriendo. Reemplaza la carga manual de SKUs (50+ por guia) por un flujo de carga masiva, validacion automatica contra inventario y ajustes de ultima hora con trazabilidad completa.
+MVP del Grupo 6 para el electivo *Ingeniería Digital en Acción: Datos, IA, MVP* (USACH, Departamento de Ingeniería Industrial).
 
-### Grupo 6 - Integrantes:
-- Bastian Vargas
-- Diego Neves
-- Oscar Ynchaustegui
-- Sebastian Carmona
+## Qué es la solución
 
-## Contexto del Proyecto: Automatizacion_bodega (USACH)
+Una aplicación web que **genera automáticamente la guía de despacho o retiro** de equipos de arriendo. Reemplaza la digitación manual de más de 50 SKU por guía por un flujo con tres pasos:
 
-### Rol
-Actúa como desarrollador senior en Python e Ingeniero Industrial.
+1. **Carga masiva** de SKU (pegados o desde archivo), eligiendo el tipo de movimiento: Despacho (Convencional o Alternativo) o Retiro (Preventivo o Por falla). Elimina duplicados y bloquea la carga si se excede el límite de 50.
+2. **Validación automática** de cada SKU contra el inventario. Cada fila queda como `OK`, `SIN STOCK DISPONIBLE` o `SKU NO EXISTE EN INVENTARIO`, con exportación a CSV.
+3. **Ajuste de última hora**: reemplaza un SKU ya cargado por otro. El original se archiva (no se borra) y el cambio queda en un registro con fecha, hora, responsable y motivo.
 
-### Reglas de Arquitectura
-- App monolítica modular en Streamlit (`app.py`).
-- Base de datos local SQLite (`bodega.db`) con migraciones/seed automáticos.
-- Dependencias estrictas en `requirements.txt` (streamlit, pandas).
-- No modificar archivos de configuración de Git ni eliminar código funcional previo sin confirmación.
+Detalle del caso, caso de uso y maqueta: [docs/unidad1](docs/unidad1). Diseño de la base de datos: [docs/datos/estructura_datos.md](docs/datos/estructura_datos.md).
 
-### Lógica del Negocio
-- Flujo: Carga masiva de >50 SKUs, validación contra inventario, reemplazo de última hora con log de auditoría (timestamp, responsable, motivo) y emisión de guía de despacho.
-- Tipos de movimiento: Despacho convencional/alternativo y Retiro preventivo/por falla.
+## Para quién es
 
-### Protocolo de Verificación
-- Validar sintaxis antes de finalizar cualquier edición.
-- No asumir dependencias no instaladas.
+Para el **jefe de bodega** de una empresa de arriendo de equipos (usuario principal). El área de **mantenimiento** participa como usuario secundario: es quien define qué SKU salen en cada orden y quien pide los cambios de último minuto.
 
-## Problema que resuelve
+## Cómo se instala y se ejecuta
 
-- El jefe de bodega digita a mano mas de 50 SKUs por guia -> alto riesgo de error humano.
-- Mantenimiento cambia equipos a ultima hora sin dejar registro formal de quien autorizo el cambio ni cuando.
-- No hay cruce automatico contra el inventario disponible, por lo que discrepancias (SKU inexistente, sin stock) se detectan tarde, en terreno.
-
-## Funcionalidad (3 vistas)
-
-1. **Carga masiva** — Pega o sube hasta 50 SKUs (uno por linea), elige tipo de movimiento (Despacho: Convencional/Alternativo — Retiro: Preventivo/Por falla). Deduplica automaticamente, bloquea la carga si se excede el limite y emite una guia de despacho descargable al confirmar.
-2. **Validador** — Cruza los SKUs de una orden contra el inventario simulado en SQLite y marca cada fila como `OK`, `SIN STOCK DISPONIBLE` o `SKU NO EXISTE EN INVENTARIO`, con metricas y exportacion a CSV.
-3. **Ajuste de ultima hora** — Reemplaza un SKU ya cargado por otro. El SKU original se archiva (no se borra) y el cambio queda registrado en un log con fecha, hora y responsable, tambien exportable a CSV.
-
-## Arquitectura
-
-Todo el MVP vive en [app.py](app.py) (Streamlit + SQLite, sin dependencias externas complejas):
-
-- **Capa de datos**: funciones `insertar_ordenes`, `obtener_orden`, `reemplazar_sku`, etc. sobre 3 tablas SQLite (`inventario`, `ordenes`, `log_cambios`). `bodega.db` se crea solo en el primer arranque.
-- **Logica de negocio pura** (testeable sin Streamlit): `deduplicar_skus`, `clasificar_fila`, `validar_orden`, `generar_guia_despacho`.
-- **Vistas**: una funcion por pantalla (`vista_carga_masiva`, `vista_validador`, `vista_ajuste_ultima_hora`), navegables desde la barra lateral.
-
-## Instalacion y ejecucion
+Requisitos: Python 3.10 o superior.
 
 ```bash
+git clone https://github.com/diegoneves-design/Automatizacion_bodega.git
+cd Automatizacion_bodega
 pip install -r requirements.txt
-streamlit run app.py
+streamlit run src/app.py
 ```
 
-La app queda disponible en `http://localhost:8501`. `bodega.db` se genera automaticamente con un inventario simulado de 10 equipos.
+La app queda en `http://localhost:8501`. La base `bodega.db` se crea sola en el primer arranque, con un inventario simulado de 10 equipos.
 
-### Con Docker
+Variables de entorno (opcionales): copiar `.env.example` a `.env`. Hoy solo existe `BODEGA_DB_PATH` (ruta de la base SQLite). Las claves reales nunca se suben al repositorio.
+
+Con Docker:
 
 ```bash
 docker build -t automatizacion-bodega .
 docker run -p 8501:8501 automatizacion-bodega
 ```
 
-## Simulacion guiada: orden de 5 equipos con reemplazo de ultima hora
-
-1. **Vista "Carga masiva"**: Folio `GUIA-2026-001`, tipo `Despacho`, modalidad `Convencional`. Pega:
-   ```
-   EXC-001
-   EXC-002
-   RET-010
-   GRU-020
-   MON-050
-   ```
-   Clic en **Cargar orden** (`MON-050` tiene stock 0 en el inventario demo, a proposito).
-
-2. **Vista "Validador"**: selecciona `GUIA-2026-001`. Se veran 4 SKUs `OK` y `MON-050` marcado en rojo como `SIN STOCK DISPONIBLE` — el error que hoy comete el jefe de bodega al digitar a mano.
-
-3. **Vista "Ajuste de ultima hora"**: selecciona el folio, elige `MON-050` como SKU original, reemplazalo por `PLA-060`, indica responsable y motivo. Al confirmar, el log de cambios registra el reemplazo con fecha/hora exacta, y al volver al Validador, `PLA-060` figura como `OK`.
-
-## Tests
+Tests (18 casos sobre la capa de datos y la lógica de negocio):
 
 ```bash
 pip install -r requirements-dev.txt
 pytest -v
 ```
 
-Los tests cubren la capa de datos y la logica de negocio pura (deduplicacion, insercion, reemplazo, log de cambios y clasificacion de validacion) usando una base de datos SQLite temporal e independiente por test.
+### Prueba guiada
 
-## CI
+1. En **Carga masiva**: folio `GUIA-2026-001`, tipo `Despacho`, modalidad `Convencional`, y pegar `EXC-001`, `EXC-002`, `RET-010`, `GRU-020`, `MON-050` (uno por línea).
+2. En **Validador**: elegir `GUIA-2026-001`. `MON-050` aparece como `SIN STOCK DISPONIBLE` (a propósito, tiene stock 0).
+3. En **Ajuste de última hora**: reemplazar `MON-050` por `PLA-060`, indicar responsable y motivo. El cambio queda en el registro y el Validador ahora muestra `PLA-060` como `OK`.
 
-Cada push/PR a `main` o `dev` ejecuta automaticamente ([.github/workflows/ci.yml](.github/workflows/ci.yml)) una verificacion de sintaxis y la suite de tests en Python 3.10, 3.11 y 3.12.
+## En qué estado está
 
-## Roadmap (fuera de alcance del MVP)
+Estado al 2 de octubre de 2026: **MVP funcional en desarrollo, Unidad 1 en curso**.
 
-- Autenticacion de usuarios y roles (bodega vs. mantenimiento).
-- Conexion a un inventario real (ERP/API) en vez de la tabla `inventario` simulada.
-- Notificaciones automaticas (email/Slack) cuando se registra un ajuste de ultima hora.
+| Hecho | Pendiente |
+|---|---|
+| Carga masiva, validador de SKU y ajuste de última hora con registro de cambios | Cuentas y permisos (mantenimiento carga; bodega valida y emite) |
+| Guía de despacho/retiro descargable en texto plano | Guía en PDF y alertas de cambios de último minuto |
+| Base SQLite con inventario simulado, tests y CI en GitHub Actions | Bloquear la emisión de la guía cuando algún SKU no valida (hoy se emite y marca el SKU) |
+| Diseño preliminar de la estructura de datos (`docs/datos`) | Pasar la base a Supabase con el modelo de `docs/datos` |
+| | Integración con el ERP (fuera del alcance del MVP) |
+
+## Quiénes la desarrollan
+
+Grupo 6, Universidad de Santiago de Chile:
+
+- Sebastián Carmona Ponce
+- Diego Neves Preau
+- Bastián Vargas Fernández
+- Oscar Ynchaustegui Narro
+
+Profesora: Andrea Arredondo.
+
+## Estructura del repositorio
+
+```
+src/        código de la solución (app.py)
+tests/      pruebas automáticas
+docs/       entregables: unidad1/, bitacora-ia/, datos/
+.env.example  nombres de variables, sin valores
+```
+
+Flujo de trabajo: se trabaja en `dev` y se llega a `main` mediante un pull request revisado por otro integrante.

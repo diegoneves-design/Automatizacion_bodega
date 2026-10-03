@@ -30,3 +30,8 @@ htmlcov/
 *.swp
 .DS_Store
 Thumbs.db
+
+# Secretos: las claves reales nunca se suben (solo .env.example)
+.env
+.env.*
+!.env.example
