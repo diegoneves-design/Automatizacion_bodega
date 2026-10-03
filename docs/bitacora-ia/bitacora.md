@@ -50,3 +50,24 @@ Encargos de esta bitácora hechos por Bastián Vargas el 2026-10-02, a partir de
 - Corregido: `pdf_url` y `motivo` quedaron como opcionales y cada uno tiene un ejemplo con el campo vacío, para no declarar obligatorio algo que queda vacío.
 
 **Cómo se verificó.** Se comparó cada campo con las columnas reales de `src/app.py`. Se revisó fila por fila que los ejemplos no dejen vacío ningún campo obligatorio ni mezclen tipos. Se comprobó que cada clave externa de los ejemplos apunta a un registro que existe (por ejemplo, `id_usuario` 2 existe en `USUARIO`).
+
+---
+
+## Encargo 3. Dejar los Avances 1 y 2 en docs/unidad1 y registrar el encargo
+
+**Objetivo.** Dejar en `docs/unidad1` los PDF de los Avances 1 y 2 con nombres claros (`Avance_1_grupo_6.pdf`, `Avance_2_grupo_6.pdf`), reemplazando el Avance 2 si en la carpeta de entregables había una versión más nueva, y agregar esta misma entrada a la bitácora.
+
+**Instrucción entregada.**
+- Contexto: entregables en PDF ubicados en `C:\Users\basti\OneDrive\Documentos\Usach\Apuntes clases\IA\ENTREGABLES`; ya existía `docs/unidad1/Avance_2_grupo_6.pdf` y `docs/bitacora-ia/bitacora.md` con dos encargos previos.
+- Intención: copiar ambos avances con nombre claro y, si el Avance 2 de ENTREGABLES era más nuevo, reemplazar el del repo.
+- Restricciones: abrir cada PDF antes de copiarlo y confirmar en la portada que dice "AVANCE 1" o "AVANCE 2"; si un archivo no calza, no copiarlo y avisar; si falta un archivo, no inventarlo ni sustituirlo por otro; no modificar el contenido de los PDF; no tocar `main` ni `dev`, ni archivos fuera de `docs/` sin preguntar; un solo commit.
+- Verificación pedida: mostrar `git status` y `git diff --stat` antes de comprometer, listar el contenido final de `docs/unidad1` y confirmar que ninguna carpeta de `docs` quedara vacía.
+
+**Respuesta obtenida.** El agente revisó la carpeta ENTREGABLES y encontró un único archivo, `ENTREGA 1.pdf`. Al abrirlo, su portada decía "AVANCE 2 – PROYECTO GRUPAL" (no Avance 1, pese al nombre del archivo). Comparó su hash SHA-256 contra `docs/unidad1/Avance_2_grupo_6.pdf` y resultaron idénticos, así que no había una versión más nueva que copiar. No encontró ningún archivo con portada "AVANCE 1" en toda la carpeta ENTREGABLES.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: no copiar ni reemplazar nada en `docs/unidad1`, porque el único PDF disponible (pese a su nombre de archivo confuso) ya está presente en el repo de forma idéntica.
+- Aceptado: no inventar ni sustituir el Avance 1 faltante; se avisó explícitamente que ese archivo no está en ENTREGABLES y queda pendiente de que el usuario lo agregue.
+- Nota: el agente detectó una carpeta sin seguimiento (`Automatizacion_bodega/`) fuera de `docs/` y no la modificó, conforme a la restricción de no tocar archivos fuera de `docs/` sin preguntar.
+
+**Cómo se verificó.** Se leyó el contenido de `ENTREGA 1.pdf` para confirmar el título real de la portada. Se calculó y comparó el hash SHA-256 de `ENTREGA 1.pdf` y `docs/unidad1/Avance_2_grupo_6.pdf`, que coincidieron exactamente. Se listó el contenido de `docs/unidad1` y `docs/bitacora-ia` antes y después del encargo para confirmar que no quedó ninguna carpeta vacía.
