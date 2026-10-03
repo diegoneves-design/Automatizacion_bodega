@@ -71,3 +71,19 @@ Encargos de esta bitácora hechos por Bastián Vargas el 2026-10-02, a partir de
 - Nota: el agente detectó una carpeta sin seguimiento (`Automatizacion_bodega/`) fuera de `docs/` y no la modificó, conforme a la restricción de no tocar archivos fuera de `docs/` sin preguntar.
 
 **Cómo se verificó.** Se leyó el contenido de `ENTREGA 1.pdf` para confirmar el título real de la portada. Se calculó y comparó el hash SHA-256 de `ENTREGA 1.pdf` y `docs/unidad1/Avance_2_grupo_6.pdf`, que coincidieron exactamente. Se listó el contenido de `docs/unidad1` y `docs/bitacora-ia` antes y después del encargo para confirmar que no quedó ninguna carpeta vacía.
+
+---
+
+## Encargo 4. Corregir el nombre del Avance 1/2 tras aviso del usuario
+
+**Objetivo.** Corregir el nombre de archivo en `docs/unidad1` después de que el usuario aclarara que el PDF entregado corresponde al Avance 1, no al Avance 2, pese a que la portada del documento dice "AVANCE 2".
+
+**Instrucción entregada.** El usuario indicó que el archivo con portada "AVANCE 2" es en realidad la primera entrega (Avance 1): el grupo se equivocó al titular el documento, pero el nombre de archivo original en su carpeta ("ENTREGA 1") es el correcto.
+
+**Respuesta obtenida.** El agente señaló la contradicción con la portada del PDF antes de actuar (ver Encargo 3) y pidió confirmación explícita, explicando la implicancia: el archivo ya commiteado como `Avance_2_grupo_6.pdf` pasaría a llamarse `Avance_1_grupo_6.pdf`, y `docs/unidad1` quedaría sin un Avance 2 real hasta que se entregue ese documento. El usuario confirmó la corrección.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: renombrar `docs/unidad1/Avance_2_grupo_6.pdf` a `docs/unidad1/Avance_1_grupo_6.pdf` con `git mv`, sin alterar el contenido del PDF, para preservar el historial del archivo.
+- Pendiente: `docs/unidad1` queda sin el PDF del Avance 2 real; falta que el usuario lo entregue para agregarlo.
+
+**Cómo se verificó.** Se usó `git mv` (no copia ni borrado manual) para que git registre el cambio como renombre y conserve el historial. Se revisó `git status` para confirmar que solo aparece el renombre y ningún otro cambio de contenido.
