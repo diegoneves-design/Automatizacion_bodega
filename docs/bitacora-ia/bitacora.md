@@ -87,3 +87,25 @@ Encargos de esta bitácora hechos por Bastián Vargas el 2026-10-02, a partir de
 - Pendiente: `docs/unidad1` queda sin el PDF del Avance 2 real; falta que el usuario lo entregue para agregarlo.
 
 **Cómo se verificó.** Se usó `git mv` (no copia ni borrado manual) para que git registre el cambio como renombre y conserve el historial. Se revisó `git status` para confirmar que solo aparece el renombre y ningún otro cambio de contenido.
+
+---
+
+## Encargo 5. Incorporar el Avance 3 al repositorio y mejorar el README y el diagrama de datos
+
+**Objetivo.** Subir el PDF del Avance 3 a `docs/unidad1`, reescribir el README con la sección "README inicial" del documento y con el trabajo real del repositorio, reemplazar el diagrama de la base de datos por el del Avance 3 y agregar su imagen al repositorio.
+
+**Instrucción entregada.**
+- Contexto: el entregable del Avance 3 está en la carpeta ENTREGABLES (PDF y Word, con la misma versión). El README actual dice que hay dos avances y tiene fecha del 2 de octubre; `docs/datos/estructura_datos.md` tiene un modelo de seis tablas que no coincide con el del documento.
+- Intención: que el repositorio refleje lo que el grupo entregó en el Avance 3, sin cambiar el código.
+- Restricciones: no cuestionar la numeración del entregable; revisar el análisis antes de subir; confirmar cuando todo esté en GitHub.
+
+**Respuesta obtenida.** El agente extrajo las imágenes incrustadas en el Word: el escudo de la universidad y el diagrama de la base de datos. Propuso reemplazar el modelo de seis tablas por el de siete tablas del documento (CLIENTES, USUARIOS, ORDENES, EQUIPOS, DETALLE_ORDEN, GUIAS, REGISTRO_CAMBIOS), con sus relaciones, cardinalidad, decisiones de diseño y ejemplos. Reescribió el README con la solución, los usuarios, la instalación, el estado al 4 de octubre, los roles del equipo y el flujo de trabajo.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: usar el modelo de siete tablas del Avance 3 en lugar del de seis tablas del Encargo 2, porque es el que presentó el grupo.
+- Aceptado: escribir los comandos de instalación con `py -m` (como en el documento) y no con `pip` ni `python` directos, porque en este equipo el comando `python` no resuelve a una instalación real (alias de la Microsoft Store).
+- Corregido: no subir `image1.png` (el escudo de la universidad), porque no aporta al repositorio. Solo se sube el diagrama de la base de datos.
+- Corregido: el README dice que la base tiene 10 equipos de ejemplo y que las vistas son Carga masiva, Validador y Ajuste de última hora; se comprobó contra `src/app.py` antes de dejarlo.
+- Pendiente de revisar: el modelo del Avance 3 no coincide con las tablas que hoy crea el MVP en `src/app.py` (`inventario`, `ordenes`, `log_cambios`). El documento lo deja explícito como diseño objetivo, no como estado actual del código.
+
+**Cómo se verificó.** Se comparó el PDF copiado con el original mediante hash SHA-256. Se confirmó en la portada que el PDF dice "AVANCE 3". Se revisó en `src/app.py` el nombre de las vistas, el seed de 10 equipos, la variable `BODEGA_DB_PATH` y el límite de 50 SKU. Se revisó el diff antes del commit. No se volvieron a ejecutar los tests en esta entrada: la cifra de 18 tests viene de la verificación del Encargo 1. El diagrama Mermaid se revisó a mano; no se renderizó localmente.
