@@ -18,6 +18,19 @@ Documentación del proyecto:
 - Diseño de la base de datos, con diagrama: [docs/datos/estructura_datos.md](docs/datos/estructura_datos.md)
 - Registro de los encargos hechos a un agente de IA: [docs/bitacora-ia/bitacora.md](docs/bitacora-ia/bitacora.md)
 
+### Estructura del repositorio
+
+```
+src/                  código de la solución (app.py)
+tests/                pruebas automáticas
+docs/unidad1/         Avances 2 y 3 de la Unidad 1 (PDF)
+docs/bitacora-ia/     registro de encargos a un agente de IA
+docs/datos/           diseño de la base de datos y su diagrama
+README.md             portada del proyecto
+.gitignore            archivos locales que no se suben (base de datos, .env)
+.env.example          nombres de variables de entorno, sin valores
+```
+
 ## Para quién es
 
 - **Usuario principal:** el jefe de bodega, que hoy digita cada guía a mano y la rehace cuando mantenimiento cambia un equipo a último minuto.
@@ -86,20 +99,7 @@ Grupo 6, Universidad de Santiago de Chile. Profesora: Andrea Arredondo.
 - **Sebastián Carmona Ponce:** validador y pruebas.
 - **Oscar Ynchaustegui Narro:** documentación.
 
-## Estructura del repositorio
-
-```
-src/                  código de la solución (app.py)
-tests/                pruebas automáticas
-docs/unidad1/         Avances 1, 2 y 3 de la Unidad 1 (PDF)
-docs/bitacora-ia/     registro de encargos a un agente de IA
-docs/datos/           diseño de la base de datos y su diagrama
-README.md             portada del proyecto
-.gitignore            archivos locales que no se suben (base de datos, .env)
-.env.example          nombres de variables de entorno, sin valores
-```
-
-## Flujo de trabajo
+### Flujo de trabajo
 
 - `main` guarda la versión estable, que es la que se entrega.
 - `dev` es donde el equipo trabaja día a día. Cada cambio se hace en `dev` o en una rama que sale de `dev`.
