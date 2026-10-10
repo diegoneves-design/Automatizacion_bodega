@@ -26,6 +26,8 @@ tests/                pruebas automáticas
 docs/unidad1/         Avances 2 y 3 de la Unidad 1 (PDF)
 docs/bitacora-ia/     registro de encargos a un agente de IA
 docs/datos/           diseño de la base de datos y su diagrama
+docs/historias-usuario/ historias de usuario y criterios de aceptación (Entrega 4)
+docs/wireframes/      wireframes de las pantallas (Entrega 4)
 README.md             portada del proyecto
 .gitignore            archivos locales que no se suben (base de datos, .env)
 .env.example          nombres de variables de entorno, sin valores
