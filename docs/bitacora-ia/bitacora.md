@@ -109,3 +109,24 @@ Encargos de esta bitácora hechos por Bastián Vargas el 2026-10-02, a partir de
 - Pendiente de revisar: el modelo del Avance 3 no coincide con las tablas que hoy crea el MVP en `src/app.py` (`inventario`, `ordenes`, `log_cambios`). El documento lo deja explícito como diseño objetivo, no como estado actual del código.
 
 **Cómo se verificó.** Se comparó el PDF copiado con el original mediante hash SHA-256. Se confirmó en la portada que el PDF dice "AVANCE 3". Se revisó en `src/app.py` el nombre de las vistas, el seed de 10 equipos, la variable `BODEGA_DB_PATH` y el límite de 50 SKU. Se revisó el diff antes del commit. No se volvieron a ejecutar los tests en esta entrada: la cifra de 18 tests viene de la verificación del Encargo 1. El diagrama Mermaid se revisó a mano; no se renderizó localmente.
+
+---
+
+## Encargo 6. Corregir el nombre del Avance 2
+
+**Objetivo.** Dejar en `docs/unidad1` el PDF con portada "AVANCE 2" con el nombre `Avance_2_grupo_6.pdf`, y dejar el repositorio ordenado (`dev` al día, README y carpetas de la Entrega 4) antes de empezar la Entrega 4.
+
+**Instrucción entregada.**
+- Contexto: el 2026-10-09 se pidió un diagnóstico de solo lectura. Este encontró que `Avance_1_grupo_6.pdf` tiene portada "AVANCE 2" y que el nombre venía del Encargo 4. El usuario aclaró que el documento es el Avance 2 y que se había llamado "1" por error.
+- Intención: renombrar el archivo con `git mv`, corregir el README y crear las carpetas `docs/historias-usuario` y `docs/wireframes`, trabajando directo en `dev`, con un commit por tema y sin abrir ni fusionar el pull request.
+- Restricciones: sin `force`, `reset` ni `rebase`; sin borrar ramas ni la etiqueta `v1.0`; sin tocar código, `bodega.db` ni `.env`; no editar los encargos anteriores; detenerse ante cualquier aviso inesperado de git.
+
+**Respuesta obtenida.** El agente actualizó la vista del remoto (`git fetch --all --tags --prune`) y comprobó que `origin/main` ya tenía `src/` y `docs/`, que `origin/dev` estaba 8 commits atrás sin commits propios y que `feature/estructura-entrega` ya estaba contenida en `main`. Propuso un plan en pasos, el usuario lo aprobó con ajustes y el agente lo ejecutó: avance rápido de `dev` hasta `origin/main`, renombre del PDF, esta entrada, ajuste del README y creación de las dos carpetas.
+
+**Qué se aceptó y qué se corrigió.**
+- Corregido: el Encargo 4 renombró el archivo a Avance 1 por una indicación del usuario. Esta entrada lo revierte. El Encargo 4 se deja tal cual como parte del historial.
+- Aceptado: dejar `docs/unidad1` con los Avances 2 y 3. No hay Avance 1 en el repositorio.
+- Aceptado: no editar los Encargos 3 y 4, aunque hablen de "Avance 1", para no reescribir lo que pasó.
+- Nota de proceso: los pull requests #3 y #4 se fusionaron de `feature/estructura-entrega` a `main` sin pasar por `dev` y sin revisor. Eso no cumple el flujo del README. El pull request `dev` → `main` de este encargo es el que se hará con revisión de otra persona.
+
+**Cómo se verificó.** Se renombró con `git mv`, y `git status` mostró un renombre sin otros cambios en el archivo. El hash SHA-256 del PDF antes y después del renombre es el mismo (`79cec99b…b40a4`). Se listó `docs/unidad1`: queda con `Avance_2_grupo_6.pdf` y `Avance_3_grupo_6.pdf`. Antes de actualizar `dev` se comprobó que no tenía commits que no estuvieran en `main` (`git rev-list --left-right --count`: 8 atrás, 0 adelante) y el avance se hizo con `--ff-only`. No se ejecutaron tests: no se cambió código.
