@@ -160,3 +160,11 @@ Para cada tabla se muestran dos registros de ejemplo. Los campos marcados con `*
 |---|---|---|---|---|---|---|
 | 1 | 3001 | 502 | 501 | 2 | 2026-10-05 09:55 | La 0315 no pasó prueba eléctrica |
 | 2 | 3003 | 504 | 505 | 2 | 2026-10-05 11:10 | (vacío) |
+
+## 5. Pendientes del modelo
+
+Tres ajustes posibles al modelo. Son **hipótesis**: salieron de un ensayo con personajes ficticios y se confirmarán o descartarán con la entrevista real, que todavía no se ha hecho. No cambian las tablas ni el diagrama de este documento.
+
+1. **Accesorios sin SKU (hipótesis).** Los ductos y las transiciones no tienen código y hoy quedan fuera del modelo (ver "Decisiones de diseño"). La idea es registrarlos por tipo y cantidad, aparte de los SKU. Por confirmar: cómo se registran hoy y si de verdad generan reclamos. Historia candidata relacionada: H09.
+2. **Estados del equipo (hipótesis).** `EQUIPOS` ya tiene un campo `estado`, pero sus valores no están definidos; el MVP actual solo distingue el stock disponible como número. Valores propuestos: disponible, en arriendo, en mantención, en reparación y dado de baja. Por confirmar: cuáles estados existen en la práctica y quién los actualiza.
+3. **Adjunto de foto de la carga (hipótesis).** Guardar una foto asociada a la orden como respaldo del despacho. Hoy no hay ningún campo para esto. Por confirmar: si la foto es parte del proceso y dónde se guardaría. Historia candidata relacionada: H10.
