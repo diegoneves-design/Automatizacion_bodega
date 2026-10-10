@@ -28,6 +28,8 @@ docs/bitacora-ia/     registro de encargos a un agente de IA
 docs/datos/           diseño de la base de datos y su diagrama
 docs/historias-usuario/ historias de usuario y criterios de aceptación (Entrega 4)
 docs/wireframes/      wireframes de las pantallas (Entrega 4)
+docs/recorrido-usuario/ borrador del mapa de recorrido del usuario (Entrega 4)
+docs/entrevistas/     guion de la entrevista real, pendiente de realizar (Entrega 4)
 README.md             portada del proyecto
 .gitignore            archivos locales que no se suben (base de datos, .env)
 .env.example          nombres de variables de entorno, sin valores
@@ -81,7 +83,7 @@ py -m pytest -v
 
 ## En qué estado está
 
-Al 4 de octubre de 2026 el proyecto está en **etapa inicial (tercer avance)**. Es un borrador de trabajo: no está probado con usuarios reales y varias decisiones pueden cambiar.
+Al 10 de octubre de 2026 el proyecto está en **etapa inicial** y la **Entrega 4 está en curso**: las historias de usuario y sus criterios están en borrador, los wireframes están como especificación de texto (faltan los PNG de Figma) y la entrevista real con un jefe de bodega todavía no se ha hecho. Es un borrador de trabajo: no está probado con usuarios reales y varias decisiones pueden cambiar.
 
 | Hecho | Pendiente |
 |---|---|
@@ -90,7 +92,8 @@ Al 4 de octubre de 2026 el proyecto está en **etapa inicial (tercer avance)**. 
 | Guía de despacho/retiro descargable en texto plano | Guía en PDF y alertas de cambios de último minuto |
 | Base SQLite con inventario simulado, tests y CI en GitHub Actions | Bloquear la emisión de la guía cuando algún SKU no valida (hoy se emite y marca el SKU) |
 | Diseño preliminar de la base de datos (`docs/datos`) | Pasar la base a Supabase con el modelo de `docs/datos` |
-| | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
+| Historias de usuario con criterios, mapa de recorrido y cuatro wireframes en texto, todo en borrador (`docs/historias-usuario`, `docs/recorrido-usuario`, `docs/wireframes`) | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
+| Guion de la entrevista real de 15 minutos (`docs/entrevistas`) | Hacer la entrevista real y validar o descartar las historias; wireframes en PNG (Figma) |
 
 ## Quiénes la desarrollan
 
