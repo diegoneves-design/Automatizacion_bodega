@@ -34,7 +34,7 @@ erDiagram
     USUARIOS {
         numero id_usuario PK
         texto nombre
-        texto correo
+        texto telefono
         lista rol
         si_no activo
     }
@@ -114,10 +114,12 @@ Para cada tabla se muestran dos registros de ejemplo. Los campos marcados con `*
 
 **USUARIOS**
 
-| id_usuario* | nombre* | correo* | rol* | activo* |
+| id_usuario* | nombre* | telefono* | rol* | activo* |
 |---|---|---|---|---|
-| 1 | Pedro Soto | psoto@ejemplo.cl | jefe_bodega | sí |
-| 2 | Camila Rojas | crojas@ejemplo.cl | mantenimiento | sí |
+| 1 | Pedro Soto | +5696518... | jefe_bodega | sí |
+| 2 | Camila Rojas | +5695732... | mantenimiento | sí |
+
+> **Nota:** los teléfonos de los ejemplos son reales y están truncados (los últimos 5 dígitos se reemplazaron por `...`). No se deben compartir datos personales reales en esta plataforma; los ejemplos del repositorio deben llevar datos ocultos o ficticios.
 
 **CLIENTES**
 
