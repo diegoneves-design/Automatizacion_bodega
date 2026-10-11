@@ -17,6 +17,9 @@ Documentación del proyecto:
 - Avances de la Unidad 1 (caso de uso, maqueta, repositorio): [docs/unidad1](docs/unidad1)
 - Diseño de la base de datos, con diagrama: [docs/datos/estructura_datos.md](docs/datos/estructura_datos.md)
 - Registro de los encargos hechos a un agente de IA: [docs/bitacora-ia/bitacora.md](docs/bitacora-ia/bitacora.md)
+- Historias de usuario y criterios de aceptación (Avance 4): [docs/historias.md](docs/historias.md)
+- Wireframes del flujo principal (Avance 4): [docs/wireframes/](docs/wireframes/)
+- Conversación con el usuario (Avance 4): [docs/entrevistas/entrevista_subjefe_bodega.md](docs/entrevistas/entrevista_subjefe_bodega.md)
 
 ### Estructura del repositorio
 
@@ -26,10 +29,10 @@ tests/                pruebas automáticas
 docs/unidad1/         Avances 2 y 3 de la Unidad 1 (PDF)
 docs/bitacora-ia/     registro de encargos a un agente de IA
 docs/datos/           diseño de la base de datos y su diagrama
-docs/historias-usuario/ historias de usuario y criterios de aceptación (Entrega 4)
-docs/wireframes/      wireframes de las pantallas (Entrega 4)
-docs/recorrido-usuario/ borrador del mapa de recorrido del usuario (Entrega 4)
-docs/entrevistas/     guion de la entrevista real, pendiente de realizar (Entrega 4)
+docs/historias.md     historias de usuario y criterios de aceptación (Avance 4)
+docs/wireframes/      wireframes del flujo principal, con sus notas (Avance 4)
+docs/entrevistas/     conversación con el usuario y su guion (Avance 4)
+docs/recorrido-usuario/ borrador del mapa de recorrido (ensayo, sin validar)
 README.md             portada del proyecto
 .gitignore            archivos locales que no se suben (base de datos, .env)
 .env.example          nombres de variables de entorno, sin valores
@@ -38,7 +41,7 @@ README.md             portada del proyecto
 ## Para quién es
 
 - **Usuario principal:** el jefe de bodega, que hoy digita cada guía a mano y la rehace cuando mantenimiento cambia un equipo a último minuto.
-- **Usuario secundario:** el área de mantenimiento, que define qué SKU salen en cada orden y pide los cambios de último minuto.
+- **Usuarios secundarios:** comercial, que envía el pedido de venta (PV), y mantenimiento, comercial y operaciones, que piden los cambios de último minuto.
 
 ## Cómo se instala y se ejecuta
 
@@ -83,17 +86,17 @@ py -m pytest -v
 
 ## En qué estado está
 
-Al 10 de octubre de 2026 el proyecto está en **etapa inicial** y la **Entrega 4 está en curso**: las historias de usuario y sus criterios están en borrador, los wireframes están como especificación de texto (faltan los PNG de Figma) y la entrevista real con un jefe de bodega todavía no se ha hecho. Es un borrador de trabajo: no está probado con usuarios reales y varias decisiones pueden cambiar.
+Al 10 de octubre de 2026 el proyecto está en **etapa inicial**, en el **Avance 4**. Ya hubo una conversación real con un subjefe de bodega que hoy hace la tarea (integrante del equipo), y de ella salen las historias de usuario y los wireframes del flujo principal. La app no está probada con usuarios reales y varias decisiones pueden cambiar.
 
 | Hecho | Pendiente |
 |---|---|
-| Problema, caso de uso y maqueta de tres pantallas | Validar el problema con un jefe de bodega real y medir cuánto demoran hoy las guías |
-| Carga masiva, validador de SKU y ajuste de última hora con registro de cambios | Cuentas y permisos (mantenimiento carga; bodega valida y emite) |
-| Guía de despacho/retiro descargable en texto plano | Guía en PDF y alertas de cambios de último minuto |
-| Base SQLite con inventario simulado, tests y CI en GitHub Actions | Bloquear la emisión de la guía cuando algún SKU no valida (hoy se emite y marca el SKU) |
-| Diseño preliminar de la base de datos (`docs/datos`) | Pasar la base a Supabase con el modelo de `docs/datos` |
-| Historias de usuario con criterios, mapa de recorrido y cuatro wireframes en texto, todo en borrador (`docs/historias-usuario`, `docs/recorrido-usuario`, `docs/wireframes`) | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
-| Guion de la entrevista real de 15 minutos (`docs/entrevistas`) | Hacer la entrevista real y validar o descartar las historias; wireframes en PNG (Figma) |
+| Problema, caso de uso y maqueta de tres pantallas | Medir cuánto demoran hoy las guías y cuántas se rehacen |
+| Conversación con el usuario (`docs/entrevistas`) | Probar el flujo con usuarios (Semana 7) |
+| Historias HU-01 a HU-05 y criterios de la historia principal (`docs/historias.md`) | Bloquear la guía cuando algún SKU no valida, como pide el criterio de la HU-01 |
+| Wireframes del flujo principal con sus notas (`docs/wireframes`) | Subir el límite de 50 a 60 productos por guía (máximo real del ERP) |
+| Carga masiva, validador de SKU y ajuste de última hora con registro de cambios | Destacar los cambios de último minuto en el validador (HU-04) |
+| Diseño preliminar de la base de datos (`docs/datos`) | Cuentas y permisos; pasar la base a Supabase |
+| Base SQLite con inventario simulado, tests y CI en GitHub Actions | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
 
 ## Quiénes la desarrollan
 
