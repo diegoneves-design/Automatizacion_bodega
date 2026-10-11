@@ -130,3 +130,152 @@ Encargos de esta bitácora hechos por Bastián Vargas el 2026-10-02, a partir de
 - Nota de proceso: los pull requests #3 y #4 se fusionaron de `feature/estructura-entrega` a `main` sin pasar por `dev` y sin revisor. Eso no cumple el flujo del README. El pull request `dev` → `main` de este encargo es el que se hará con revisión de otra persona.
 
 **Cómo se verificó.** Se renombró con `git mv`, y `git status` mostró un renombre sin otros cambios en el archivo. El hash SHA-256 del PDF antes y después del renombre es el mismo (`79cec99b…b40a4`). Se listó `docs/unidad1`: queda con `Avance_2_grupo_6.pdf` y `Avance_3_grupo_6.pdf`. Antes de actualizar `dev` se comprobó que no tenía commits que no estuvieran en `main` (`git rev-list --left-right --count`: 8 atrás, 0 adelante) y el avance se hizo con `--ff-only`. No se ejecutaron tests: no se cambió código.
+
+---
+
+## Encargo 7. Simular una entrevista a un jefe de bodega para ensayar las preguntas
+
+**Objetivo.** Ensayar la entrevista de la Entrega 4 con una persona simulada (jefe de bodega, y también mantenimiento y despachador), para afinar las preguntas y saber qué confirmar antes de hablar con una persona real.
+
+**Instrucción entregada.**
+- Contexto: el caso del Avance 2 (emisión automática de guía de despacho o retiro en una empresa de arriendo de equipos) y las cinco preguntas base de la pauta de entrevista.
+- Intención: obtener un ensayo con preguntas, temas y condiciones de uso en celular. No una entrevista real.
+- Herramienta: una skill de Claude que simula a un jefe de bodega y a su entorno (`entrevistado-bodega-guias`).
+- Restricciones: dejar claro en cada nota que los personajes, las cifras y las anécdotas son inventados y que no se pueden citar como testimonio.
+
+**Respuesta obtenida.** Dos notas de ensayo, guardadas fuera del repositorio: una "entrevista completa" (bloques de preguntas, mapa de áreas, guion de 15 minutos y hoja de notas) y una "entrevista profunda" (casos de sistemas anteriores, síntesis y riesgos). Ambas traen personajes ficticios, cifras y anécdotas inventadas.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: la estructura de preguntas (guion de 10 preguntas y reglas del entrevistador) y los temas por explorar (formato del listado, doble control, cambios de último minuto, uso en celular, accesorios sin código).
+- Descartado: las cifras y las anécdotas inventadas (tiempos por guía, frecuencias, costos, casos de sistemas anteriores, nombres). No se usan como evidencia y no se copian al repositorio.
+- Corregido: todo lo que se deriva del ensayo queda marcado como "hipótesis por validar con la entrevista real". La entrevista real todavía no se ha hecho.
+
+**Cómo se verificó.** Se contrastó el ensayo con el documento del Avance 2 y con `src/app.py` (revisión hecha el 2026-10-10, al preparar la Entrega 4):
+- Calza con el Avance 2: la digitación manual, el doble control físico, el reemplazo de equipos a último minuto y el bloqueo de la emisión cuando un SKU no coincide.
+- No está en el Avance 2 ni en el código, y por eso queda como hipótesis: accesorios sin SKU, estados del equipo más allá de la disponibilidad, foto de la carga y el uso del celular en terreno.
+- Falta aclarar un término: la app usa `Convencional`/`Alternativo` (despacho) y `Preventivo`/`Por falla` (retiro) como modalidades, mientras que el modelo de datos usa `normal`/`falla` como motivo. Se pregunta en la entrevista real.
+
+---
+
+## Encargo 8. Borrador de historias de usuario y criterios de aceptación
+
+**Objetivo.** Dejar en `docs/historias-usuario/historias_usuario.md` las historias H01 a H07 con prioridad, criterios de aceptación y revisión INVEST, y las historias candidatas H08 a H15 aparte, sin validar. Además, dejar un borrador del mapa de recorrido en `docs/recorrido-usuario/mapa_recorrido.md`.
+
+**Instrucción entregada.**
+- Contexto: la nota de reparto de la Entrega 4 (borrador del grupo con H01 a H07, su prioridad sugerida y sus criterios) y las notas del ensayo del Encargo 7.
+- Intención: pasar el borrador a Markdown, ordenarlo por prioridad y agregar la revisión INVEST.
+- Restricciones: sin cifras ni anécdotas del ensayo; las candidatas H08 a H15 solo en formato Como / Quiero / Para; estado "Borrador"; no decir que la entrevista real se hizo.
+
+**Respuesta obtenida.** El agente transcribió las siete historias en el orden de prioridad H01, H02, H04, H03, H05, H07, H06, con criterios principal y alternativo en formato Dado / Cuando / Entonces, una revisión INVEST por historia y una línea "En el MVP hoy" que compara cada una con `src/app.py`. Las candidatas H08 a H15 quedaron en una sección aparte. El mapa de recorrido se armó con las etapas del ensayo, con el aviso de que se reemplazará con la entrevista real.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: el formato Como / Quiero / Para, la priorización del borrador y los criterios principal y alternativo.
+- Corregido: las candidatas H08 a H15 quedan sin prioridad y sin criterios hasta validarlas con la entrevista real.
+- Corregido: la revisión INVEST muestra dependencias que el borrador no decía: H04 depende de H02, H06 depende de H05 y H07 depende de H02 y de las cuentas y permisos, que están pendientes.
+- Pendiente: la nota de reparto dice que la profesora pidió que las historias las escriba el equipo y no la IA. Este documento es un borrador transcrito y redactado con ayuda de IA: el grupo debe revisarlo, corregirlo y adoptarlo antes de entregarlo.
+
+**Cómo se verificó.** Se revisó cada historia con las seis letras de INVEST, indicando por qué cumple o no. Se contrastó cada historia con el caso de uso del Avance 2 (seleccionar la orden, destacar los cambios, validar, bloquear si un SKU no coincide, generar la guía) y con `src/app.py`: varias conductas que piden los criterios (bloqueo de la orden, número de guía, PDF, filtro del historial por orden, cuentas y permisos) no existen todavía y quedaron anotadas en "En el MVP hoy". No se ejecutaron tests: no se tocó código.
+
+---
+
+## Encargo 9. Especificación en texto de cuatro pantallas para celular
+
+**Objetivo.** Dejar en `docs/wireframes/README.md` la especificación en texto de cuatro pantallas (W1 a W4) pensadas para celular, mientras el Grupo B termina los wireframes en Figma.
+
+**Instrucción entregada.**
+- Contexto: la tabla de pantallas de la nota de reparto (W1 Carga masiva, W2 Validador, W3 Ajuste de última hora, W4 Guía emitida) y las historias del Encargo 8.
+- Intención: describir, por pantalla, objetivo, elementos, datos, navegación, anotaciones y requisitos de uso en celular (formato vertical de 360 x 800).
+- Restricciones: no inventar imágenes; no agregar campos ni pantallas que no estén en la tabla; marcar como hipótesis los requisitos que salen del ensayo.
+
+**Respuesta obtenida.** Una especificación en texto de W1 Carga del listado (H01), W2 Validación (H02, H03, H07), W3 Ajuste de último minuto (H05, H06) y W4 Guía emitida (H04), con la navegación entre ellas y los requisitos de uso en celular (botones grandes, alto contraste, pocos pasos y aviso de qué quedó guardado si se pierde la señal).
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: la estructura por pantalla y la navegación W1 → W2 → W4, con W3 como desvío desde W2.
+- Corregido: el campo "Motivo" de W3 no estaba en la tabla de la nota de reparto, pero sí está en la app y en el modelo de datos, como campo opcional; se dejó con esa aclaración.
+- Corregido: los requisitos de uso en celular salen del ensayo y quedan marcados como hipótesis.
+- Pendiente: los PNG de Figma (Grupo B) y la validación de las pantallas con la entrevista real.
+
+**Cómo se verificó.** Se comprobó que cada pantalla enlaza con al menos una historia y que las siete historias H01 a H07 quedan cubiertas por alguna pantalla. Se comparó la navegación con la tabla de la nota de reparto y los datos de cada pantalla con `src/app.py` y con `docs/datos/estructura_datos.md`. No se generaron ni verificaron imágenes.
+
+---
+
+## Encargo 10. Pauta de la conversación con el usuario
+
+Encargos 10 a 13 hechos por Oscar Ynchaustegui el 2026-10-10, con Claude, a partir de las instrucciones oficiales del Avance 4.
+
+**Objetivo.** Preparar una pauta corta para la conversación con una persona que hoy realiza la tarea del flujo principal, como pide el Avance 4.
+
+**Instrucción entregada.**
+- Contexto: las instrucciones oficiales del Avance 4 (una conversación de unos 15 minutos con una sola persona) y el caso del Avance 2. El entrevistado es Oscar, subjefe de bodega en la empresa del caso y a cargo de la bodega durante 4 meses en total.
+- Intención: un documento Word con preguntas y espacio para responder, centrado en el flujo principal (recibir el listado, validar, emitir la guía y los cambios de último minuto).
+- Restricciones: preguntas por casos concretos, no por opiniones generales; nada inventado; las dudas abiertas del proyecto (modalidad, máximo de SKU, prefijos) en una sección aparte.
+
+**Respuesta obtenida.** Una pauta de 15 preguntas en cinco bloques, cinco dudas del proyecto y una pregunta de cierre por los 2 o 3 problemas principales.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: los bloques y las preguntas por casos concretos ("cuéntame la última vez que…").
+- Corregido: el agente sugirió primero conversar con otra persona de la bodega; como Oscar realiza la tarea (subjefe y a cargo de la bodega 4 meses en total), se decidió que él fuera el entrevistado y que en `historias.md` se declare que es integrante del equipo.
+- Descartado: la entrevista simulada del Encargo 7 no se usó como fuente; solo su lista "Qué confirmar con una persona real" sirvió para elegir preguntas.
+
+**Cómo se verificó.** Se comparó la pauta con lo que pide el Avance 4: cargo (no nombre), fecha y 2 o 3 problemas con palabras del usuario. Se revisó que cada pregunta apunte al flujo principal.
+
+---
+
+## Encargo 11. Corrección de redacción de las respuestas
+
+**Objetivo.** Corregir la ortografía y la redacción de las respuestas de Oscar sin cambiar su contenido.
+
+**Instrucción entregada.**
+- Contexto: el Word de la pauta respondido por Oscar, escrito rápido y con errores de tipeo.
+- Intención: dejar las respuestas legibles para usarlas en las historias.
+- Restricciones: mantener la forma de hablar de Oscar en las frases que sirven como cita; no agregar información; marcar las dudas en vez de inventar.
+
+**Respuesta obtenida.** El Word con las respuestas corregidas y divididas en párrafos, y la conversación en Markdown (`docs/entrevistas/entrevista_subjefe_bodega.md`).
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: la ortografía, los tildes, la puntuación y la división en párrafos.
+- Aceptado: se mantuvieron expresiones como "harta pega", "pistolear" y "buscar como locos".
+- Revisado con Oscar: en la pregunta 8 el agente agregó que la guía se emite en el ERP y se sube al SII, dato tomado de las respuestas 1 y D5; en la pregunta 13 interpretó "no lo notifico" como "no lo informo", y Oscar lo corrigió: los cambios no dejan ninguna huella, porque el ERP no registra quién corrigió la guía.
+
+**Cómo se verificó.** Oscar revisa cada respuesta corregida contra su original, antes de subirla, para confirmar que dice lo mismo.
+
+---
+
+## Encargo 12. Historias de usuario a partir de la conversación
+
+**Objetivo.** Escribir `docs/historias.md` según la plantilla del Avance 4: conversación, flujo principal, 3 a 5 historias y los criterios de la historia principal.
+
+**Instrucción entregada.**
+- Contexto: las respuestas de Oscar, el borrador de historias H01 a H07 del Encargo 8 y el caso de uso del Avance 2.
+- Intención: ajustar el borrador del grupo con evidencia real, en lugar de partir de cero.
+- Restricciones: entre 3 y 5 historias numeradas HU-01…; cargo concreto, acción de la persona y beneficio; un escenario principal y uno alternativo solo para la historia principal, con un "entonces" que describa lo que se ve en pantalla.
+
+**Respuesta obtenida.** Cinco historias: HU-01 validar el pedido (principal), HU-02 cargar el listado del PV, HU-03 registrar un cambio de último minuto, HU-04 ver los cambios destacados y HU-05 dejar lista la guía.
+
+**Qué se aceptó y qué se corrigió.**
+- Corregido: el agente propuso primero que la historia principal fuera registrar los cambios de último minuto (el dolor número uno de la conversación). Se mantuvo validar el pedido, porque la profesora define el flujo principal como el escenario principal del caso de uso del Avance 2, y los cambios son una extensión.
+- Corregido respecto del Encargo 8: el listado lo envía comercial (no mantenimiento); los cambios los hacen tres áreas; el máximo es de 60 productos; la guía oficial sale del ERP.
+- Descartado: H06, H07 y las candidatas H08 a H15, para quedar en 5 historias del flujo principal.
+- Pendiente: los accesorios genéricos, que la conversación sí respalda, quedan para una historia futura.
+
+**Cómo se verificó.** Se revisó cada historia contra los errores frecuentes del Avance 4 (rol genérico, beneficio circular, tarea técnica, "entonces" interno) y cada cita contra las respuestas de Oscar.
+
+---
+
+## Encargo 13. Wireframes del flujo principal
+
+**Objetivo.** Dibujar los wireframes del flujo principal con las cuatro notas por pantalla y dejarlos en `docs/wireframes/`.
+
+**Instrucción entregada.**
+- Contexto: `docs/historias.md` y `docs/datos/estructura_datos.md`.
+- Intención: entre 3 y 5 pantallas en baja fidelidad, cada una con de qué historia viene, qué datos muestra, qué parte del criterio se ve y a dónde lleva cada botón.
+- Restricciones: solo pantallas que alguna historia pida; nombres de datos iguales a los de la estructura de datos; los dos escenarios de la HU-01 dibujados.
+
+**Respuesta obtenida.** Seis imágenes PNG: el flujo completo y las pantallas P1 Cargar pedido, P2a Validación (todo correcto), P2b Validación (con error), P3 Registrar cambio y P4 Guía lista, con un `README.md` que las muestra.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: las cinco pantallas y la navegación P1 → P2 → P4, con P3 como desvío desde P2.
+- Corregido: en una primera versión, la misma extensión (`SD-63A20-0314`) aparecía en dos órdenes distintas, justo el error que contó Oscar; se cambiaron los SKU de la orden 3002.
+- Corregido: los wireframes de texto del Encargo 9 (W1 a W4) quedan reemplazados por estas imágenes.
+
+**Cómo se verificó.** Se revisó que cada pantalla tenga sus cuatro notas, que cada historia HU-01 a HU-05 aparezca en al menos una pantalla, que los nombres de los campos existan en `estructura_datos.md` y que lo que dice el "entonces" de los dos escenarios de la HU-01 esté dibujado en P2a y P2b.
