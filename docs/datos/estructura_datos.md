@@ -1,6 +1,6 @@
 # Estructura de datos preliminar
 
-Grupo 6 · Automatizacion_bodega · Versión del 2026-10-04 (Avance 3)
+Grupo 6 · Automatizacion_bodega · Versión del 2026-10-04 (Avance 3), actualizada el 2026-10-15
 
 Las tablas salen de los sustantivos del caso de uso del Avance 2 (emisión automática de guía): cliente, usuario, orden, equipo, detalle de orden, guía y cambio de último minuto. Este es el diseño preliminar; todavía no se crea la base en Supabase.
 
@@ -34,33 +34,34 @@ erDiagram
     USUARIOS {
         numero id_usuario PK
         texto nombre
+        texto correo
         texto telefono
-        lista rol
+        lista rol "jefe_bodega, mantenimiento, comercial, gerente"  
         si_no activo
     }
     EQUIPOS {
         numero id_equipo PK
-        texto sku
+        texto sku "unico"
         texto descripcion
-        lista estado
-        lista ubicacion
+        lista estado "disponible, arrendado, en_mantencion, fuera_servicio"
+        lista ubicacion "bodega, cliente, taller"
     }
     ORDENES {
         numero id_orden PK
         numero id_cliente FK
         numero id_usuario_carga FK
         fecha_hora fecha_orden
-        lista tipo_movimiento
-        lista modalidad
-        lista motivo
-        lista estado
+        lista tipo_movimiento "despacho, retiro"
+        lista modalidad "convencional, alternativo"
+        lista motivo "normal, mantencion_preventiva, falla"
+        lista estado "pendiente, bloqueada, validada, emitida"
     }
     DETALLE_ORDEN {
         numero id_detalle PK
         numero id_orden FK
         numero id_equipo FK
         texto sku_informado
-        lista resultado_validacion
+        lista resultado_validacion "pendiente, ok, no_existe, no_disponible"
         si_no vigente
     }
     GUIAS {
@@ -114,12 +115,10 @@ Para cada tabla se muestran dos registros de ejemplo. Los campos marcados con `*
 
 **USUARIOS**
 
-| id_usuario* | nombre* | telefono* | rol* | activo* |
-|---|---|---|---|---|
-| 1 | Pedro Soto | +5696518... | jefe_bodega | sí |
-| 2 | Camila Rojas | +5695732... | mantenimiento | sí |
-
-> **Nota:** los teléfonos de los ejemplos son reales y están truncados (los últimos 5 dígitos se reemplazaron por `...`). No se deben compartir datos personales reales en esta plataforma; los ejemplos del repositorio deben llevar datos ocultos o ficticios.
+| id_usuario* | nombre* | correo* | telefono | rol* | activo* |
+|---|---|---|---|---|---|
+| 1 | Pedro Soto | psoto@ejemplo.cl | +56 9 1111 1111 | jefe_bodega | sí |
+| 2 | Camila Rojas | crojas@ejemplo.cl | +56 9 2222 2222 | mantenimiento | sí |
 
 **CLIENTES**
 
@@ -165,8 +164,8 @@ Para cada tabla se muestran dos registros de ejemplo. Los campos marcados con `*
 
 ## 5. Pendientes del modelo
 
-Tres ajustes posibles al modelo. Son **hipótesis**: salieron de un ensayo con personajes ficticios y se confirmarán o descartarán con la entrevista real, que todavía no se ha hecho. No cambian las tablas ni el diagrama de este documento.
+Tres ajustes posibles al modelo. Son **hipótesis**: salieron de un ensayo con personajes ficticios y se confirmarán o descartarán con las conversaciones con bodega (la primera, del 10 de octubre, está en `docs/entrevistas/`). No cambian las tablas ni el diagrama de este documento.
 
-1. **Accesorios sin SKU (hipótesis).** Los ductos y las transiciones no tienen código y hoy quedan fuera del modelo (ver "Decisiones de diseño"). La idea es registrarlos por tipo y cantidad, aparte de los SKU. Por confirmar: cómo se registran hoy y si de verdad generan reclamos. Historia candidata relacionada: H09.
-2. **Estados del equipo (hipótesis).** `EQUIPOS` ya tiene un campo `estado`, pero sus valores no están definidos; el MVP actual solo distingue el stock disponible como número. Valores propuestos: disponible, en arriendo, en mantención, en reparación y dado de baja. Por confirmar: cuáles estados existen en la práctica y quién los actualiza.
-3. **Adjunto de foto de la carga (hipótesis).** Guardar una foto asociada a la orden como respaldo del despacho. Hoy no hay ningún campo para esto. Por confirmar: si la foto es parte del proceso y dónde se guardaría. Historia candidata relacionada: H10.
+1. **Accesorios sin SKU (hipótesis).** Los ductos y las transiciones no tienen código y hoy quedan fuera del modelo (ver "Decisiones de diseño"). La idea es registrarlos por tipo y cantidad, aparte de los SKU. Por confirmar: cómo se registran hoy y si de verdad generan reclamos. Queda en el roadmap, columna "Después".
+2. **Estados del equipo (hipótesis).** El diagrama propone para `estado` los valores disponible, arrendado, en_mantencion y fuera_servicio; el MVP actual solo distingue el stock disponible como número. Por confirmar: cuáles estados existen en la práctica y quién los actualiza.
+3. **Adjunto de foto de la carga (hipótesis).** Guardar una foto asociada a la orden como respaldo del despacho. Hoy no hay ningún campo para esto. Por confirmar: si la foto es parte del proceso y dónde se guardaría.
