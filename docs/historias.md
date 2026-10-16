@@ -23,7 +23,7 @@ Como jefe de bodega, quiero cargar de una vez el listado de productos del pedido
 
 ## HU-03 · Registrar un cambio de último minuto
 
-Como supervisor de mantenimiento, comercial u operaciones, quiero registrar en el sistema el cambio de un equipo de una orden, para que bodega se entere sin depender de una llamada o un WhatsApp.
+Como supervisor de mantenimiento, quiero registrar en el sistema el cambio de un equipo de una orden, para que bodega se entere sin depender de una llamada o un WhatsApp.
 
 ## HU-04 · Ver los cambios destacados
 
