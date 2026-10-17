@@ -28,6 +28,11 @@ def ir(vista, folio=None, sku=None):
     st.session_state.sku_corregir = sku
 
 
+def boton_volver(texto, vista, clave):
+    """Enlace de vuelta (boton discreto) hacia otra pantalla."""
+    st.button(texto, key=clave, on_click=ir, args=(vista,))
+
+
 def ir_menu(destino):
     """Navegacion desde el menu: validar y ajustar necesitan una orden elegida."""
     if destino in ("validacion", "ajuste") and not st.session_state.get("folio"):

@@ -94,6 +94,18 @@ def datos(items):
     return Html(f'<dl class="bp-datos">{celdas}</dl>')
 
 
+def ficha_orden(folio, etiqueta_estado, items):
+    """Cabecera de una orden: folio con su estado y la cuadricula de datos."""
+    return Html(
+        f'<div class="bp-ficha"><div class="bp-ficha-cab"><span class="bp-folio-grande">{esc(folio)}</span>'
+        f"{etiqueta_estado}</div>{datos(items)}</div>"
+    )
+
+
+def subtitulo(texto):
+    return Html(f'<div class="bp-subtitulo">{esc(texto)}</div>')
+
+
 def titulo(texto, subtitulo=""):
     """Titulo de pantalla con su bajada."""
     bajada = f"<p>{esc(subtitulo)}</p>" if subtitulo else ""

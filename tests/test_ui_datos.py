@@ -98,6 +98,38 @@ def test_contar_por_tipo(resumen):
 
 
 # ---------------------------------------------------------------------------
+# Resultado de validacion
+# ---------------------------------------------------------------------------
+
+def test_describir_resultado_ok():
+    assert ui_datos.describir_resultado("OK") == ("OK", "ok", "En inventario")
+
+
+def test_describir_resultado_sin_stock_muestra_el_stock():
+    assert ui_datos.describir_resultado("SIN STOCK DISPONIBLE", 0) == ("Sin stock", "error", "Stock: 0")
+
+
+def test_describir_resultado_sku_inexistente():
+    etiqueta, tono, detalle = ui_datos.describir_resultado("SKU NO EXISTE EN INVENTARIO", float("nan"))
+    assert (etiqueta, tono, detalle) == ("No existe", "error", "No existe en inventario")
+
+
+def test_contar_validos_con_orden_real(db):
+    app.insertar_ordenes("PV-1", ["EXC-001", "MON-050", "XXX-999"], "Despacho", "Convencional")
+    assert ui_datos.contar_validos(app.validar_orden("PV-1")) == (1, 3)
+    assert ui_datos.contar_validos(app.validar_orden("NO-EXISTE")) == (0, 0)
+
+
+def test_ultimas_modificaciones_toma_el_ultimo_reemplazo(db):
+    app.insertar_ordenes("PV-1", ["MON-050"], "Despacho", "Convencional")
+    orden = app.obtener_orden("PV-1")
+    app.reemplazar_sku(int(orden.iloc[0]["id"]), "PV-1", "MON-050", "PLA-060", "Ana", "sin stock")
+    mods = ui_datos.ultimas_modificaciones(app.obtener_log_cambios(), "PV-1")
+    assert list(mods) == ["PLA-060"]
+    assert ui_datos.ultimas_modificaciones(app.obtener_log_cambios(), "OTRA") == {}
+
+
+# ---------------------------------------------------------------------------
 # CSV seguro
 # ---------------------------------------------------------------------------
 
