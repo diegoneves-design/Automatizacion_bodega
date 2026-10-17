@@ -14,3 +14,7 @@ toolbarMode = "minimal"
 
 [browser]
 gatherUsageStats = false
+
+[server]
+# Un listado de SKU pesa unos pocos KB: se limita la subida de archivos a 1 MB.
+maxUploadSize = 1

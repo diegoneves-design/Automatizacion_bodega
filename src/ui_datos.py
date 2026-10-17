@@ -46,6 +46,16 @@ def fecha_emision(valor):
     return f"{fecha_corta(d)} - {d:%H:%M}"
 
 
+def unir_lineas(texto, contenido_archivo=None):
+    """Lineas de SKU pegadas en el cuadro de texto mas las de un archivo (bytes), sin limpiar."""
+    lineas = []
+    if texto and texto.strip():
+        lineas.extend(texto.splitlines())
+    if contenido_archivo:
+        lineas.extend(contenido_archivo.decode("utf-8", errors="ignore").splitlines())
+    return lineas
+
+
 def estado_orden(folio, folios_con_cambios, folios_emitidos):
     """
     Estado de una orden, DERIVADO (la base no guarda estados de orden):

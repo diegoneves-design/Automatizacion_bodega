@@ -4,7 +4,7 @@ import streamlit as st
 
 import ui_datos
 from ui_components import banner, ficha_orden, mostrar, pill, subtitulo, tabla, titulo
-from ui_nav import boton_volver, ir
+from ui_nav import boton_volver, ir, mostrar_aviso
 
 
 def _validar(folio):
@@ -18,6 +18,7 @@ def render(app):
     folio = ss.folio
     boton_volver("← Volver a órdenes", "ordenes", "volver_ordenes")
     mostrar(titulo("Detalle de la orden", "Revisa los equipos y valida su información."))
+    mostrar_aviso()
 
     resumen = app.obtener_resumen_ordenes()
     fila = resumen[resumen["folio"] == folio] if folio else resumen.iloc[0:0]
