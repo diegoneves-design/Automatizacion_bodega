@@ -33,6 +33,9 @@ MENU_ACTIVO = {
     "historial": "menu_historial",
 }
 
+# Paso del flujo (1 a 5) que corresponde a cada pantalla; las demas no resaltan ninguno
+PASO_POR_VISTA = {"ordenes": 1, "detalle": 2, "validacion": 3, "ajuste": 4, "guia": 5}
+
 # Usuario de ejemplo del menu: la app no tiene inicio de sesion (solo es una etiqueta).
 USUARIO_ETIQUETA = "Jefe de Bodega"
 USUARIO_INICIALES = "JB"
@@ -71,9 +74,38 @@ PANTALLAS = {
 }
 
 
+def _encabezado():
+    atributos = "".join(
+        f'<div class="bp-atributo">{icono(icono_nombre, 18)}<span>{esc(etiqueta)}</span></div>'
+        for etiqueta, icono_nombre in ui_theme.ATRIBUTOS
+    )
+    mostrar(
+        Html(
+            '<div class="bp-encabezado">'
+            f'<div class="bp-encabezado-marca">{icono("logo", 34)}<div>'
+            f'<div class="bp-encabezado-nombre">{esc(ui_theme.NOMBRE_APP)}</div>'
+            f'<div class="bp-encabezado-eslogan">{esc(ui_theme.ESLOGAN_APP)}</div></div></div>'
+            f'<div class="bp-encabezado-lado"><div class="bp-lema">{esc(ui_theme.LEMA_INICIO)} <b>{esc(ui_theme.LEMA_ENFASIS)}</b></div>'
+            f'<div class="bp-atributos">{atributos}</div></div></div>'
+        )
+    )
+
+
+def _flujo(vista):
+    activo = PASO_POR_VISTA.get(vista)
+    pasos = []
+    for numero, texto in enumerate(ui_theme.PASOS, start=1):
+        clase = " bp-paso-activo" if numero == activo else ""
+        pasos.append(f'<div class="bp-paso{clase}"><span class="bp-paso-n">{numero}</span><span class="bp-paso-t">{esc(texto)}</span></div>')
+    unidos = "".join(pasos)
+    mostrar(Html(f'<div class="bp-flujo">{unidos}</div><div class="bp-frase">{esc(ui_theme.FRASE_PIE)}</div>'))
+
+
 def run(app):
     """Punto de entrada de la interfaz: estado, tema, menu y pantalla actual."""
     ui_nav.iniciar_estado()
     ui_theme.inyectar()
     _menu_lateral()
+    _encabezado()
     PANTALLAS[st.session_state.vista](app)
+    _flujo(st.session_state.vista)

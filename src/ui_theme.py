@@ -14,8 +14,15 @@ from ui_components import TRAZOS
 
 NOMBRE_APP = "BodegaPlus"
 ESLOGAN_APP = "Guías más simples. Operaciones más seguras."
-LEMA_APP = "Del pedido a la guía, sin errores."
+LEMA_INICIO = "Del pedido a la guía,"
+LEMA_ENFASIS = "sin errores."
 FRASE_PIE = "Equipos en movimiento, negocios que avanzan."
+
+# Etiqueta e icono de los tres atributos del encabezado
+ATRIBUTOS = [("Trazabilidad", "trazabilidad"), ("Eficiencia", "eficiencia"), ("Operación conectada", "conectada")]
+
+# Pasos del flujo del pie (se resalta el de la pantalla actual)
+PASOS = ["Seleccionar orden", "Revisar y validar", "Corregir si es necesario", "Registrar cambios", "Generar guía"]
 
 MENU_GREEN = "#0B4F2E"
 
@@ -158,6 +165,28 @@ __ICONOS_MENU__
 .bp-banner-error .bp-banner-icono { color: #c62828; }
 .bp-banner-info { background: #e9f1fe; border-color: #c5d9f8; }
 .bp-banner-info .bp-banner-icono { color: var(--acento); }
+
+/* ---------- Encabezado y flujo ---------- */
+.bp-encabezado { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 2px 0 14px; margin-bottom: 10px; border-bottom: 1px solid var(--borde); }
+.bp-encabezado-marca { display: flex; align-items: center; gap: 10px; color: var(--acento); }
+.bp-encabezado-marca svg { width: 34px; height: 34px; flex: none; }
+.bp-encabezado-nombre { font-size: 22px; font-weight: 700; color: var(--texto); line-height: 1.1; }
+.bp-encabezado-eslogan { font-size: 13px; color: var(--suave); }
+.bp-encabezado-lado { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.bp-lema { font-size: 16px; font-weight: 500; color: var(--texto); white-space: nowrap; }
+.bp-lema b { color: var(--acento); font-weight: 700; }
+.bp-atributos { display: flex; gap: 18px; }
+.bp-atributo { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--suave); white-space: nowrap; }
+.bp-atributo svg { color: var(--acento); width: 18px; height: 18px; }
+@media (max-width: 760px) { .bp-encabezado-lado { display: none; } }
+.bp-flujo { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 2.2rem; padding: 14px 10px; background: var(--tarjeta); border: 1px solid var(--borde); border-radius: var(--radio); }
+.bp-paso { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; padding-right: 16px; font-size: 13px; line-height: 1.25; color: var(--suave); }
+.bp-paso:not(:last-child)::after { content: "→"; position: absolute; right: 2px; color: #b8c4d4; }
+.bp-paso-n { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--borde); font-size: 13px; font-weight: 700; flex: none; }
+.bp-paso-activo { color: var(--texto); font-weight: 600; }
+.bp-paso-activo .bp-paso-n { background: var(--acento); border-color: var(--acento); color: #fff; }
+.bp-frase { text-align: right; color: var(--suave); font-style: italic; margin-top: .7rem; font-size: 14px; }
+@media (max-width: 760px) { .bp-paso:not(.bp-paso-activo) .bp-paso-t { display: none; } .bp-paso { padding-right: 12px; } }
 
 /* ---------- Titulos ---------- */
 .bp-titulo h1 { font-size: 30px; font-weight: 700; margin: 0; padding: 0; line-height: 1.2; }
