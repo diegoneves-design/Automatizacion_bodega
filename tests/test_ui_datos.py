@@ -38,6 +38,10 @@ def test_fecha_hora_corta_incluye_hora_con_dos_digitos():
     assert ui_datos.fecha_hora_corta("2026-10-10T09:05:00") == "10 oct. 2026 09:05"
 
 
+def test_fecha_emision_une_fecha_y_hora():
+    assert ui_datos.fecha_emision(datetime(2026, 10, 10, 14, 35, 9)) == "10 oct. 2026 - 14:35"
+
+
 # ---------------------------------------------------------------------------
 # Estado de la orden
 # ---------------------------------------------------------------------------

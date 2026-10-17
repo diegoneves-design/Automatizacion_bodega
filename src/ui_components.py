@@ -102,6 +102,11 @@ def ficha_orden(folio, etiqueta_estado, items):
     )
 
 
+def ficha_guia(items):
+    """Ficha de una guia emitida: icono de documento y sus datos."""
+    return Html(f'<div class="bp-ficha bp-ficha-guia"><span class="bp-ficha-icono">{icono("doc", 44)}</span>{datos(items)}</div>')
+
+
 def subtitulo(texto):
     return Html(f'<div class="bp-subtitulo">{esc(texto)}</div>')
 
