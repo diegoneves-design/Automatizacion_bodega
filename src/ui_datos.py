@@ -40,6 +40,12 @@ def fecha_hora_corta(valor):
     return f"{fecha_corta(d)} {d:%H:%M}"
 
 
+def fecha_emision(valor):
+    """10 oct. 2026 - 14:35 (fecha de emision de una guia)."""
+    d = _a_datetime(valor)
+    return f"{fecha_corta(d)} - {d:%H:%M}"
+
+
 def estado_orden(folio, folios_con_cambios, folios_emitidos):
     """
     Estado de una orden, DERIVADO (la base no guarda estados de orden):

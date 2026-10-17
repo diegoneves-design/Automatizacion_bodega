@@ -212,6 +212,11 @@ __ICONOS_MENU__
 .bp-folio-grande { font-size: 22px; font-weight: 700; }
 .bp-subtitulo { font-size: 17px; font-weight: 700; margin: 1.2rem 0 .3rem; }
 
+/* ---------- Guia generada ---------- */
+.bp-ficha-guia { display: flex; gap: 18px; align-items: flex-start; }
+.bp-ficha-guia .bp-datos { flex: 1; grid-template-columns: minmax(0, 1fr); }
+.bp-ficha-icono { color: var(--acento); flex: none; }
+
 /* ---------- Datos y tarjetas ---------- */
 .bp-datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 20px; margin: 0; }
 .bp-datos dt { font-size: 12px; color: var(--suave); }
