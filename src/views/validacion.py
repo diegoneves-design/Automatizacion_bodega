@@ -6,7 +6,7 @@ import streamlit as st
 
 import ui_datos
 from ui_components import banner, mostrar, pill, tabla, titulo
-from ui_nav import boton_volver, ir
+from ui_nav import boton_volver, ir, mostrar_aviso
 
 COLUMNAS_CSV = ["sku", "descripcion", "stock_disponible", "tipo_movimiento", "modalidad", "resultado"]
 
@@ -25,6 +25,7 @@ def render(app):
     folio = ss.folio
     boton_volver("← Volver al detalle", "detalle", "volver_detalle")
     mostrar(titulo("Resultado de validación", "Revisa el estado de cada SKU y corrige si es necesario."))
+    mostrar_aviso()
 
     validada = app.validar_orden(folio) if folio else None
     if validada is None or validada.empty:

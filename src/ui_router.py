@@ -11,7 +11,7 @@ import streamlit as st
 import ui_nav
 import ui_theme
 from ui_components import Html, esc, icono, mostrar
-from views import detalle, ordenes, validacion
+from views import ajuste, detalle, ordenes, validacion
 
 # (clave del boton, etiqueta, pantalla de destino)
 MENU = [
@@ -90,7 +90,7 @@ PANTALLAS = {
     "ordenes": ordenes.render,
     "detalle": detalle.render,
     "validacion": validacion.render,
-    "ajuste": _clasica("vista_ajuste_ultima_hora"),
+    "ajuste": ajuste.render,
     "guia": _pendiente("Guía generada"),
     "historial": _historial_clasico,
     "carga": _clasica("vista_carga_masiva"),
