@@ -11,7 +11,7 @@ import streamlit as st
 import ui_nav
 import ui_theme
 from ui_components import Html, esc, icono, mostrar
-from views import ajuste, detalle, guia, historial, ordenes, validacion
+from views import ajuste, carga, detalle, guia, historial, ordenes, validacion
 
 # (clave del boton, etiqueta, pantalla de destino)
 MENU = [
@@ -60,15 +60,6 @@ def _menu_lateral():
         st.button("Cerrar sesión · Próximamente", key="menu_salir", disabled=True, use_container_width=True, help="Próximamente")
 
 
-def _clasica(nombre_funcion):
-    """Pantalla anterior de app.py, mientras se rediseña la nueva."""
-
-    def render(app):
-        getattr(app, nombre_funcion)()
-
-    return render
-
-
 PANTALLAS = {
     "ordenes": ordenes.render,
     "detalle": detalle.render,
@@ -76,7 +67,7 @@ PANTALLAS = {
     "ajuste": ajuste.render,
     "guia": guia.render,
     "historial": historial.render,
-    "carga": _clasica("vista_carga_masiva"),
+    "carga": carga.render,
 }
 
 

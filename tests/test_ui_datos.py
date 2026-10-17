@@ -42,6 +42,17 @@ def test_fecha_emision_une_fecha_y_hora():
     assert ui_datos.fecha_emision(datetime(2026, 10, 10, 14, 35, 9)) == "10 oct. 2026 - 14:35"
 
 
+def test_unir_lineas_junta_texto_y_archivo():
+    texto = "\n".join(["A", "B"])
+    archivo = "\n".join(["C", "D"]).encode("utf-8")
+    assert ui_datos.unir_lineas(texto, archivo) == ["A", "B", "C", "D"]
+
+
+def test_unir_lineas_sin_nada_devuelve_lista_vacia():
+    assert ui_datos.unir_lineas("   ", None) == []
+    assert ui_datos.unir_lineas(None, b"") == []
+
+
 # ---------------------------------------------------------------------------
 # Estado de la orden
 # ---------------------------------------------------------------------------
