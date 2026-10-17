@@ -7,6 +7,7 @@ Ejecutar con: streamlit run src/app.py
 
 import os
 import sqlite3
+import sys
 from datetime import datetime
 
 import pandas as pd
@@ -413,6 +414,17 @@ def vista_ajuste_ultima_hora():
 # ---------------------------------------------------------------------------
 
 def main():
+    """Interfaz actual: la logica de datos de este modulo + las pantallas de ui_router."""
+    import ui_router
+    import ui_theme
+
+    st.set_page_config(page_title=ui_theme.NOMBRE_APP, layout="wide", initial_sidebar_state="auto")
+    init_db()
+    ui_router.run(sys.modules[__name__])
+
+
+def main_clasico():
+    """Interfaz anterior (radio con 3 vistas). Se conserva hasta confirmar su eliminacion."""
     st.set_page_config(page_title="Automatizacion de Bodega", layout="wide")
     init_db()
 
