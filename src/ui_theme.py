@@ -141,6 +141,10 @@ __ICONOS_MENU__
   .bp-oculto-movil { display: none; }
 }
 
+.bp-compacta .bp-tabla th, .bp-compacta .bp-tabla td { padding: 9px 8px; font-size: 13px; }
+.bp-compacta .bp-tabla th { white-space: normal; }
+.bp-compacta { margin-top: .6rem; }
+
 /* ---------- Avisos ---------- */
 .bp-banner { display: flex; align-items: flex-start; gap: 12px; margin: .5rem 0 1rem; padding: 14px 16px; border-radius: var(--radio); border: 1px solid; }
 .bp-banner strong { display: block; font-size: 15px; }
@@ -195,6 +199,12 @@ __ICONOS_MENU__
 /* ---------- Enlaces de vuelta ---------- */
 .stApp [class*="st-key-volver_"] button { background: transparent; border: 0; box-shadow: none; padding: 0; min-height: 2rem; width: auto; color: var(--acento); font-weight: 600; }
 .stApp [class*="st-key-volver_"] button:hover { text-decoration: underline; background: transparent; }
+
+/* ---------- Formulario de ajuste ---------- */
+.bp-ayuda { font-size: 12px; color: var(--suave); margin: -6px 0 8px; min-height: 16px; }
+.bp-flecha-par { text-align: center; padding-top: 2.2rem; color: var(--suave); }
+.bp-sin-margen { margin-top: 0 !important; }
+@media (max-width: 640px) { .bp-flecha-par { display: none; } }
 
 /* ---------- Ficha de la orden y subtitulos ---------- */
 .bp-ficha { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: var(--radio); padding: 18px 20px; margin: .5rem 0 1rem; }

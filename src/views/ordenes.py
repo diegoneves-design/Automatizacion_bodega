@@ -6,7 +6,7 @@ import streamlit as st
 
 import ui_datos
 from ui_components import banner, esc, mostrar, pill, titulo
-from ui_nav import ir
+from ui_nav import ir, mostrar_aviso
 
 # Ancho de la cuadricula de datos frente al del boton "Ver detalle"
 PROPORCION = [8.2, 1.5]
@@ -31,9 +31,7 @@ def render(app):
     ss = st.session_state
     mostrar(titulo("Órdenes del día", "Selecciona la orden que deseas gestionar."))
 
-    if ss.get("aviso"):
-        mostrar(banner("info", ss.aviso))
-        ss.aviso = None
+    mostrar_aviso()
 
     resumen = app.obtener_resumen_ordenes()
     con_cambios = set(app.obtener_log_cambios()["folio"])
