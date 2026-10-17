@@ -152,6 +152,43 @@ __ICONOS_MENU__
 .bp-banner-info { background: #e9f1fe; border-color: #c5d9f8; }
 .bp-banner-info .bp-banner-icono { color: var(--acento); }
 
+/* ---------- Titulos ---------- */
+.bp-titulo h1 { font-size: 30px; font-weight: 700; margin: 0; padding: 0; line-height: 1.2; }
+.bp-titulo p { margin: 4px 0 18px; color: var(--suave); font-size: 15px; }
+
+/* ---------- Campos (buscador y fecha) ---------- */
+.stApp [data-testid="stTextInput"] input, .stApp [data-testid="stDateInput"] input, .stApp [data-testid="stSelectbox"] [data-baseweb="select"] > div,
+.stApp [data-testid="stTextArea"] textarea {
+  background: #fff; border: 1px solid var(--borde); border-radius: 10px; color: var(--texto);
+}
+.stApp [data-testid="stTextInput"] [data-baseweb="input"], .stApp [data-testid="stDateInput"] [data-baseweb="input"],
+.stApp [data-testid="stTextArea"] [data-baseweb="textarea"] { background: transparent; border: 0; }
+
+/* ---------- Pestanas de tipo (radio horizontal en forma de segmentos) ---------- */
+.stApp [data-testid="stRadioGroup"] { gap: 0; background: #e6ebf2; border-radius: 10px; padding: 3px; width: fit-content; max-width: 100%; }
+@media (max-width: 640px) { .stApp [data-testid="stRadioGroup"] { width: 100%; } }
+.stApp [data-testid="stRadioGroup"] > div { flex: 1; }
+.stApp [data-testid="stRadioOption"] { width: 100%; margin: 0; padding: 7px 10px; border-radius: 8px; cursor: pointer; justify-content: center; }
+.stApp [data-testid="stRadioOption"] > div { width: 100%; justify-content: center; }
+.stApp [data-testid="stRadioOption"] > div > div:first-child { display: none; }
+.stApp [data-testid="stRadioOption"] p { font-size: 14px; font-weight: 600; color: var(--suave); text-align: center; margin: 0; white-space: nowrap; }
+.stApp [data-testid="stRadioOption"][data-selected="true"] { background: #fff; box-shadow: 0 1px 2px rgba(15,37,64,.12); }
+.stApp [data-testid="stRadioOption"][data-selected="true"] p { color: var(--acento); }
+
+/* ---------- Lista de ordenes (filas con columnas de Streamlit) ---------- */
+.bp-cabecera { font-size: 13px; font-weight: 700; color: var(--suave); padding: 4px 0; }
+.bp-orden-grid { display: grid; grid-template-columns: 2.3fr 1.5fr 1.7fr 1.1fr 1.6fr; gap: 8px; align-items: center; }
+.bp-folio { font-weight: 700; font-size: 15px; }
+.bp-sub { font-size: 12px; color: var(--suave); }
+.bp-celda { font-size: 14px; }
+[data-testid="stHorizontalBlock"]:has(.bp-orden-grid:not(.bp-cabecera)) { align-items: center; border-top: 1px solid var(--borde); padding-top: .55rem; }
+@media (max-width: 640px) {
+  [data-testid="stHorizontalBlock"]:has(.bp-cabecera) { display: none; }
+  .bp-orden-grid { grid-template-columns: 1fr 1fr; row-gap: 6px; }
+  .bp-orden-folio { grid-column: 1 / -1; }
+  .bp-celda::before { content: attr(data-et) ": "; color: var(--suave); }
+}
+
 /* ---------- Datos y tarjetas ---------- */
 .bp-datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 20px; margin: 0; }
 .bp-datos dt { font-size: 12px; color: var(--suave); }

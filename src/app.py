@@ -124,6 +124,26 @@ def obtener_folios():
     return df["folio"].tolist()
 
 
+def obtener_resumen_ordenes():
+    """Una fila por folio: tipo, modalidad, fecha de carga y cantidad de SKU vigentes."""
+    conn = get_conn()
+    df = pd.read_sql_query(
+        """
+        SELECT folio,
+               MIN(tipo_movimiento) AS tipo_movimiento,
+               MIN(modalidad) AS modalidad,
+               MIN(fecha_carga) AS fecha_carga,
+               SUM(CASE WHEN estado = 'CARGADO' THEN 1 ELSE 0 END) AS skus_vigentes
+        FROM ordenes
+        GROUP BY folio
+        ORDER BY MIN(fecha_carga) DESC, folio DESC
+        """,
+        conn,
+    )
+    conn.close()
+    return df
+
+
 def obtener_orden(folio):
     conn = get_conn()
     df = pd.read_sql_query(
