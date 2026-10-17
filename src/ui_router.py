@@ -1,17 +1,17 @@
 """
-Navegacion y estructura comun de la interfaz (menu lateral y despacho de pantallas).
+Estructura comun de la interfaz: menu lateral y despacho de pantallas.
 
-La navegacion vive en st.session_state:
-  vista   pantalla actual (ordenes, detalle, validacion, ajuste, guia, historial, carga)
-  folio   orden seleccionada
-Cada pantalla es una funcion render(app) que recibe el modulo app.py, de modo que la
-capa de datos sigue en app.py (y los tests pueden redirigir app.DB_PATH).
+La navegacion vive en st.session_state (ver ui_nav). Cada pantalla es una funcion
+render(app) que recibe el modulo app.py, de modo que la capa de datos sigue en app.py
+(y los tests pueden redirigir app.DB_PATH).
 """
 
 import streamlit as st
 
+import ui_nav
 import ui_theme
 from ui_components import Html, esc, icono, mostrar
+from views import ordenes
 
 # (clave del boton, etiqueta, pantalla de destino)
 MENU = [
@@ -38,31 +38,6 @@ USUARIO_ETIQUETA = "Jefe de Bodega"
 USUARIO_INICIALES = "JB"
 
 
-def iniciar_estado():
-    ss = st.session_state
-    ss.setdefault("vista", "ordenes")
-    ss.setdefault("folio", None)
-    ss.setdefault("validadas", set())  # folios validados en esta sesion
-    ss.setdefault("guias", {})  # folio -> {"numero", "fecha"} emitidas en esta sesion
-    ss.setdefault("sku_corregir", None)
-    ss.setdefault("aviso", None)
-
-
-def ir(vista, folio=None):
-    """Callback de navegacion (se usa en on_click, antes de que se redibuje la pagina)."""
-    st.session_state.vista = vista
-    if folio is not None:
-        st.session_state.folio = folio
-
-
-def ir_menu(destino):
-    """Navegacion desde el menu: validar y ajustar necesitan una orden elegida."""
-    if destino in ("validacion", "ajuste") and not st.session_state.get("folio"):
-        st.session_state.aviso = "Primero elige una orden de la lista."
-        destino = "ordenes"
-    st.session_state.vista = destino
-
-
 def _menu_lateral():
     with st.sidebar:
         mostrar(Html(f'<div class="bp-marca">{icono("logo", 28)}<span>{esc(ui_theme.NOMBRE_APP)}</span></div>'))
@@ -72,7 +47,7 @@ def _menu_lateral():
                 etiqueta,
                 key=clave,
                 type="primary" if clave == activo else "secondary",
-                on_click=ir_menu,
+                on_click=ui_nav.ir_menu,
                 args=(destino,),
                 use_container_width=True,
             )
@@ -112,7 +87,7 @@ def _historial_clasico(app):
 
 
 PANTALLAS = {
-    "ordenes": _pendiente("Órdenes del día"),
+    "ordenes": ordenes.render,
     "detalle": _pendiente("Detalle de la orden"),
     "validacion": _clasica("vista_validador"),
     "ajuste": _clasica("vista_ajuste_ultima_hora"),
@@ -124,7 +99,7 @@ PANTALLAS = {
 
 def run(app):
     """Punto de entrada de la interfaz: estado, tema, menu y pantalla actual."""
-    iniciar_estado()
+    ui_nav.iniciar_estado()
     ui_theme.inyectar()
     _menu_lateral()
     PANTALLAS[st.session_state.vista](app)

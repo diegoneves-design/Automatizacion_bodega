@@ -94,6 +94,15 @@ def datos(items):
     return Html(f'<dl class="bp-datos">{celdas}</dl>')
 
 
+def titulo(texto, subtitulo=""):
+    """Titulo de pantalla con su bajada."""
+    bajada = f"<p>{esc(subtitulo)}</p>" if subtitulo else ""
+    return Html(f'<div class="bp-titulo"><h1>{esc(texto)}</h1>{bajada}</div>')
+
+
 def mostrar(contenido):
     """Dibuja HTML construido por este modulo. Va siempre envuelto en un bloque <div> (no se interpreta como markdown)."""
-    st.markdown(str(contenido), unsafe_allow_html=True)
+    texto = str(contenido)
+    if not texto.startswith(("<div", "<dl", "<table")):
+        texto = f"<div>{texto}</div>"
+    st.markdown(texto, unsafe_allow_html=True)
