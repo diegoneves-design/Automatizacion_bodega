@@ -128,7 +128,7 @@ __ICONOS_MENU__
 
 /* ---------- Tablas ---------- */
 .bp-tabla-wrap { overflow-x: auto; background: var(--tarjeta); border: 1px solid var(--borde); border-radius: var(--radio); margin: .5rem 0 1rem; }
-.bp-tabla { width: 100%; border-collapse: collapse; font-size: 14px; }
+.bp-tabla { width: 100%; border-collapse: collapse; font-size: 14px; margin: 0 !important; }
 .bp-tabla th { background: #f3f6fa; color: var(--texto); font-weight: 700; text-align: left; padding: 10px 14px; font-size: 13px; white-space: nowrap; }
 .bp-tabla td { padding: 11px 14px; border-top: 1px solid var(--borde); vertical-align: middle; }
 .bp-tabla td.bp-sku { font-weight: 600; white-space: nowrap; }
