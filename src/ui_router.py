@@ -11,7 +11,7 @@ import streamlit as st
 import ui_nav
 import ui_theme
 from ui_components import Html, esc, icono, mostrar
-from views import ordenes
+from views import detalle, ordenes
 
 # (clave del boton, etiqueta, pantalla de destino)
 MENU = [
@@ -88,7 +88,7 @@ def _historial_clasico(app):
 
 PANTALLAS = {
     "ordenes": ordenes.render,
-    "detalle": _pendiente("Detalle de la orden"),
+    "detalle": detalle.render,
     "validacion": _clasica("vista_validador"),
     "ajuste": _clasica("vista_ajuste_ultima_hora"),
     "guia": _pendiente("Guía generada"),

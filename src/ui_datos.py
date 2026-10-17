@@ -79,6 +79,37 @@ def contar_por_tipo(resumen):
     return len(resumen), despachos, retiros
 
 
+# Resultado de app.validar_orden -> (etiqueta, tono de la etiqueta, texto de detalle)
+RESULTADOS = {
+    "OK": ("OK", "ok", "En inventario"),
+    "SIN STOCK DISPONIBLE": ("Sin stock", "error", "Stock: 0"),
+    "SKU NO EXISTE EN INVENTARIO": ("No existe", "error", "No existe en inventario"),
+}
+
+
+def describir_resultado(resultado, stock=None):
+    """(etiqueta, tono, detalle) de un resultado de validacion; el stock se muestra si hay."""
+    etiqueta, tono, detalle = RESULTADOS.get(resultado, (str(resultado), "error", ""))
+    if resultado == "SIN STOCK DISPONIBLE" and stock is not None and not pd.isna(stock):
+        detalle = f"Stock: {int(stock)}"
+    return etiqueta, tono, detalle
+
+
+def contar_validos(validada):
+    """(validos, total) de un DataFrame devuelto por app.validar_orden."""
+    if validada.empty:
+        return 0, 0
+    return int((validada["resultado"] == "OK").sum()), len(validada)
+
+
+def ultimas_modificaciones(log, folio):
+    """{sku_nuevo: fecha_hora} del ultimo reemplazo de cada SKU en una orden."""
+    if log.empty:
+        return {}
+    propios = log[log["folio"] == folio].sort_values("id")
+    return dict(zip(propios["sku_nuevo"], propios["fecha_hora"]))
+
+
 def neutralizar_csv(df):
     """
     Evita la inyeccion de formulas al abrir un CSV en Excel: antepone una comilla a los

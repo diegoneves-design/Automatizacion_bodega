@@ -131,10 +131,13 @@ __ICONOS_MENU__
 .bp-tabla { width: 100%; border-collapse: collapse; font-size: 14px; }
 .bp-tabla th { background: #f3f6fa; color: var(--texto); font-weight: 700; text-align: left; padding: 10px 14px; font-size: 13px; white-space: nowrap; }
 .bp-tabla td { padding: 11px 14px; border-top: 1px solid var(--borde); vertical-align: middle; }
-.bp-tabla .bp-sku { font-weight: 600; white-space: nowrap; }
+.bp-tabla td.bp-sku { font-weight: 600; white-space: nowrap; }
+.bp-tabla th, .bp-tabla td { border-left: 0; border-right: 0; }
+.bp-tabla th { border-bottom: 0; }
 .bp-vacio { text-align: center; color: var(--suave); padding: 18px; }
 @media (max-width: 640px) {
   .bp-tabla th, .bp-tabla td { padding: 9px 8px; font-size: 13px; }
+  .bp-tabla th { white-space: normal; }
   .bp-oculto-movil { display: none; }
 }
 
@@ -188,6 +191,16 @@ __ICONOS_MENU__
   .bp-orden-folio { grid-column: 1 / -1; }
   .bp-celda::before { content: attr(data-et) ": "; color: var(--suave); }
 }
+
+/* ---------- Enlaces de vuelta ---------- */
+.stApp [class*="st-key-volver_"] button { background: transparent; border: 0; box-shadow: none; padding: 0; min-height: 2rem; width: auto; color: var(--acento); font-weight: 600; }
+.stApp [class*="st-key-volver_"] button:hover { text-decoration: underline; background: transparent; }
+
+/* ---------- Ficha de la orden y subtitulos ---------- */
+.bp-ficha { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: var(--radio); padding: 18px 20px; margin: .5rem 0 1rem; }
+.bp-ficha-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.bp-folio-grande { font-size: 22px; font-weight: 700; }
+.bp-subtitulo { font-size: 17px; font-weight: 700; margin: 1.2rem 0 .3rem; }
 
 /* ---------- Datos y tarjetas ---------- */
 .bp-datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 20px; margin: 0; }
