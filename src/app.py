@@ -7,6 +7,7 @@ Ejecutar con: streamlit run src/app.py
 
 import os
 import sqlite3
+import sys
 from datetime import datetime
 
 import pandas as pd
@@ -121,6 +122,26 @@ def obtener_folios():
     )
     conn.close()
     return df["folio"].tolist()
+
+
+def obtener_resumen_ordenes():
+    """Una fila por folio: tipo, modalidad, fecha de carga y cantidad de SKU vigentes."""
+    conn = get_conn()
+    df = pd.read_sql_query(
+        """
+        SELECT folio,
+               MIN(tipo_movimiento) AS tipo_movimiento,
+               MIN(modalidad) AS modalidad,
+               MIN(fecha_carga) AS fecha_carga,
+               SUM(CASE WHEN estado = 'CARGADO' THEN 1 ELSE 0 END) AS skus_vigentes
+        FROM ordenes
+        GROUP BY folio
+        ORDER BY MIN(fecha_carga) DESC, folio DESC
+        """,
+        conn,
+    )
+    conn.close()
+    return df
 
 
 def obtener_orden(folio):
@@ -413,6 +434,17 @@ def vista_ajuste_ultima_hora():
 # ---------------------------------------------------------------------------
 
 def main():
+    """Interfaz actual: la logica de datos de este modulo + las pantallas de ui_router."""
+    import ui_router
+    import ui_theme
+
+    st.set_page_config(page_title=ui_theme.NOMBRE_APP, layout="wide", initial_sidebar_state="auto")
+    init_db()
+    ui_router.run(sys.modules[__name__])
+
+
+def main_clasico():
+    """Interfaz anterior (radio con 3 vistas). Se conserva hasta confirmar su eliminacion."""
     st.set_page_config(page_title="Automatizacion de Bodega", layout="wide")
     init_db()
 
