@@ -134,7 +134,124 @@
   /* ---------- Pantallas ---------- */
   var VISTAS = {};
 
-  /* @@VISTA-P1 */
+  /* ----- P1 Cargar pedido (HU-02) ----- */
+
+  function textoContador(p) {
+    var n = p.skus.length;
+    var t = plural(n, 'producto detectado', 'productos detectados') + ' · máximo ' + MAX_SKUS;
+    if (p.repetidos) t += ' · ' + plural(p.repetidos, 'repetido ignorado', 'repetidos ignorados');
+    return t;
+  }
+
+  function errorListado(p) {
+    var n = p.skus.length;
+    if (n === 0) return 'Pega al menos un SKU, uno por línea. Ejemplo: SD-63A20-0314';
+    if (n > MAX_SKUS) return 'Hay ' + n + ' productos y el máximo es ' + MAX_SKUS + '. Quita ' + (n - MAX_SKUS) + ' para continuar.';
+    return '';
+  }
+
+  VISTAS.p1 = {
+    titulo: function () { return 'Cargar pedido'; },
+
+    html: function () {
+      var f = estado.form;
+      var o = orden(f.id_orden);
+      var aviso = estado.aviso;
+      estado.aviso = null;
+      var p = parsearListado(f.listado);
+      var ordenes = D.ordenes.map(function (x) {
+        return { valor: x.id_orden, etiqueta: x.id_orden + ' · ' + cliente(x.id_cliente).razon_social };
+      });
+
+      return migas('p1') +
+        '<h1 id="titulo" tabindex="-1">Cargar pedido</h1>' +
+        '<p class="ayuda-pantalla">Datos de ejemplo: edita el listado para probar un error.</p>' +
+        '<div class="aviso" id="aviso" tabindex="-1" role="status" aria-live="polite">' + esc(aviso || '') + '</div>' +
+        '<form id="form-carga" novalidate>' +
+          '<div class="campo"><label for="orden">Orden</label>' +
+            '<select id="orden">' + opciones(ordenes, 'valor', 'etiqueta', f.id_orden) + '</select></div>' +
+          '<div class="campo"><label for="cliente">Cliente</label>' +
+            '<input id="cliente" type="text" readonly value="' + esc(cliente(o.id_cliente).razon_social) + '"></div>' +
+          '<div class="fila-2">' +
+            '<div class="campo"><label for="tipo">Tipo de movimiento</label>' +
+              '<select id="tipo">' + opciones(D.tipos_movimiento, 'valor', 'etiqueta', f.tipo_movimiento) + '</select></div>' +
+            '<div class="campo"><label for="modalidad">Modalidad</label>' +
+              '<select id="modalidad">' + opciones(D.modalidades, 'valor', 'etiqueta', f.modalidad) + '</select></div>' +
+          '</div>' +
+          '<div class="campo"><label for="skus">Productos del pedido, uno por línea</label>' +
+            '<textarea id="skus" rows="7" spellcheck="false" autocapitalize="characters" autocomplete="off" aria-describedby="skus-ayuda skus-error">' +
+              esc(f.listado) + '</textarea>' +
+            '<p class="ayuda' + (p.skus.length > MAX_SKUS ? ' es-alerta' : '') + '" id="skus-ayuda" aria-live="polite">' + esc(textoContador(p)) + '</p>' +
+            '<p class="error" id="skus-error" role="alert"></p></div>' +
+          '<div class="acciones">' +
+            '<button type="submit" class="boton boton-primario" id="cargar">Cargar pedido →</button>' +
+            '<button type="button" class="boton boton-secundario" id="cancelar">Cancelar</button>' +
+          '</div>' +
+        '</form>';
+    },
+
+    enlazar: function () {
+      var f = estado.form;
+      var selOrden = document.getElementById('orden');
+      var selTipo = document.getElementById('tipo');
+      var selModalidad = document.getElementById('modalidad');
+      var area = document.getElementById('skus');
+      var ayuda = document.getElementById('skus-ayuda');
+      var error = document.getElementById('skus-error');
+
+      function mostrarError(msg) {
+        error.textContent = msg ? '✕ ' + msg : '';
+        if (msg) area.setAttribute('aria-invalid', 'true'); else area.removeAttribute('aria-invalid');
+      }
+
+      selOrden.addEventListener('change', function () {
+        estado.form = formDeOrden(Number(selOrden.value));
+        render('orden');
+      });
+      selTipo.addEventListener('change', function () { f.tipo_movimiento = selTipo.value; });
+      selModalidad.addEventListener('change', function () { f.modalidad = selModalidad.value; });
+
+      area.addEventListener('input', function () {
+        f.listado = area.value;
+        var p = parsearListado(area.value);
+        ayuda.textContent = textoContador(p);
+        ayuda.classList.toggle('es-alerta', p.skus.length > MAX_SKUS);
+        mostrarError('');
+      });
+
+      document.getElementById('cancelar').addEventListener('click', function () {
+        estado.form = formDeOrden(3001);
+        estado.form.listado = '';
+        estado.aviso = 'Carga cancelada. No se guardó nada.';
+        render('aviso');
+      });
+
+      document.getElementById('form-carga').addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var p = parsearListado(area.value);
+        var msg = errorListado(p);
+        if (msg) { mostrarError(msg); area.focus(); return; }
+        mostrarError('');
+
+        botonCargando(document.getElementById('cargar'), 'Cargando…');
+        document.getElementById('cancelar').disabled = true;
+        esperar(function () {
+          estado.pedido = {
+            id_orden: f.id_orden,
+            id_cliente: orden(f.id_orden).id_cliente,
+            tipo_movimiento: f.tipo_movimiento,
+            modalidad: f.modalidad,
+            lineas: p.skus.map(function (sku) {
+              return { sku: sku, resultado: 'pendiente', vigente: true, cambio: null };
+            })
+          };
+          estado.guia = null;
+          estado.aviso = null;
+          ir('p2');
+        });
+      });
+    }
+  };
 
   /* @@VISTA-P2 */
 
