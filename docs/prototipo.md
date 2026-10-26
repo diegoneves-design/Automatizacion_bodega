@@ -84,9 +84,14 @@ Bordes y componentes (WCAG pide 3:1 para lo que identifica un control):
 | Rojo sobre rosado | `#B42323` / `#FBEAEA` | 5.63:1 | Cumple | Línea y campo con error |
 | Gris de borde sobre gris del botón bloqueado | `#6B7A8F` / `#E3E8EF` | 3.55:1 | Cumple | Borde punteado del botón bloqueado |
 | Gris de borde sobre gris azulado | `#6B7A8F` / `#E8ECF2` | 3.69:1 | Cumple | Borde de los avisos |
-| Gris claro sobre blanco | `#C5CED9` / `#FFFFFF` | 1.59:1 | **No cumple** | Borde de las tarjetas de producto |
+| Gris azulado sobre blanco | `#7A8799` / `#FFFFFF` | 3.65:1 (3.37:1 sobre el fondo de página `#F3F6FB`) | Cumple | Borde de las tarjetas de producto (corregido) |
+| Gris claro sobre blanco | `#C5CED9` / `#FFFFFF` | 1.59:1 | **No cumple** | Borde del campo de solo lectura (pendiente) |
 
-**Pendiente de corregir:** el borde de las tarjetas de producto (`#C5CED9`) mide 1.59:1 y no llega a 3:1. Hoy es solo un marco decorativo, porque el estado de cada producto va en la pastilla (que sí cumple) y en texto, pero si se quiere que el marco también sea visible con reflejos, hay que oscurecerlo. Queda como decisión del equipo.
+**Corregido:** el borde de las tarjetas de producto pasó de `#C5CED9` (1.59:1) a `#7A8799` (3.65:1 sobre blanco y 3.37:1 sobre el fondo de página `#F3F6FB`). El cambio quedó documentado con capturas del antes y el después en `docs/img/etica/`.
+
+**Pendiente de corregir:** el borde del campo de solo lectura (el cliente en P1) usa `#C5CED9` y mide 1.59:1 sobre blanco, bajo el mínimo de 3:1. Queda registrado y no se cambió en esta etapa.
+
+**Bordes decorativos:** los bordes de la cabecera y del pie, y el marco exterior de la tarjeta en pantallas anchas, usan el mismo `#C5CED9`. Solo separan zonas, no identifican ningún control ni llevan información, así que no se les exige el mínimo de 3:1.
 
 ## Mapa de navegación
 
