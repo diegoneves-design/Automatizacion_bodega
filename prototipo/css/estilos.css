@@ -2,7 +2,7 @@
    - Dos tamaños de texto: 16 px (todo) y 24 px (título de pantalla).
    - Un color de acción: verde oscuro (también indica "ok").
    - Un color de alerta: rojo (errores y bloqueos).
-   - Una unidad de espaciado: 8 px; todo espacio es múltiplo de --u.
+   - Una unidad de espaciado: 8 px; todo margen, relleno y separación es múltiplo de --u.
    Contrastes verificados contra el fondo que les toca (mínimo 4.5:1 en texto). */
 
 :root {
@@ -24,7 +24,7 @@
   --tinte-neutro: #e8ecf2;
   --tinte-bloqueado: #e3e8ef;
 
-  --radio: calc(var(--u) * 1.5);
+  --radio: calc(var(--u) * 2);
   --alto: calc(var(--u) * 6);
 
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -112,7 +112,7 @@ p { margin: 0 0 var(--u); }
 select, input, textarea {
   width: 100%;
   min-height: var(--alto);
-  padding: var(--u) calc(var(--u) * 1.5);
+  padding: var(--u) calc(var(--u) * 2);
   border: 2px solid var(--borde);
   border-radius: var(--radio);
   background: var(--superficie);
@@ -162,8 +162,8 @@ select[aria-invalid="true"], textarea[aria-invalid="true"], input[aria-invalid="
 .boton-secundario.cargando:disabled { background: var(--superficie); color: var(--accion); }
 
 .enlace {
-  min-height: calc(var(--u) * 5.5);
-  min-width: calc(var(--u) * 5.5);
+  min-height: 44px;
+  min-width: 44px;
   padding: 0 var(--u);
   border: 0;
   background: none;
@@ -197,7 +197,7 @@ a.enlace { display: inline-flex; align-items: center; }
 /* ---------- Avisos y resumen ---------- */
 .aviso, .resumen {
   margin: 0 0 calc(var(--u) * 2);
-  padding: calc(var(--u) * 1.5) calc(var(--u) * 2);
+  padding: calc(var(--u) * 2);
   border: 2px solid var(--borde);
   border-radius: var(--radio);
   background: var(--tinte-neutro);
@@ -216,7 +216,7 @@ a.enlace { display: inline-flex; align-items: center; }
   grid-template-columns: 1fr auto;
   align-items: start;
   gap: 0 var(--u);
-  padding: calc(var(--u) * 1.5) calc(var(--u) * 2);
+  padding: calc(var(--u) * 2);
   border: 2px solid var(--borde-suave);
   border-radius: var(--radio);
 }
@@ -231,7 +231,7 @@ a.enlace { display: inline-flex; align-items: center; }
 
 .pastilla {
   align-self: start;
-  padding: calc(var(--u) / 2) calc(var(--u) * 1.5);
+  padding: var(--u) calc(var(--u) * 2);
   border: 2px solid;
   border-radius: 999px;
   background: var(--superficie);
@@ -245,7 +245,7 @@ a.enlace { display: inline-flex; align-items: center; }
 /* ---------- Guía (P4) ---------- */
 .guia-lista {
   margin: 0 0 var(--u);
-  padding: calc(var(--u) * 1.5) calc(var(--u) * 2);
+  padding: calc(var(--u) * 2);
   border: 2px solid var(--borde);
   border-radius: var(--radio);
   list-style: none;
