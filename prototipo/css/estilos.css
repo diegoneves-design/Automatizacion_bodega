@@ -17,6 +17,7 @@
   --apoyo: #4a586b;
   --borde: #6b7a8f;
   --borde-suave: #c5ced9;
+  --borde-tarjeta: #7a8799;
   --fondo: #f3f6fb;
   --superficie: #ffffff;
   --tinte-ok: #e4f1e9;
@@ -217,7 +218,7 @@ a.enlace { display: inline-flex; align-items: center; }
   align-items: start;
   gap: 0 var(--u);
   padding: calc(var(--u) * 2);
-  border: 2px solid var(--borde-suave);
+  border: 2px solid var(--borde-tarjeta);
   border-radius: var(--radio);
 }
 .linea .sku { font-weight: 700; font-family: ui-monospace, "SF Mono", Consolas, "Liberation Mono", monospace; overflow-wrap: anywhere; }
