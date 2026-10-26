@@ -173,8 +173,10 @@ select[aria-invalid="true"], textarea[aria-invalid="true"], input[aria-invalid="
   text-decoration: underline;
   cursor: pointer;
 }
-.volver { display: inline-flex; align-items: center; gap: var(--u); text-decoration: none; margin-left: calc(var(--u) * -1); }
+a.enlace { display: inline-flex; align-items: center; }
+.volver { gap: var(--u); text-decoration: none; margin-left: calc(var(--u) * -1); }
 .volver:hover { text-decoration: underline; }
+.acciones-arriba { margin: 0 0 calc(var(--u) * 2); }
 
 :focus-visible { outline: 3px solid var(--accion); outline-offset: 2px; }
 

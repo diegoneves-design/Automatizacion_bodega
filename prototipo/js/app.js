@@ -253,9 +253,243 @@
     }
   };
 
-  /* @@VISTA-P2 */
+  /* ----- P2 Validar pedido (HU-01, HU-04) ----- */
 
-  /* @@VISTA-P3 */
+  var PASTILLAS = {
+    pendiente: ['p-neutra', 'Pendiente'],
+    validando: ['p-neutra', 'Validando…'],
+    ok: ['p-ok', '✓ ok'],
+    no_existe: ['p-alerta', '✕ no existe'],
+    no_disponible: ['p-alerta', '✕ sin stock']
+  };
+
+  function lineaHtml(l, validando) {
+    var e = equipo(l.sku);
+    var res = validando ? 'validando' : l.resultado;
+    var pastilla = PASTILLAS[res];
+    var clases = 'linea' + (!validando && conProblema(l) ? ' es-alerta' : '') + (l.cambio ? ' es-cambio' : '');
+    var detalle = '';
+
+    if (!validando && l.resultado === 'no_existe') {
+      detalle = 'No está en el inventario. Revisa el código o cámbialo con Registrar cambio.';
+    } else if (!validando && l.resultado === 'no_disponible') {
+      detalle = 'El equipo está en mantención y no se puede despachar. Cámbialo con Registrar cambio.';
+    }
+
+    var cambio = '';
+    if (l.cambio) {
+      var u = usuario(l.cambio.id_usuario);
+      cambio = '<p class="detalle cambio"><span aria-hidden="true">↻</span> Cambiado por ' + esc(u.nombre) + ' (' + esc(u.rol) +
+        ') a las ' + esc(l.cambio.hora) + ' · reemplaza a ' + esc(l.cambio.sale) +
+        (l.cambio.motivo ? ' · ' + esc(l.cambio.motivo) : '') + '</p>';
+    }
+
+    return '<li class="' + clases + '">' +
+      '<div><div class="sku">' + esc(l.sku) + '</div>' +
+      '<div class="desc">' + esc(e ? e.descripcion : '— (no se encuentra)') + '</div></div>' +
+      '<span class="pastilla ' + pastilla[0] + '">' + esc(pastilla[1]) + '</span>' +
+      (detalle ? '<p class="detalle">' + esc(detalle) + '</p>' : '') + cambio + '</li>';
+  }
+
+  VISTAS.p2 = {
+    titulo: function () { return 'Validar pedido'; },
+
+    html: function () {
+      var p = estado.pedido;
+      var v = vigentes();
+      var validando = estado.validando;
+      var pend = v.filter(function (l) { return l.resultado === 'pendiente'; }).length;
+      var err = v.filter(conProblema).length;
+      var modo = pend > 0 ? 'validar' : (err > 0 ? 'registrar' : 'preparar');
+      var bloqueado = modo !== 'preparar';
+      var aviso = estado.aviso;
+      estado.aviso = null;
+
+      var resumen;
+      if (validando) {
+        resumen = ['r-neutro', 'Validando el pedido…'];
+      } else if (pend > 0) {
+        resumen = ['r-neutro', plural(pend, 'producto sin validar', 'productos sin validar') + '. Presiona Validar para revisar.'];
+      } else if (err > 0) {
+        resumen = ['r-alerta', '✕ Corrige ' + plural(err, 'producto', 'productos') + ' para continuar'];
+      } else {
+        resumen = ['r-ok', '✓ ' + v.length + ' de ' + v.length + ' productos ok'];
+      }
+
+      function clase(m) { return 'boton ' + (modo === m ? 'boton-primario' : 'boton-secundario'); }
+
+      return migas('p2') +
+        '<a class="enlace volver" id="volver" href="#/p1"><span aria-hidden="true">‹</span> Volver</a>' +
+        '<h1 id="titulo" tabindex="-1">Validar pedido · orden ' + p.id_orden + '</h1>' +
+        '<p class="meta">' + esc(cliente(p.id_cliente).razon_social) + ' · ' + esc(etiqueta(D.tipos_movimiento, p.tipo_movimiento)) +
+          ' · ' + esc(etiqueta(D.modalidades, p.modalidad)) + '</p>' +
+        '<div class="aviso" id="aviso" role="status" aria-live="polite">' + esc(aviso || '') + '</div>' +
+        '<div class="acciones acciones-arriba">' +
+          '<button type="button" class="' + clase('validar') + (validando ? ' cargando' : '') + '" id="validar"' + (validando ? ' disabled aria-busy="true"' : '') + '>' +
+            (validando ? '<span class="giro" aria-hidden="true"></span><span>Validando…</span>' : 'Validar') + '</button>' +
+        '</div>' +
+        '<ul class="lista" aria-label="Productos del pedido">' + v.map(function (l) { return lineaHtml(l, validando); }).join('') + '</ul>' +
+        '<div class="resumen ' + resumen[0] + '" id="resumen" tabindex="-1" role="status" aria-live="polite">' + esc(resumen[1]) + '</div>' +
+        '<div class="acciones">' +
+          '<button type="button" class="' + (bloqueado ? 'boton boton-secundario' : clase('preparar')) + '" id="preparar"' + (bloqueado || validando ? ' disabled' : '') + '>' +
+            (bloqueado ? 'Preparar guía (bloqueado)' : 'Preparar guía →') + '</button>' +
+          '<button type="button" class="' + clase('registrar') + '" id="registrar"' + (validando ? ' disabled' : '') + '>Registrar cambio</button>' +
+        '</div>';
+    },
+
+    enlazar: function () {
+      document.getElementById('validar').addEventListener('click', function () {
+        estado.validando = true;
+        render('resumen');
+        esperar(function () {
+          vigentes().forEach(function (l) { l.resultado = resultadoSku(l.sku); });
+          estado.validando = false;
+          if (rutaActual() === 'p2') render('resumen');
+        });
+      });
+
+      document.getElementById('preparar').addEventListener('click', function () {
+        if (!todoOk()) return;
+        estado.guia = { id_usuario: 1, fecha: new Date() };
+        ir('p4');
+      });
+
+      document.getElementById('registrar').addEventListener('click', function () {
+        abrirP3();
+        ir('p3');
+      });
+    }
+  };
+
+  /* ----- P3 Registrar cambio (HU-03) ----- */
+
+  function abrirP3() {
+    var problema = vigentes().filter(conProblema)[0];
+    estado.p3 = {
+      sale: problema ? problema.sku : '',
+      entra: '',
+      motivo: problema ? (problema.resultado === 'no_existe' ? 'Código mal digitado' : 'Equipo en mantención') : '',
+      id_usuario: 2
+    };
+  }
+
+  function etiquetaSale(l) {
+    var e = equipo(l.sku);
+    if (!e) return l.sku + ' · no existe en el inventario';
+    return l.sku + ' · ' + e.descripcion + (l.resultado === 'no_disponible' ? ' · sin stock' : '');
+  }
+
+  function etiquetaEntra(e) {
+    return e.sku + ' · ' + e.descripcion + ' · ' + (e.estado === 'disponible' ? 'disponible' : 'sin stock');
+  }
+
+  VISTAS.p3 = {
+    titulo: function () { return 'Registrar cambio'; },
+
+    html: function () {
+      if (!estado.p3) abrirP3();
+      var f = estado.p3;
+      var p = estado.pedido;
+
+      var sale = [{ valor: '', etiqueta: 'Elige el equipo que sale' }].concat(vigentes().map(function (l) {
+        return { valor: l.sku, etiqueta: etiquetaSale(l) };
+      }));
+      var entra = [{ valor: '', etiqueta: 'Elige el equipo que entra' }].concat(D.equipos.map(function (e) {
+        return { valor: e.sku, etiqueta: etiquetaEntra(e) };
+      }));
+      var responsables = D.usuarios.map(function (u) {
+        return { valor: u.id_usuario, etiqueta: u.nombre + ' · ' + u.rol };
+      });
+
+      return migas('p3') +
+        '<h1 id="titulo" tabindex="-1">Registrar cambio · orden ' + p.id_orden + '</h1>' +
+        '<p class="ayuda-pantalla">Cambia un equipo del pedido. La línea nueva queda destacada en la validación.</p>' +
+        '<form id="form-cambio" novalidate>' +
+          '<div class="campo"><label for="sale">Equipo que sale</label>' +
+            '<select id="sale" aria-describedby="sale-error">' + opciones(sale, 'valor', 'etiqueta', f.sale) + '</select>' +
+            '<p class="error" id="sale-error" role="alert"></p></div>' +
+          '<div class="campo"><label for="entra">Equipo que entra</label>' +
+            '<select id="entra" aria-describedby="entra-error">' + opciones(entra, 'valor', 'etiqueta', f.entra) + '</select>' +
+            '<p class="error" id="entra-error" role="alert"></p></div>' +
+          '<div class="campo"><label for="motivo">Motivo (opcional)</label>' +
+            '<select id="motivo">' + opciones(D.motivos_cambio, 'valor', 'etiqueta', f.motivo) + '</select></div>' +
+          '<div class="campo"><label for="responsable">Quién lo registra</label>' +
+            '<select id="responsable">' + opciones(responsables, 'valor', 'etiqueta', f.id_usuario) + '</select>' +
+            '<p class="ayuda">Fecha y hora: se guardan solas al presionar Guardar cambio (ahora, ' + hhmm(new Date()) + ').</p></div>' +
+          '<div class="acciones">' +
+            '<button type="submit" class="boton boton-primario" id="guardar">Guardar cambio →</button>' +
+            '<button type="button" class="boton boton-secundario" id="volver-p2">Volver</button>' +
+          '</div>' +
+        '</form>';
+    },
+
+    enlazar: function () {
+      var f = estado.p3;
+      var selSale = document.getElementById('sale');
+      var selEntra = document.getElementById('entra');
+      var selMotivo = document.getElementById('motivo');
+      var selResp = document.getElementById('responsable');
+
+      function marcar(sel, msg) {
+        var error = document.getElementById(sel.id + '-error');
+        error.textContent = msg ? '✕ ' + msg : '';
+        if (msg) sel.setAttribute('aria-invalid', 'true'); else sel.removeAttribute('aria-invalid');
+      }
+
+      selSale.addEventListener('change', function () {
+        f.sale = selSale.value;
+        marcar(selSale, '');
+        var l = vigentes().filter(function (x) { return x.sku === f.sale; })[0];
+        if (l && conProblema(l)) {
+          f.motivo = l.resultado === 'no_existe' ? 'Código mal digitado' : 'Equipo en mantención';
+          selMotivo.value = f.motivo;
+        }
+      });
+      selEntra.addEventListener('change', function () { f.entra = selEntra.value; marcar(selEntra, ''); });
+      selMotivo.addEventListener('change', function () { f.motivo = selMotivo.value; });
+      selResp.addEventListener('change', function () { f.id_usuario = Number(selResp.value); });
+
+      document.getElementById('volver-p2').addEventListener('click', function () {
+        estado.p3 = null;
+        ir('p2');
+      });
+
+      document.getElementById('form-cambio').addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var sale = selSale.value;
+        var entra = selEntra.value;
+        var errSale = '';
+        var errEntra = '';
+
+        if (!sale) errSale = 'Elige el equipo que sale.';
+        if (!entra) errEntra = 'Elige el equipo que entra.';
+        else if (entra === sale) errEntra = 'El equipo que entra debe ser distinto del que sale.';
+        else if (vigentes().some(function (l) { return l.sku === entra; })) errEntra = 'Ese equipo ya está en el pedido. Elige otro.';
+
+        marcar(selSale, errSale);
+        marcar(selEntra, errEntra);
+        if (errSale) { selSale.focus(); return; }
+        if (errEntra) { selEntra.focus(); return; }
+
+        botonCargando(document.getElementById('guardar'), 'Guardando…');
+        document.getElementById('volver-p2').disabled = true;
+        esperar(function () {
+          var lineas = estado.pedido.lineas;
+          var vieja = vigentes().filter(function (l) { return l.sku === sale; })[0];
+          vieja.vigente = false;
+          lineas.splice(lineas.indexOf(vieja) + 1, 0, {
+            sku: entra,
+            resultado: 'pendiente',
+            vigente: true,
+            cambio: { sale: sale, id_usuario: f.id_usuario, hora: hhmm(new Date()), motivo: f.motivo }
+          });
+          estado.p3 = null;
+          estado.aviso = 'Cambio guardado. Presiona Validar para revisar la línea nueva.';
+          ir('p2');
+        });
+      });
+    }
+  };
 
   /* @@VISTA-P4 */
 
