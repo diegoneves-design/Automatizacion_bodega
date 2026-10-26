@@ -491,7 +491,81 @@
     }
   };
 
-  /* @@VISTA-P4 */
+  /* ----- P4 Guía lista (HU-05) ----- */
+
+  function textoGuia(p, u, fecha, v) {
+    var lineas = [
+      'GUIA DE EJEMPLO (PROTOTIPO, SIN VALIDEZ)',
+      'Orden: ' + p.id_orden,
+      'Cliente: ' + cliente(p.id_cliente).razon_social,
+      'Tipo de movimiento: ' + etiqueta(D.tipos_movimiento, p.tipo_movimiento),
+      'Modalidad: ' + etiqueta(D.modalidades, p.modalidad),
+      'Preparada por: ' + u.nombre + ' (' + u.rol + ')',
+      'Fecha de emision: ' + fechaHora(fecha),
+      '',
+      'Productos vigentes:'
+    ];
+    v.forEach(function (l) { lineas.push('- ' + l.sku + ' | ' + equipo(l.sku).descripcion); });
+    lineas.push('', 'Total de equipos: ' + v.length);
+    return lineas.join('\r\n');
+  }
+
+  function descargar(nombre, texto) {
+    var blob = new Blob([texto], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = nombre;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  VISTAS.p4 = {
+    titulo: function () { return 'Guía lista'; },
+
+    html: function () {
+      var p = estado.pedido;
+      if (!estado.guia) estado.guia = { id_usuario: 1, fecha: new Date() };
+      var u = usuario(estado.guia.id_usuario);
+      var aviso = estado.aviso;
+      estado.aviso = null;
+
+      return migas('p4') +
+        '<h1 id="titulo" tabindex="-1">Guía lista · orden ' + p.id_orden + '</h1>' +
+        '<p class="meta">' + esc(cliente(p.id_cliente).razon_social) + ' · ' + esc(etiqueta(D.tipos_movimiento, p.tipo_movimiento)) +
+          ' · ' + esc(etiqueta(D.modalidades, p.modalidad)) + '</p>' +
+        '<p><strong>Productos vigentes</strong></p>' +
+        '<ul class="guia-lista" aria-label="Productos vigentes de la guía">' + vigentes().map(function (l) {
+          return '<li>' + esc(l.sku) + ' · ' + esc(equipo(l.sku).descripcion) + '</li>';
+        }).join('') + '</ul>' +
+        '<p class="preparada">Preparada por ' + esc(u.nombre) + ' · ' + esc(fechaHora(estado.guia.fecha)) + '</p>' +
+        '<div class="resumen r-ok" id="resumen" tabindex="-1" role="status" aria-live="polite">✓ Lista para pasar al ERP</div>' +
+        '<div class="aviso" id="aviso" role="status" aria-live="polite">' + esc(aviso || '') + '</div>' +
+        '<div class="acciones">' +
+          '<button type="button" class="boton boton-primario" id="descargar">Descargar para el ERP</button>' +
+          '<button type="button" class="boton boton-secundario" id="volver-p1">Volver a cargar pedido</button>' +
+        '</div>';
+    },
+
+    enlazar: function () {
+      document.getElementById('volver-p1').addEventListener('click', function () { ir('p1'); });
+
+      document.getElementById('descargar').addEventListener('click', function () {
+        var boton = document.getElementById('descargar');
+        botonCargando(boton, 'Preparando archivo…');
+        document.getElementById('volver-p1').disabled = true;
+        esperar(function () {
+          var p = estado.pedido;
+          var nombre = 'guia_orden_' + p.id_orden + '.txt';
+          descargar(nombre, textoGuia(p, usuario(estado.guia.id_usuario), estado.guia.fecha, vigentes()));
+          estado.aviso = 'Archivo descargado: ' + nombre;
+          if (rutaActual() === 'p4') render('aviso');
+        });
+      });
+    }
+  };
 
   /* ---------- Render ---------- */
 
