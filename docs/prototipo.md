@@ -39,11 +39,11 @@ Todos los valores de contraste de esta sección están medidos con la fórmula d
 
 | Color | Uso | Contraste con blanco | Por qué | Alternativa descartada |
 |---|---|---|---|---|
-| Verde `#0B4F2E` | Única acción principal: botón principal, enlaces, borde del botón secundario y foco del teclado. También el estado correcto ("✓ ok") | 9,67:1 | Un solo color de acción evita dudar cuál tocar. Es oscuro para que se lea aunque haya reflejos | Un color para las acciones y otro para el "ok": dos colores compitiendo. Un verde brillante (`#00A651`) mide 3,19:1 y no alcanza AA |
-| Rojo `#B42323` | Solo alertas y bloqueos que detienen el flujo: errores junto al campo, "no existe", "sin stock" y "Corrige N productos" | 6,55:1 | Es un rojo oscuro y no puro, para sostener el contraste como texto sobre blanco y sobre su fondo rosado (5,63:1) | Rojo puro (`#FF0000`): mide 4,00:1 y no alcanza AA. Naranja o amarillo para "advertencia": un tercer color, y `#FF9900` mide 2,14:1 |
-| Azul marino `#0F2540` | Texto general y títulos | 15,45:1 | Lectura rápida sobre fondo blanco, con holgura aun con luz directa | Negro puro: más contraste (21:1), pero más brusco y no hace falta, porque este valor ya pasa AAA |
-| Gris oscuro `#4A586B` | Texto de apoyo: descripciones, ayudas, migas, pie | 7,24:1 | Baja un escalón la jerarquía sin perder legibilidad | Un gris más claro: el gris de borde (`#6B7A8F`) mide 4,37:1 y no sirve para texto normal |
-| Gris de borde `#6B7A8F` | Borde de campos y de la pastilla "Pendiente" | 4,37:1 | Los bordes que identifican un control deben llegar a 3:1 | Borde claro: el campo se pierde en pantallas con reflejos |
+| Verde `#0B4F2E` | Única acción principal: botón principal, enlaces, borde del botón secundario y foco del teclado. También el estado correcto ("✓ ok") | 9.67:1 | Un solo color de acción evita dudar cuál tocar. Es oscuro para que se lea aunque haya reflejos | Un color para las acciones y otro para el "ok": dos colores compitiendo. Un verde brillante (`#00A651`) mide 3.19:1 y no alcanza AA |
+| Rojo `#B42323` | Solo alertas y bloqueos que detienen el flujo: errores junto al campo, "no existe", "sin stock" y "Corrige N productos" | 6.55:1 | Es un rojo oscuro y no puro, para sostener el contraste como texto sobre blanco y sobre su fondo rosado (5.63:1) | Rojo puro (`#FF0000`): mide 4.00:1 y no alcanza AA. Naranja o amarillo para "advertencia": un tercer color, y `#FF9900` mide 2.14:1 |
+| Azul marino `#0F2540` | Texto general y títulos | 15.45:1 | Lectura rápida sobre fondo blanco, con holgura aun con luz directa | Negro puro: más contraste (21:1), pero más brusco y no hace falta, porque este valor ya pasa AAA |
+| Gris oscuro `#4A586B` | Texto de apoyo: descripciones, ayudas, migas, pie | 7.24:1 | Baja un escalón la jerarquía sin perder legibilidad | Un gris más claro: el gris de borde (`#6B7A8F`) mide 4.37:1 y no sirve para texto normal |
+| Gris de borde `#6B7A8F` | Borde de campos y de la pastilla "Pendiente" | 4.37:1 | Los bordes que identifican un control deben llegar a 3:1 | Borde claro: el campo se pierde en pantallas con reflejos |
 | Blanco `#FFFFFF` | Fondo de la tarjeta y de los campos | (base) | Fondo claro con texto oscuro. No hay modo oscuro, porque con luz directa un fondo oscuro refleja más | Modo oscuro |
 | Fondos suaves `#E4F1E9`, `#FBEAEA`, `#E8ECF2`, `#E3E8EF` | Resumen "ok", línea o campo con error, avisos y línea cambiada, botón bloqueado | (ver tabla siguiente) | Agrupan sin usar un color nuevo: son tintes de los mismos tres tonos | Un color distinto por estado |
 
@@ -55,22 +55,22 @@ El fondo de la página (`#F3F6FB`) solo se ve fuera de la tarjeta en pantallas g
 
 ### Contrastes medidos
 
-Texto normal: AA exige 4,5:1 y AAA exige 7:1.
+Texto normal: AA exige 4.5:1 y AAA exige 7:1.
 
 | Texto sobre fondo | Hex | Razón | AA | AAA | Dónde se usa |
 |---|---|---|---|---|---|
-| Azul marino sobre blanco | `#0F2540` / `#FFFFFF` | 15,45:1 | Cumple | Cumple | Texto general, títulos, etiquetas, SKU, listado de la guía |
-| Gris oscuro sobre blanco | `#4A586B` / `#FFFFFF` | 7,24:1 | Cumple | Cumple | Cabecera, migas, ayudas, descripción del equipo, pie |
-| Verde sobre blanco | `#0B4F2E` / `#FFFFFF` | 9,67:1 | Cumple | Cumple | Botón secundario, enlaces, pastilla "ok" |
-| Rojo sobre blanco | `#B42323` / `#FFFFFF` | 6,55:1 | Cumple | No | Mensajes de error, pastillas "no existe" y "sin stock" |
-| Blanco sobre verde | `#FFFFFF` / `#0B4F2E` | 9,67:1 | Cumple | Cumple | Botón principal y botón en estado "cargando" |
-| Verde sobre verde suave | `#0B4F2E` / `#E4F1E9` | 8,31:1 | Cumple | Cumple | Resumen "✓ N de N productos ok" |
-| Rojo sobre rosado | `#B42323` / `#FBEAEA` | 5,63:1 | Cumple | No | Resumen "Corrige N productos" y detalle de la línea con error |
-| Azul marino sobre gris azulado | `#0F2540` / `#E8ECF2` | 13,03:1 | Cumple | Cumple | Avisos, resumen sin validar, línea cambiada, campo de solo lectura |
-| Azul marino sobre rosado | `#0F2540` / `#FBEAEA` | 13,29:1 | Cumple | Cumple | SKU dentro de una línea con error |
-| Gris oscuro sobre gris azulado | `#4A586B` / `#E8ECF2` | 6,11:1 | Cumple | No | Descripción del equipo en una línea cambiada |
-| Gris oscuro sobre rosado | `#4A586B` / `#FBEAEA` | 6,23:1 | Cumple | No | Descripción del equipo en una línea con error |
-| Gris oscuro sobre gris del botón bloqueado | `#4A586B` / `#E3E8EF` | 5,88:1 | Cumple | No | "Preparar guía (bloqueado)" |
+| Azul marino sobre blanco | `#0F2540` / `#FFFFFF` | 15.45:1 | Cumple | Cumple | Texto general, títulos, etiquetas, SKU, listado de la guía |
+| Gris oscuro sobre blanco | `#4A586B` / `#FFFFFF` | 7.24:1 | Cumple | Cumple | Cabecera, migas, ayudas, descripción del equipo, pie |
+| Verde sobre blanco | `#0B4F2E` / `#FFFFFF` | 9.67:1 | Cumple | Cumple | Botón secundario, enlaces, pastilla "ok" |
+| Rojo sobre blanco | `#B42323` / `#FFFFFF` | 6.55:1 | Cumple | No | Mensajes de error, pastillas "no existe" y "sin stock" |
+| Blanco sobre verde | `#FFFFFF` / `#0B4F2E` | 9.67:1 | Cumple | Cumple | Botón principal y botón en estado "cargando" |
+| Verde sobre verde suave | `#0B4F2E` / `#E4F1E9` | 8.31:1 | Cumple | Cumple | Resumen "✓ N de N productos ok" |
+| Rojo sobre rosado | `#B42323` / `#FBEAEA` | 5.63:1 | Cumple | No | Resumen "Corrige N productos" y detalle de la línea con error |
+| Azul marino sobre gris azulado | `#0F2540` / `#E8ECF2` | 13.03:1 | Cumple | Cumple | Avisos, resumen sin validar, línea cambiada, campo de solo lectura |
+| Azul marino sobre rosado | `#0F2540` / `#FBEAEA` | 13.29:1 | Cumple | Cumple | SKU dentro de una línea con error |
+| Gris oscuro sobre gris azulado | `#4A586B` / `#E8ECF2` | 6.11:1 | Cumple | No | Descripción del equipo en una línea cambiada |
+| Gris oscuro sobre rosado | `#4A586B` / `#FBEAEA` | 6.23:1 | Cumple | No | Descripción del equipo en una línea con error |
+| Gris oscuro sobre gris del botón bloqueado | `#4A586B` / `#E3E8EF` | 5.88:1 | Cumple | No | "Preparar guía (bloqueado)" |
 
 Ningún par de texto queda bajo AA.
 
@@ -78,15 +78,15 @@ Bordes y componentes (WCAG pide 3:1 para lo que identifica un control):
 
 | Borde sobre fondo | Hex | Razón | 3:1 | Dónde se usa |
 |---|---|---|---|---|
-| Gris de borde sobre blanco | `#6B7A8F` / `#FFFFFF` | 4,37:1 | Cumple | Campos y pastilla "Pendiente" |
-| Verde sobre blanco | `#0B4F2E` / `#FFFFFF` | 9,67:1 | Cumple | Botón secundario, pastilla "ok" y foco del teclado |
-| Rojo sobre blanco | `#B42323` / `#FFFFFF` | 6,55:1 | Cumple | Pastilla de alerta |
-| Rojo sobre rosado | `#B42323` / `#FBEAEA` | 5,63:1 | Cumple | Línea y campo con error |
-| Gris de borde sobre gris del botón bloqueado | `#6B7A8F` / `#E3E8EF` | 3,55:1 | Cumple | Borde punteado del botón bloqueado |
-| Gris de borde sobre gris azulado | `#6B7A8F` / `#E8ECF2` | 3,69:1 | Cumple | Borde de los avisos |
-| Gris claro sobre blanco | `#C5CED9` / `#FFFFFF` | 1,59:1 | **No cumple** | Borde de las tarjetas de producto |
+| Gris de borde sobre blanco | `#6B7A8F` / `#FFFFFF` | 4.37:1 | Cumple | Campos y pastilla "Pendiente" |
+| Verde sobre blanco | `#0B4F2E` / `#FFFFFF` | 9.67:1 | Cumple | Botón secundario, pastilla "ok" y foco del teclado |
+| Rojo sobre blanco | `#B42323` / `#FFFFFF` | 6.55:1 | Cumple | Pastilla de alerta |
+| Rojo sobre rosado | `#B42323` / `#FBEAEA` | 5.63:1 | Cumple | Línea y campo con error |
+| Gris de borde sobre gris del botón bloqueado | `#6B7A8F` / `#E3E8EF` | 3.55:1 | Cumple | Borde punteado del botón bloqueado |
+| Gris de borde sobre gris azulado | `#6B7A8F` / `#E8ECF2` | 3.69:1 | Cumple | Borde de los avisos |
+| Gris claro sobre blanco | `#C5CED9` / `#FFFFFF` | 1.59:1 | **No cumple** | Borde de las tarjetas de producto |
 
-**Pendiente de corregir:** el borde de las tarjetas de producto (`#C5CED9`) mide 1,59:1 y no llega a 3:1. Hoy es solo un marco decorativo, porque el estado de cada producto va en la pastilla (que sí cumple) y en texto, pero si se quiere que el marco también sea visible con reflejos, hay que oscurecerlo. Queda como decisión del equipo.
+**Pendiente de corregir:** el borde de las tarjetas de producto (`#C5CED9`) mide 1.59:1 y no llega a 3:1. Hoy es solo un marco decorativo, porque el estado de cada producto va en la pastilla (que sí cumple) y en texto, pero si se quiere que el marco también sea visible con reflejos, hay que oscurecerlo. Queda como decisión del equipo.
 
 ## Mapa de navegación
 
