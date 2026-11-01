@@ -21,6 +21,7 @@ Documentación del proyecto:
 - Wireframes del flujo principal (Avance 4): [docs/wireframes/](docs/wireframes/)
 - Conversación con el usuario (Avance 4): [docs/entrevistas/entrevista_subjefe_bodega.md](docs/entrevistas/entrevista_subjefe_bodega.md)
 - Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app)
+- Análisis ético del prototipo (Avance 5): [docs/etica.md](docs/etica.md)
 
 ### Estructura del repositorio
 
