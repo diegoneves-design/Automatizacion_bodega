@@ -34,7 +34,7 @@ Una fila por cada campo del formulario del prototipo (P1 y P3) y por los datos q
 
 **Plazo de conservación:** la guía oficial se emite en el ERP y se sube al SII (conversación, preguntas 1 y D5), así que su respaldo tributario queda en el ERP. El plazo exacto para los datos de este sistema es una **propuesta del equipo por confirmar con administración**.
 
-**Campos revisados por privacidad desde el diseño:** el prototipo **no** incluye `USUARIOS.correo` ni un teléfono, aunque el modelo de datos los considera, porque ninguna pantalla del flujo principal los necesita. Se usarán solo si se agrega inicio de sesión. Tampoco se pide el motivo de la orden (`ORDENES.motivo`), porque ninguna historia lo justifica en este flujo.
+**Campos revisados por privacidad desde el diseño:** el prototipo **no** incluye `USUARIOS.correo` ni un teléfono, aunque el modelo de datos los considera, porque ninguna pantalla del flujo principal los necesita. Se usarán solo si se agrega inicio de sesión. Tampoco se pide el motivo de una orden alternativa (`ORDENES.motivo_alternativo`), porque ninguna historia del flujo principal lo justifica.
 
 ## B3 · Sesgo, accesibilidad y transparencia
 
