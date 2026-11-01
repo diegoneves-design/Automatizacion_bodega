@@ -303,3 +303,26 @@ Hecho por Oscar Ynchaustegui el 2026-11-01, con Claude.
 - Pendiente: los responsables de los riesgos 3 a 5 son una propuesta; los integrantes deben confirmarlos al revisar el pull request.
 
 **Cómo se verificó.** Cada campo de la ficha se buscó en `prototipo/js/app.js` (etiquetas de P1 y P3) y en `estructura_datos.md`. Los contrastes se compararon con la tabla de `docs/prototipo.md` y con las variables de `prototipo/css/estilos.css`. Las rutas de las capturas se comprobaron contra `docs/img/etica/`.
+
+---
+
+## Encargo 15. Corregir los ejemplos de la estructura de datos según la revisión del Avance 3
+
+Preparado el 2026-11-01 con Claude a partir de la retroalimentación de la profesora; revisado y subido por Sebastián Carmona, con revisión de Oscar Ynchaustegui en el pull request.
+
+**Objetivo.** Corregir en `docs/datos/estructura_datos.md` los cuatro problemas que señaló la revisión del Avance 3 (punto 6) y que la verificación del Encargo 2 no detectó, porque revisaba el modelo anterior de seis tablas.
+
+**Instrucción entregada.**
+- Contexto: la retroalimentación de la profesora, el modelo de siete tablas vigente y la conversación con el subjefe de bodega (`docs/entrevistas/`).
+- Intención: que todas las tablas de ejemplo cuenten la misma historia y que las reglas sigan al negocio, no a los ejemplos.
+- Restricciones: no cambiar las tablas ni las relaciones del diagrama salvo lo necesario; mantener los campos que ya usan el prototipo y los wireframes; cada clave externa debe apuntar a un registro que exista.
+
+**Respuesta obtenida.** Ejemplos rehechos como una sola mañana de bodega (órdenes 3001, 3002 y 3003), `motivo` reemplazado por `motivo_alternativo` (obligatorio solo si la modalidad es alternativa), `motivo_cambio` obligatorio, estado y ubicación de los equipos actualizados después de cada guía, y el diagrama regenerado.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: la orden 3003 y los equipos 503, 504, 505 y 507 se agregan a sus tablas, en lugar de borrar las filas que los usaban.
+- Aceptado: `modalidad` aplica a despacho y retiro, porque la conversación (pregunta D1) dice que "alternativo" es el cambio por mantención o falla en ambos.
+- Corregido respecto del Avance 3: `motivo_cambio` deja de ser opcional. Antes se había dejado opcional para que un ejemplo vacío no incumpliera la regla; ahora el ejemplo se ajusta a la regla.
+- Pendiente: el prototipo todavía ofrece "Sin motivo" en P3 (riesgo 3 de `docs/etica.md`) y `docs/prototipo.md` todavía menciona `ORDENES.motivo`.
+
+**Cómo se verificó.** Un script recorrió las tablas de ejemplo y comprobó que cada `id_cliente`, `id_usuario`, `id_orden` e `id_equipo` usado como clave externa existe en su tabla, y que ningún cambio tiene el motivo vacío: cero errores. Se revisó a mano que cada cambio ocurra antes de la guía de su orden y que el estado final de cada equipo calce con las guías emitidas. El diagrama se regeneró desde el bloque Mermaid y se revisó la imagen.
