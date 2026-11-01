@@ -279,3 +279,27 @@ Encargos 10 a 13 hechos por Oscar Ynchaustegui el 2026-10-10, con Claude, a part
 - Corregido: los wireframes de texto del Encargo 9 (W1 a W4) quedan reemplazados por estas imágenes.
 
 **Cómo se verificó.** Se revisó que cada pantalla tenga sus cuatro notas, que cada historia HU-01 a HU-05 aparezca en al menos una pantalla, que los nombres de los campos existan en `estructura_datos.md` y que lo que dice el "entonces" de los dos escenarios de la HU-01 esté dibujado en P2a y P2b.
+
+---
+
+## Encargo 14. Análisis ético del prototipo (Avance 5, Parte B)
+
+Hecho por Oscar Ynchaustegui el 2026-11-01, con Claude.
+
+**Objetivo.** Escribir `docs/etica.md` con las cuatro piezas de la Parte B del Avance 5 (mapa de exclusión, ficha de datos, accesibilidad y riesgos) y documentar la modificación del prototipo que motivó el análisis.
+
+**Instrucción entregada.**
+- Contexto: las instrucciones del Avance 5, el prototipo en `prototipo/` y `docs/prototipo.md`, la conversación con el subjefe de bodega (`docs/entrevistas/`), `docs/datos/estructura_datos.md` y el ejercicio de clase "¿quién queda fuera?".
+- Intención: un análisis referido a este prototipo, con personas, campos y pantallas concretas, no afirmaciones genéricas.
+- Restricciones: cada campo de la ficha debe existir en el formulario del prototipo y en la estructura de datos; los valores de contraste se toman de la medición ya hecha por el equipo; lo que no aplica (IA, ordenamiento) se declara con justificación; no inventar plazos legales.
+
+**Respuesta obtenida.** `docs/etica.md` con la tabla de tres actores (el excluido es el bodeguero de terreno sin cuenta que anota en papel), una ficha de 11 filas, la revisión de accesibilidad de P1 a P4, tres prácticas de uso eficiente y cinco riesgos con tratamiento, responsable y fecha de revisión, más las capturas de antes y después del borde de las tarjetas.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: el actor excluido sale de la conversación (preguntas 3, 14 y 15), no de un supuesto.
+- Aceptado: declarar "no aplica" para IA y ordenamiento, con su razón.
+- Corregido: el agente revisó el código y encontró que el campo Cliente de solo lectura tiene fondo gris, así que su borde mide aún menos que 1,59:1; se dejó como riesgo pendiente con responsable.
+- Corregido: el plazo de conservación queda como propuesta por confirmar con administración, en lugar de citar un plazo legal sin verificarlo.
+- Pendiente: los responsables de los riesgos 3 a 5 son una propuesta; los integrantes deben confirmarlos al revisar el pull request.
+
+**Cómo se verificó.** Cada campo de la ficha se buscó en `prototipo/js/app.js` (etiquetas de P1 y P3) y en `estructura_datos.md`. Los contrastes se compararon con la tabla de `docs/prototipo.md` y con las variables de `prototipo/css/estilos.css`. Las rutas de las capturas se comprobaron contra `docs/img/etica/`.
