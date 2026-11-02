@@ -35,6 +35,7 @@ docs/historias.md     historias de usuario y criterios de aceptación (Avance 4)
 docs/wireframes/      wireframes del flujo principal, con sus notas (Avance 4)
 docs/entrevistas/     conversación con el usuario y su guion (Avance 4)
 docs/recorrido-usuario/ borrador del mapa de recorrido (ensayo, sin validar)
+prototipo/            prototipo navegable del flujo principal (Avance 5), en HTML, CSS y JS sin build
 README.md             portada del proyecto
 .gitignore            archivos locales que no se suben (base de datos, .env)
 .env.example          nombres de variables de entorno, sin valores
@@ -117,20 +118,24 @@ Haz clic en la ventana de PowerShell y presiona `Ctrl + C`. Después ya puedes c
 
 ### Qué vas a ver
 
-A la izquierda hay un menú con tres vistas:
+La aplicación abre en **Órdenes**. A la izquierda hay un menú con cinco opciones. *Validador* y *Ajuste de última hora* trabajan sobre la orden que tengas elegida; si no hay ninguna, te devuelven a *Órdenes*.
 
 | Vista | Para qué sirve |
 |---|---|
-| **1. Carga masiva** | Cargar el listado de SKU de una orden (pegados o desde un archivo `.txt` o `.csv`), eligiendo el tipo de movimiento: Despacho (Convencional o Alternativo) o Retiro (Preventivo o Por falla). Elimina duplicados y no deja cargar más de 50 SKU por guía |
-| **2. Validador** | Revisar cada SKU contra el inventario. Cada fila queda como `OK`, `SIN STOCK DISPONIBLE` o `SKU NO EXISTE EN INVENTARIO`, y se puede exportar a CSV |
-| **3. Ajuste de última hora** | Reemplazar un SKU por otro. El original no se borra y el cambio queda en un registro con fecha, hora, responsable y motivo |
+| **Órdenes** | Ver las órdenes del día, buscarlas por número, cambiar la fecha y filtrar por Despacho o Retiro. *Ver detalle* abre la orden con sus equipos, el estado de cada uno y su última modificación |
+| **Carga masiva** | Cargar el listado de SKU de una orden (pegados o desde un archivo `.txt` o `.csv`), eligiendo el tipo de movimiento: Despacho (Convencional o Alternativo) o Retiro (Preventivo o Por falla). Elimina duplicados y no deja cargar más de 50 SKU por guía. Al cargar, abre el detalle de la orden nueva |
+| **Validador** | Revisar cada SKU de la orden contra el inventario. Cada fila queda como `OK`, `Sin stock` o `No existe`, y se puede descargar en CSV. Si algún SKU tiene problemas, *Emitir guía* queda bloqueado y *Corregir SKU* lleva al ajuste. Con todo `OK`, emite la guía y la deja para descargar en `.txt` |
+| **Ajuste de última hora** | Reemplazar un SKU por otro del inventario, con motivo y responsable. El original no se borra y el cambio queda en el historial de la orden |
+| **Historial** | Ver todos los cambios de última hora (fecha y hora, orden, SKU original y nuevo, responsable y motivo) y descargarlos en CSV |
 
 ### Prueba guiada (5 minutos)
 
 Sirve para comprobar que todo funciona. Sigue los pasos en orden.
 
-1. En el menú de la izquierda elige **1. Carga masiva**.
-   - En *Folio de guia / orden* escribe `GUIA-2026-001`.
+> Si ya probaste la app antes, borra `bodega.db` para partir con los datos de ejemplo: la app no rechaza un folio repetido y mezclaría las órdenes.
+
+1. En el menú de la izquierda elige **Carga masiva**.
+   - En *Folio de guía u orden* escribe `GUIA-2026-001`.
    - *Tipo de movimiento*: `Despacho`. *Modalidad*: `Convencional`.
    - En el cuadro grande pega estas cinco líneas (una por línea):
 
@@ -142,15 +147,15 @@ Sirve para comprobar que todo funciona. Sigue los pasos en orden.
      MON-050
      ```
 
-   - Presiona **Cargar orden**. Debe aparecer un mensaje verde: `Orden 'GUIA-2026-001' cargada con 5 SKUs`.
-2. Elige **2. Validador** y, en *Selecciona un folio*, `GUIA-2026-001`. `MON-050` aparece en rojo como `SIN STOCK DISPONIBLE`: es a propósito, porque en el inventario simulado tiene stock 0.
-3. Elige **3. Ajuste de ultima hora**. En el formulario:
-   - *SKU original a reemplazar*: la opción que termina en `MON-050`.
-   - *SKU de reemplazo*: `PLA-060`.
-   - *Responsable del cambio*: tu nombre.
-   - *Motivo*: por ejemplo `Sin stock`.
-   - Presiona **Registrar reemplazo**. Abajo, en *Log de cambios*, queda anotado el cambio.
-4. Vuelve a **2. Validador**: ahora `PLA-060` aparece como `OK` y todo sale en verde.
+   - Presiona **Cargar orden**. Se abre *Detalle de la orden* con el mensaje `Orden GUIA-2026-001 cargada con 5 SKU. Revisa los equipos y valídala.` Los cinco equipos aparecen como `Sin validar`.
+2. Presiona **Validar SKUs →**. En *Resultado de validación* aparece `Validación con diferencias` (4 de 5 SKU válidos): `MON-050` sale como `Sin stock`. Es a propósito, porque en el inventario simulado tiene stock 0. *Emitir guía* queda bloqueado.
+3. Presiona **Corregir SKU**. Se abre *Ajuste de última hora* con `MON-050` ya elegido en *SKU a reemplazar*. En el formulario:
+   - *Nuevo SKU*: `PLA-060`.
+   - *Motivo del cambio*: `Sin stock`.
+   - *Responsable*: tu nombre (es obligatorio).
+   - Presiona **Guardar cambio**. Vuelves a la validación con el mensaje `Cambio registrado: MON-050 → PLA-060.`
+4. Ahora aparece `Validación completada` (5 de 5) y todo sale `OK`. Presiona **Emitir guía →**: se abre *Guía generada* con el botón **Descargar guía (.txt)**. La guía emitida se recuerda solo mientras la página esté abierta.
+5. En el menú elige **Historial**: el cambio queda anotado con fecha, hora, orden, responsable y motivo.
 
 ### Si algo falla
 
@@ -186,17 +191,19 @@ py -m pytest -v
 
 ## En qué estado está
 
-Al 10 de octubre de 2026 el proyecto está en **etapa inicial**, en el **Avance 4**. Ya hubo una conversación real con un subjefe de bodega que hoy hace la tarea (integrante del equipo), y de ella salen las historias de usuario y los wireframes del flujo principal. La app no está probada con usuarios reales y varias decisiones pueden cambiar.
+Al 1 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance 5**. A partir de la conversación con un subjefe de bodega que hoy hace la tarea (integrante del equipo), de las historias de usuario y de los wireframes del Avance 4, se construyó un prototipo navegable del flujo principal, publicado en [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app) e independiente de la app, y se hizo su análisis ético. Ni el prototipo ni la app están probados con usuarios reales, y varias decisiones pueden cambiar.
 
 | Hecho | Pendiente |
 |---|---|
 | Problema, caso de uso y maqueta de tres pantallas | Medir cuánto demoran hoy las guías y cuántas se rehacen |
 | Conversación con el usuario (`docs/entrevistas`) | Probar el flujo con usuarios (Semana 7) |
-| Historias HU-01 a HU-05 y criterios de la historia principal (`docs/historias.md`) | Bloquear la guía cuando algún SKU no valida, como pide el criterio de la HU-01 |
-| Wireframes del flujo principal con sus notas (`docs/wireframes`) | Subir el límite de 50 a 60 productos por guía (máximo real del ERP) |
-| Carga masiva, validador de SKU y ajuste de última hora con registro de cambios | Destacar los cambios de último minuto en el validador (HU-04) |
-| Diseño preliminar de la base de datos (`docs/datos`) | Cuentas y permisos; pasar la base a Supabase |
-| Base SQLite con inventario simulado, tests y CI en GitHub Actions | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
+| Historias HU-01 a HU-05 y criterios de la historia principal (`docs/historias.md`) | Revisar y aprobar los criterios en borrador de HU-02 a HU-05 (`docs/prototipo.md`) |
+| Wireframes del flujo principal con sus notas (`docs/wireframes`) | Subir el límite de 50 a 60 productos por guía en la app (máximo real del ERP; el prototipo ya usa 60) |
+| Prototipo navegable P1 a P4 con sistema mínimo, mapa de navegación y registro de decisiones (`prototipo/`, `docs/prototipo.md`) | Destacar los cambios de último minuto en el validador de la app (HU-04) |
+| Análisis ético: exclusión, datos personales, accesibilidad, sostenibilidad y riesgos (`docs/etica.md`) | Hacer obligatorio el motivo del cambio y corregir el borde del campo Cliente (riesgos 3 y 5 de `docs/etica.md`) |
+| Carga masiva, validador de SKU y ajuste de última hora con registro de cambios; la app bloquea la emisión de la guía si algún SKU no valida | Cuentas y permisos; pasar la base a Supabase |
+| Diseño preliminar de la base de datos (`docs/datos`) | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
+| Base SQLite con inventario simulado, tests y CI en GitHub Actions | |
 
 ## Quiénes la desarrollan
 
@@ -210,6 +217,7 @@ Grupo 6, Universidad de Santiago de Chile. Profesora: Andrea Arredondo.
 ### Flujo de trabajo
 
 - `main` guarda la versión estable, que es la que se entrega.
-- `dev` es donde el equipo trabaja día a día. Cada cambio se hace en `dev` o en una rama que sale de `dev`.
-- Terminado el cambio, se abre un pull request de `dev` hacia `main`. Otro integrante, distinto de quien hizo el cambio, lo revisa y lo aprueba.
+- Cada cambio se hace en una rama `feature/<tema>` que sale de `main` actualizado (por ejemplo, `feature/avance5-prototipo`).
+- Terminado el cambio, se abre un pull request de esa rama hacia `main`. Otro integrante, distinto de quien hizo el cambio, lo revisa y lo aprueba antes de fusionarlo.
 - Ningún integrante sube cambios directamente a `main`.
+- La rama `dev` se usó en las primeras entregas y hoy no forma parte del flujo.

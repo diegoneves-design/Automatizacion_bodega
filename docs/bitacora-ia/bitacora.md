@@ -326,3 +326,43 @@ Preparado el 2026-11-01 con Claude a partir de la retroalimentación de la profe
 - Pendiente: el prototipo todavía ofrece "Sin motivo" en P3 (riesgo 3 de `docs/etica.md`) y `docs/prototipo.md` todavía menciona `ORDENES.motivo`.
 
 **Cómo se verificó.** Un script recorrió las tablas de ejemplo y comprobó que cada `id_cliente`, `id_usuario`, `id_orden` e `id_equipo` usado como clave externa existe en su tabla, y que ningún cambio tiene el motivo vacío: cero errores. Se revisó a mano que cada cambio ocurra antes de la guía de su orden y que el estado final de cada equipo calce con las guías emitidas. El diagrama se regeneró desde el bloque Mermaid y se revisó la imagen.
+
+---
+
+## Encargo 16. Revisar el Avance 5 en main y dejar coherentes los documentos
+
+Hecho por Diego Neves el 2026-11-01, con Claude, en la rama `feature/coherencia-avance5`, que sale de `main` actualizado.
+
+**Objetivo.** Revisar `main` contra las instrucciones del Avance 5 sin modificar nada y, a partir de esa revisión, corregir las inconsistencias entre `docs/prototipo.md`, `docs/datos/estructura_datos.md`, el README y la aplicación.
+
+**Instrucción entregada.**
+- Contexto: `main` con los PR del Avance 5 (#14 a #18) y la corrección de la estructura de datos (#20); las instrucciones del Avance 5 (README, `docs/prototipo.md`, prototipo, `docs/etica.md`).
+- Intención: primero un diagnóstico de solo lectura (qué cumple, qué falta, qué archivos sobran y qué PR aprobó cada integrante); después, corregir solo lo pedido, punto por punto.
+- Restricciones: un commit por punto, con mensaje en español; mostrar el cambio y esperar aprobación antes de cada commit; confirmar que ninguna captura se enlaza antes de borrarla; no editar el Encargo 15; no corregir la app en este PR; no hacer push sin preguntar.
+
+**Respuesta obtenida.**
+- Diagnóstico: el Avance 5 cumple casi todo. Faltas: los PR #14 a #17 se fusionaron sin aprobación de otro integrante; `prototipo.md` quedó desactualizado después del PR #20; el README seguía en el Avance 4 y describía un flujo con `dev` que no se usa; había 4 capturas de ética que no enlaza ningún archivo.
+- Cuatro commits:
+  1. `docs/prototipo.md`: el equipo en mantención del modelo es `SD-63A20-0316`, no `SD-63A20-0315`, y el campo se llama `ORDENES.motivo_alternativo`. Esto resuelve la nota pendiente del Encargo 15 sobre `ORDENES.motivo`.
+  2. README: estado al Avance 5, carpeta `prototipo/` en el árbol, y flujo de trabajo con ramas `feature/<tema>` desde `main` y pull request aprobado por otro integrante.
+  3. Eliminación de `antes/despues-p2-3001-360.png` y `antes/despues-p2-3002-1280.png`, que aplica la práctica de sostenibilidad 2 de `etica.md`.
+  4. README: "Qué vas a ver" y la prueba guiada pasan a la interfaz actual de cinco vistas (Órdenes, Carga masiva, Validador, Ajuste de última hora, Historial).
+- Revisión de esta bitácora: la ética está registrada (Encargo 14); el prototipo de los PR #14 a #17 no tiene entrada.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: quitar de "Pendiente" el bloqueo de la guía cuando un SKU no valida, porque la app ya lo hace (`src/views/validacion.py`, botón *Emitir guía* desactivado).
+- Aceptado: dejar como pendientes de la app el límite de 60 SKU (`MAX_SKUS` sigue en 50) y destacar los cambios en el validador (HU-04).
+- Corregido: el agente intentó hacer el commit del punto 2 y preparar el borrado del punto 3 en un solo paso; se rechazó y se pidió un paso a la vez.
+- Corregido: el mensaje del commit del punto 3 se cambió para citar la práctica de sostenibilidad que lo motiva.
+- Corregido: se agregó a la prueba guiada la nota de borrar `bodega.db` antes de empezar, porque la app no rechaza un folio repetido.
+- Pendiente (Bastián Vargas, app): al cargar un folio que ya existe, la app agrega los SKU nuevos a la orden antigua, y el mensaje dice "cargada con 5 SKU" aunque la orden quede con 10.
+- Pendiente (Bastián Vargas, app): la carga acepta SKU con una coma al final (por ejemplo `EXC-001,`) y no reconoce el equipo.
+- Pendiente (Bastián Vargas): registrar en esta bitácora el uso de IA en el prototipo (PR #14 a #17), si lo hubo.
+- Revisado: el agente marcó que los riesgos de `etica.md` tienen hitos ("Semana 7", "Próximo avance") y no fechas. Se confirmó que los riesgos indican la oportunidad de revisión que pide la pauta; no requiere cambio.
+
+**Cómo se verificó.**
+- El diagnóstico se hizo leyendo los archivos de `main` y el código del prototipo (`prototipo/js/app.js` y `datos.js`). Los autores y las aprobaciones de los PR se consultaron en la API pública de GitHub.
+- Antes de borrar las capturas se buscaron sus nombres en todo el repositorio: solo `docs/etica.md` enlaza capturas de ética, y no usa ninguna de las cuatro borradas.
+- La prueba guiada nueva se escribió leyendo `src/views/` y `src/app.py` (nombres de menús, campos, botones, mensajes e inventario inicial).
+- Diego ejecutó la app con la base limpia y siguió la prueba guiada paso a paso: los nombres de menús, campos y botones coinciden con la interfaz. Funcionaron la carga, la validación con `MON-050` sin stock, *Corregir SKU*, *Guardar cambio*, la emisión y descarga de la guía, y el Historial con fecha, responsable y motivo.
+- Cada commit se revisó en el diff antes de aprobarlo. No se ejecutaron tests: no se cambió código.

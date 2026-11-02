@@ -183,7 +183,7 @@ Los nombres de los campos son los de [`docs/datos/estructura_datos.md`](datos/es
 | Tema | Wireframes o documentos | Prototipo |
 |---|---|---|
 | Quién cambia el equipo | P2b dice "Pedro (mantenimiento)"; P4 dice "Preparada por Oscar" | Se sigue `estructura_datos.md`: Camila Rojas es de mantenimiento y Pedro Soto es jefe de bodega, quien prepara la guía |
-| Equipo `SD-63A20-0315` | P2a lo muestra "ok"; `estructura_datos.md` lo tiene en mantención | Disponible. El equipo en mantención del prototipo es `SD-63A20-0316` |
+| Equipo en mantención | `estructura_datos.md` tiene en mantención a `SD-63A20-0316` (503); `SD-63A20-0315` (502) queda arrendado al final de la mañana | Igual: `SD-63A20-0316` está en mantención (sin stock). `SD-63A20-0315` aparece disponible porque el prototipo muestra el inventario antes del despacho, como P2a |
 | Orden 3001 | P2a dice que no tiene cambios; el ejemplo de `estructura_datos.md` le registra uno | Sin cambios, como en P2a |
 | Límite de productos | Wireframe P1 e historia HU-02: máximo 60 | **60**. La aplicación actual todavía tiene el límite en 50 |
 | Orden y cliente en P1 | El wireframe los muestra como campos | Selector de orden con 3001 por defecto; el cliente se precarga y es de solo lectura |
@@ -191,7 +191,7 @@ Los nombres de los campos son los de [`docs/datos/estructura_datos.md`](datos/es
 | *Cancelar* de P1 | Dice "vuelve al inicio", y no hay pantalla de inicio | Limpia el formulario y muestra "Carga cancelada. No se guardó nada." |
 | Acción primaria | Los wireframes dibujan siempre *Preparar guía* o *Guardar cambio* como botón dominante | Hay un solo botón dominante por pantalla y cambia con el estado: *Validar* antes de validar, *Registrar cambio* si hay un error y *Preparar guía* cuando todo está ok |
 | SKU que no existe | `id_equipo_sale` es una clave a EQUIPOS, y un SKU inexistente no tiene equipo | "Equipo que sale" es la línea del pedido tal como se informó |
-| Motivo de la orden | `ORDENES.motivo` existe en el modelo; el wireframe P1 no lo muestra | No se incluye, como en el wireframe |
+| Motivo de la orden alternativa | `ORDENES.motivo_alternativo` existe en el modelo y es obligatorio solo si la modalidad es alternativa; el wireframe P1 no lo muestra | No se incluye, como en el wireframe |
 | Número de guía | `GUIAS.numero_guia` es obligatorio; el wireframe P4 no lo muestra | No se muestra; la guía oficial se emite en el ERP |
 | Fecha y hora | P3 muestra 09:55 de ejemplo | Se toma del reloj del dispositivo al guardar |
 | Archivo de la guía | `archivo_pdf` | Archivo de texto generado en el navegador, marcado como ejemplo |
