@@ -118,20 +118,24 @@ Haz clic en la ventana de PowerShell y presiona `Ctrl + C`. Después ya puedes c
 
 ### Qué vas a ver
 
-A la izquierda hay un menú con tres vistas:
+La aplicación abre en **Órdenes**. A la izquierda hay un menú con cinco opciones. *Validador* y *Ajuste de última hora* trabajan sobre la orden que tengas elegida; si no hay ninguna, te devuelven a *Órdenes*.
 
 | Vista | Para qué sirve |
 |---|---|
-| **1. Carga masiva** | Cargar el listado de SKU de una orden (pegados o desde un archivo `.txt` o `.csv`), eligiendo el tipo de movimiento: Despacho (Convencional o Alternativo) o Retiro (Preventivo o Por falla). Elimina duplicados y no deja cargar más de 50 SKU por guía |
-| **2. Validador** | Revisar cada SKU contra el inventario. Cada fila queda como `OK`, `SIN STOCK DISPONIBLE` o `SKU NO EXISTE EN INVENTARIO`, y se puede exportar a CSV |
-| **3. Ajuste de última hora** | Reemplazar un SKU por otro. El original no se borra y el cambio queda en un registro con fecha, hora, responsable y motivo |
+| **Órdenes** | Ver las órdenes del día, buscarlas por número, cambiar la fecha y filtrar por Despacho o Retiro. *Ver detalle* abre la orden con sus equipos, el estado de cada uno y su última modificación |
+| **Carga masiva** | Cargar el listado de SKU de una orden (pegados o desde un archivo `.txt` o `.csv`), eligiendo el tipo de movimiento: Despacho (Convencional o Alternativo) o Retiro (Preventivo o Por falla). Elimina duplicados y no deja cargar más de 50 SKU por guía. Al cargar, abre el detalle de la orden nueva |
+| **Validador** | Revisar cada SKU de la orden contra el inventario. Cada fila queda como `OK`, `Sin stock` o `No existe`, y se puede descargar en CSV. Si algún SKU tiene problemas, *Emitir guía* queda bloqueado y *Corregir SKU* lleva al ajuste. Con todo `OK`, emite la guía y la deja para descargar en `.txt` |
+| **Ajuste de última hora** | Reemplazar un SKU por otro del inventario, con motivo y responsable. El original no se borra y el cambio queda en el historial de la orden |
+| **Historial** | Ver todos los cambios de última hora (fecha y hora, orden, SKU original y nuevo, responsable y motivo) y descargarlos en CSV |
 
 ### Prueba guiada (5 minutos)
 
 Sirve para comprobar que todo funciona. Sigue los pasos en orden.
 
-1. En el menú de la izquierda elige **1. Carga masiva**.
-   - En *Folio de guia / orden* escribe `GUIA-2026-001`.
+> Si ya probaste la app antes, borra `bodega.db` para partir con los datos de ejemplo: la app no rechaza un folio repetido y mezclaría las órdenes.
+
+1. En el menú de la izquierda elige **Carga masiva**.
+   - En *Folio de guía u orden* escribe `GUIA-2026-001`.
    - *Tipo de movimiento*: `Despacho`. *Modalidad*: `Convencional`.
    - En el cuadro grande pega estas cinco líneas (una por línea):
 
@@ -143,15 +147,15 @@ Sirve para comprobar que todo funciona. Sigue los pasos en orden.
      MON-050
      ```
 
-   - Presiona **Cargar orden**. Debe aparecer un mensaje verde: `Orden 'GUIA-2026-001' cargada con 5 SKUs`.
-2. Elige **2. Validador** y, en *Selecciona un folio*, `GUIA-2026-001`. `MON-050` aparece en rojo como `SIN STOCK DISPONIBLE`: es a propósito, porque en el inventario simulado tiene stock 0.
-3. Elige **3. Ajuste de ultima hora**. En el formulario:
-   - *SKU original a reemplazar*: la opción que termina en `MON-050`.
-   - *SKU de reemplazo*: `PLA-060`.
-   - *Responsable del cambio*: tu nombre.
-   - *Motivo*: por ejemplo `Sin stock`.
-   - Presiona **Registrar reemplazo**. Abajo, en *Log de cambios*, queda anotado el cambio.
-4. Vuelve a **2. Validador**: ahora `PLA-060` aparece como `OK` y todo sale en verde.
+   - Presiona **Cargar orden**. Se abre *Detalle de la orden* con el mensaje `Orden GUIA-2026-001 cargada con 5 SKU. Revisa los equipos y valídala.` Los cinco equipos aparecen como `Sin validar`.
+2. Presiona **Validar SKUs →**. En *Resultado de validación* aparece `Validación con diferencias` (4 de 5 SKU válidos): `MON-050` sale como `Sin stock`. Es a propósito, porque en el inventario simulado tiene stock 0. *Emitir guía* queda bloqueado.
+3. Presiona **Corregir SKU**. Se abre *Ajuste de última hora* con `MON-050` ya elegido en *SKU a reemplazar*. En el formulario:
+   - *Nuevo SKU*: `PLA-060`.
+   - *Motivo del cambio*: `Sin stock`.
+   - *Responsable*: tu nombre (es obligatorio).
+   - Presiona **Guardar cambio**. Vuelves a la validación con el mensaje `Cambio registrado: MON-050 → PLA-060.`
+4. Ahora aparece `Validación completada` (5 de 5) y todo sale `OK`. Presiona **Emitir guía →**: se abre *Guía generada* con el botón **Descargar guía (.txt)**. La guía emitida se recuerda solo mientras la página esté abierta.
+5. En el menú elige **Historial**: el cambio queda anotado con fecha, hora, orden, responsable y motivo.
 
 ### Si algo falla
 
