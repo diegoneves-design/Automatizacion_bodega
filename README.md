@@ -35,6 +35,7 @@ docs/historias.md     historias de usuario y criterios de aceptación (Avance 4)
 docs/wireframes/      wireframes del flujo principal, con sus notas (Avance 4)
 docs/entrevistas/     conversación con el usuario y su guion (Avance 4)
 docs/recorrido-usuario/ borrador del mapa de recorrido (ensayo, sin validar)
+prototipo/            prototipo navegable del flujo principal (Avance 5), en HTML, CSS y JS sin build
 README.md             portada del proyecto
 .gitignore            archivos locales que no se suben (base de datos, .env)
 .env.example          nombres de variables de entorno, sin valores
@@ -186,17 +187,19 @@ py -m pytest -v
 
 ## En qué estado está
 
-Al 10 de octubre de 2026 el proyecto está en **etapa inicial**, en el **Avance 4**. Ya hubo una conversación real con un subjefe de bodega que hoy hace la tarea (integrante del equipo), y de ella salen las historias de usuario y los wireframes del flujo principal. La app no está probada con usuarios reales y varias decisiones pueden cambiar.
+Al 1 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance 5**. A partir de la conversación con un subjefe de bodega que hoy hace la tarea (integrante del equipo), de las historias de usuario y de los wireframes del Avance 4, se construyó un prototipo navegable del flujo principal, publicado en [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app) e independiente de la app, y se hizo su análisis ético. Ni el prototipo ni la app están probados con usuarios reales, y varias decisiones pueden cambiar.
 
 | Hecho | Pendiente |
 |---|---|
 | Problema, caso de uso y maqueta de tres pantallas | Medir cuánto demoran hoy las guías y cuántas se rehacen |
 | Conversación con el usuario (`docs/entrevistas`) | Probar el flujo con usuarios (Semana 7) |
-| Historias HU-01 a HU-05 y criterios de la historia principal (`docs/historias.md`) | Bloquear la guía cuando algún SKU no valida, como pide el criterio de la HU-01 |
-| Wireframes del flujo principal con sus notas (`docs/wireframes`) | Subir el límite de 50 a 60 productos por guía (máximo real del ERP) |
-| Carga masiva, validador de SKU y ajuste de última hora con registro de cambios | Destacar los cambios de último minuto en el validador (HU-04) |
-| Diseño preliminar de la base de datos (`docs/datos`) | Cuentas y permisos; pasar la base a Supabase |
-| Base SQLite con inventario simulado, tests y CI en GitHub Actions | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
+| Historias HU-01 a HU-05 y criterios de la historia principal (`docs/historias.md`) | Revisar y aprobar los criterios en borrador de HU-02 a HU-05 (`docs/prototipo.md`) |
+| Wireframes del flujo principal con sus notas (`docs/wireframes`) | Subir el límite de 50 a 60 productos por guía en la app (máximo real del ERP; el prototipo ya usa 60) |
+| Prototipo navegable P1 a P4 con sistema mínimo, mapa de navegación y registro de decisiones (`prototipo/`, `docs/prototipo.md`) | Destacar los cambios de último minuto en el validador de la app (HU-04) |
+| Análisis ético: exclusión, datos personales, accesibilidad, sostenibilidad y riesgos (`docs/etica.md`) | Hacer obligatorio el motivo del cambio y corregir el borde del campo Cliente (riesgos 3 y 5 de `docs/etica.md`) |
+| Carga masiva, validador de SKU y ajuste de última hora con registro de cambios; la app bloquea la emisión de la guía si algún SKU no valida | Cuentas y permisos; pasar la base a Supabase |
+| Diseño preliminar de la base de datos (`docs/datos`) | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
+| Base SQLite con inventario simulado, tests y CI en GitHub Actions | |
 
 ## Quiénes la desarrollan
 
@@ -210,6 +213,7 @@ Grupo 6, Universidad de Santiago de Chile. Profesora: Andrea Arredondo.
 ### Flujo de trabajo
 
 - `main` guarda la versión estable, que es la que se entrega.
-- `dev` es donde el equipo trabaja día a día. Cada cambio se hace en `dev` o en una rama que sale de `dev`.
-- Terminado el cambio, se abre un pull request de `dev` hacia `main`. Otro integrante, distinto de quien hizo el cambio, lo revisa y lo aprueba.
+- Cada cambio se hace en una rama `feature/<tema>` que sale de `main` actualizado (por ejemplo, `feature/avance5-prototipo`).
+- Terminado el cambio, se abre un pull request de esa rama hacia `main`. Otro integrante, distinto de quien hizo el cambio, lo revisa y lo aprueba antes de fusionarlo.
 - Ningún integrante sube cambios directamente a `main`.
+- La rama `dev` se usó en las primeras entregas y hoy no forma parte del flujo.
