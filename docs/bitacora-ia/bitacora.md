@@ -366,3 +366,33 @@ Hecho por Diego Neves el 2026-11-01, con Claude, en la rama `feature/coherencia-
 - La prueba guiada nueva se escribió leyendo `src/views/` y `src/app.py` (nombres de menús, campos, botones, mensajes e inventario inicial).
 - Diego ejecutó la app con la base limpia y siguió la prueba guiada paso a paso: los nombres de menús, campos y botones coinciden con la interfaz. Funcionaron la carga, la validación con `MON-050` sin stock, *Corregir SKU*, *Guardar cambio*, la emisión y descarga de la guía, y el Historial con fecha, responsable y motivo.
 - Cada commit se revisó en el diff antes de aprobarlo. No se ejecutaron tests: no se cambió código.
+
+---
+
+## Encargo 17. Diseño de la prueba de usuarios y pauta de validación (Avance 6)
+
+Lo hizo Oscar Ynchaustegui el 2026-11-05, con Claude. Lo revisa Sebastián Carmona en el pull request.
+
+**Objetivo.** Armar `docs/prueba-usuarios.md` (objetivo e hipótesis, tareas con umbral, perfiles y plan de registro) y `docs/pauta-validacion.md` (el guion de cada sesión, en no más de dos planas y 20 minutos), siguiendo las instrucciones del Avance 6.
+
+**Instrucción entregada.**
+- Contexto. Las instrucciones del Avance 6, el prototipo y `docs/prototipo.md` con sus órdenes de ejemplo 3001 y 3002, `docs/historias.md`, el mapa de exclusión de `docs/etica.md` y la conversación con el subjefe de bodega.
+- Intención. Que la prueba pueda demostrar que estamos equivocados, con una hipótesis que pueda fallar y umbrales con número fijados antes de ver a nadie.
+- Restricciones. Para la prueba solo estamos disponibles dos integrantes. Ninguna tarea puede nombrar botones ni pantallas, las preguntas de contexto tienen que ser sobre cosas que ya pasaron, no puede quedar ningún nombre ni contacto de participantes en el repositorio y la sesión completa no puede pasar de 20 minutos.
+
+**Respuesta obtenida.** Dos tareas (T1, un despacho sin problemas, y T2, un retiro con un código que no existe), cada una con su umbral, y un SUS esperado de 68 o más. Dos hipótesis, una sobre el flujo principal y otra sobre si de verdad dejamos fuera al bodeguero de terreno. Dos perfiles de usuarios, incluido el excluido del Avance 5, y cuatro de stakeholders. Un reparto de roles para dos personas, la planilla vacía, la regla de decisión y la pauta de 20 minutos con su versión imprimible.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado. Dos tareas en vez de tres, porque con tres la sesión pasaba de los 20 minutos.
+- Aceptado. Una segunda hipótesis que pone a prueba lo que dijimos en el Avance 5. Si el bodeguero de terreno logra la tarea solo, nos equivocamos sobre quién queda fuera.
+- Corregido. Como Oscar está a cargo de la bodega del caso, no facilita ni asiste a las sesiones con sus compañeros de trabajo, para que no se sientan evaluados por su jefe. Esas sesiones las facilita Sebastián, y Oscar las registra después, desde la grabación.
+- Corregido. Oscar tiene un conocido que ve la bodega igual que él. Puede participar, pero solo como 1 de los 5 de U1, queda anotado como conocido y lo facilita Sebastián. Así evitamos armar una muestra que solo confirme lo que ya creemos.
+- Corregido. Oscar pidió reescribir los dos documentos con un tono más cercano, en primera persona y con razones sacadas de la bodega real, sin cambiar la estructura, los umbrales ni los perfiles. Las frases del cuestionario SUS no se tocaron, porque es un instrumento estándar.
+- Corregido. Oscar pasó la pauta a limpio en Word, con el encabezado de la universidad y su propia redacción del consentimiento. Su primera versión ocupaba 3 planas. Con Claude se dejó en 2 y se corrigieron detalles como el enlace del prototipo, la numeración de las tareas (4.1 y 4.2), algunas comas y tildes, y la frase "la ayudamos con un ¿Qué está pensando ahora?", que se cambió por "se le pregunta", porque esa pregunta no cuenta como ayuda. El `.md` se ajustó para que diga lo mismo que el PDF. También pidió sacar los dos puntos y los punto y coma de los textos, porque no es como escribimos nosotros.
+- Pendiente. Ensayar la pauta completa dentro del equipo antes de la primera sesión, con Sebastián leyéndola en voz alta sin haber diseñado las tareas.
+
+**Cómo comprobamos que no hubiera sesgo.**
+- Buscamos en los escenarios y en las preguntas de contexto y de cierre las palabras de la interfaz ("botón", "pantalla", "Cargar pedido", "Validar", "Preparar guía", "Registrar cambio", "rojo", "verde", "bloqueado", "no existe") y no aparece ninguna.
+- Buscamos preguntas de opinión o sobre el futuro ("¿le gustó?", "¿usaría…?", "¿le parece…?") y no hay ninguna fuera del cuestionario SUS. El único "¿Está de acuerdo…?" está en el consentimiento, donde se pide permiso para grabar.
+- Revisamos en el prototipo que las dos tareas se pueden terminar solo con lo que dice el escenario, la orden 3001 y la orden 3002 con la extensión `SD-63A20-0315` disponible.
+- Sumamos los tiempos de la pauta (2 + 3 + 1 + 9 + 3 + 2 = 20 minutos) y generamos la versión imprimible, que ocupa 2 planas tamaño carta.

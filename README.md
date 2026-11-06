@@ -22,6 +22,8 @@ Documentación del proyecto:
 - Conversación con el usuario (Avance 4): [docs/entrevistas/entrevista_subjefe_bodega.md](docs/entrevistas/entrevista_subjefe_bodega.md)
 - Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app)
 - Análisis ético del prototipo (Avance 5): [docs/etica.md](docs/etica.md)
+- Diseño de la prueba de usuarios (Avance 6): [docs/prueba-usuarios.md](docs/prueba-usuarios.md)
+- Guion para cada sesión de la prueba (Avance 6): [docs/pauta-validacion.md](docs/pauta-validacion.md)
 
 ### Estructura del repositorio
 
@@ -191,12 +193,12 @@ py -m pytest -v
 
 ## En qué estado está
 
-Al 1 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance 5**. A partir de la conversación con un subjefe de bodega que hoy hace la tarea (integrante del equipo), de las historias de usuario y de los wireframes del Avance 4, se construyó un prototipo navegable del flujo principal, publicado en [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app) e independiente de la app, y se hizo su análisis ético. Ni el prototipo ni la app están probados con usuarios reales, y varias decisiones pueden cambiar.
+Al 5 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance 6**. Ya está diseñado cómo vamos a probar el prototipo con personas de fuera del equipo, pero la prueba todavía no se hace. A partir de la conversación con un subjefe de bodega que hoy hace la tarea (integrante del equipo), de las historias de usuario y de los wireframes del Avance 4, se construyó un prototipo navegable del flujo principal, publicado en [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app) e independiente de la app, y se hizo su análisis ético. Ni el prototipo ni la app están probados con usuarios reales, y varias decisiones pueden cambiar.
 
 | Hecho | Pendiente |
 |---|---|
 | Problema, caso de uso y maqueta de tres pantallas | Medir cuánto demoran hoy las guías y cuántas se rehacen |
-| Conversación con el usuario (`docs/entrevistas`) | Probar el flujo con usuarios (Semana 7) |
+| Conversación con el usuario (`docs/entrevistas`) | Ejecutar la prueba de usuarios diseñada en el Avance 6 (`docs/prueba-usuarios.md`) |
 | Historias HU-01 a HU-05 y criterios de la historia principal (`docs/historias.md`) | Revisar y aprobar los criterios en borrador de HU-02 a HU-05 (`docs/prototipo.md`) |
 | Wireframes del flujo principal con sus notas (`docs/wireframes`) | Subir el límite de 50 a 60 productos por guía en la app (máximo real del ERP; el prototipo ya usa 60) |
 | Prototipo navegable P1 a P4 con sistema mínimo, mapa de navegación y registro de decisiones (`prototipo/`, `docs/prototipo.md`) | Destacar los cambios de último minuto en el validador de la app (HU-04) |
@@ -204,6 +206,7 @@ Al 1 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance
 | Carga masiva, validador de SKU y ajuste de última hora con registro de cambios; la app bloquea la emisión de la guía si algún SKU no valida | Cuentas y permisos; pasar la base a Supabase |
 | Diseño preliminar de la base de datos (`docs/datos`) | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
 | Base SQLite con inventario simulado, tests y CI en GitHub Actions | |
+| Diseño de la prueba con usuarios y guion de cada sesión (`docs/prueba-usuarios.md`, `docs/pauta-validacion.md`) | |
 
 ## Quiénes la desarrollan
 
