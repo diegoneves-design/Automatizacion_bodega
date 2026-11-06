@@ -38,7 +38,7 @@ Elegimos dos tareas y no tres, porque con tres la sesión pasaba de los 20 minut
 | **Tiempo** | Los minutos que pasan desde que terminamos de leer el escenario hasta que se cumple el criterio de éxito | Con el reloj de la grabación |
 | **Ayudas** | Cuántas veces pide ayuda o quien facilita tiene que intervenir | Una fila por cada ayuda |
 | **Desvíos** | Cuántas veces entra a una pantalla o toca algo que no la acerca a lo que tiene que hacer | Una fila por cada desvío |
-| **Satisfacción** | El puntaje SUS, de 0 a 100, una sola vez al final de la sesión | Con el cuestionario de la pauta. **Esperamos un promedio de 68 o más en U1** |
+| **Satisfacción** | El puntaje SUS, de 0 a 100, una sola vez al final de la sesión | Con el cuestionario de la pauta. **Esperamos un promedio de 68 o más en U1**. Adaptamos la redacción de las frases para leerlas en voz alta, así que el 68 lo usamos como referencia |
 
 Contamos como **ayuda** cualquier cosa que le diga a la persona qué hacer, como señalarle algo, nombrarle un botón o decirle "va bien". Si nos pide que le repitamos el escenario, eso no cuenta como ayuda.
 
@@ -91,6 +91,8 @@ Para la prueba vamos a estar dos integrantes. Hay algo que nos importa cuidar. U
 - **Observado.** Lo que la persona hizo o dijo, tal cual. Por ejemplo, "vuelve dos veces a la pantalla donde se carga el pedido".
 - **Interpretado.** Lo que nosotros creemos que significa, siempre en otra columna. Por ejemplo, "no encuentra dónde se valida".
 - **Severidad.** Bloquea, entorpece o estético, según la regla que sigue.
+
+También anotamos si la persona menciona, sin que se lo preguntemos, que igual tendría que anotar en papel o traspasar datos a mano. Lo notamos en el ensayo de la pauta y queremos saber si a otros les pasa lo mismo.
 
 **Cómo vamos a decidir qué corregir**
 - **Bloquea** (no la termina sin ayuda). Se corrige en el prototipo **antes de construir** esa parte de la aplicación.

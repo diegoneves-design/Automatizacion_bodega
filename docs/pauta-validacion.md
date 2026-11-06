@@ -36,18 +36,20 @@ Cada escenario se lee una vez, tal cual. Si la persona pide que se lo repitan, s
 
 > Para terminar, le voy a leer diez frases sobre el borrador que acaba de usar. Para cada una, dígame un número del 1 al 5, donde 1 es "muy en desacuerdo" y 5 es "muy de acuerdo".
 
+*(Las frases se leen tal cual y sin explicarlas. Son las del cuestionario SUS, con la redacción adaptada para leerlas en voz alta, en el mismo orden y con el mismo sentido.)*
+
 | N.º | Frase | 1 a 5 |
 |---|---|---|
-| 1 | Creo que me gustaría usar este sistema con frecuencia. | |
-| 2 | Encontré el sistema innecesariamente complejo. | |
-| 3 | Pensé que el sistema era fácil de usar. | |
-| 4 | Creo que necesitaría el apoyo de una persona técnica para poder usar este sistema. | |
-| 5 | Encontré que las distintas funciones del sistema estaban bien integradas. | |
-| 6 | Pensé que había demasiada inconsistencia en este sistema. | |
-| 7 | Imagino que la mayoría de las personas aprendería a usar este sistema muy rápido. | |
-| 8 | Encontré el sistema muy engorroso de usar. | |
-| 9 | Me sentí muy seguro usando el sistema. | |
-| 10 | Necesité aprender muchas cosas antes de poder usar este sistema. | |
+| 1 | Le gustaría usar este sistema con frecuencia. | |
+| 2 | El sistema tiene más pasos o cosas de las que hacen falta. | |
+| 3 | El sistema le pareció fácil de usar. | |
+| 4 | Necesitaría el apoyo de una persona técnica para poder usar este sistema. | |
+| 5 | Las distintas funciones del sistema le parecieron bien integradas. | |
+| 6 | El sistema le pareció demasiado inconsistente. | |
+| 7 | La mayoría de las personas aprendería a usar este sistema muy rápido. | |
+| 8 | El sistema le pareció muy engorroso de usar. | |
+| 9 | Se sintió muy seguro o segura usando el sistema. | |
+| 10 | Necesitó aprender muchas cosas antes de poder usar este sistema. | |
 
 Para calcular el puntaje, a cada frase impar se le resta 1 a la nota y en las pares la nota se le resta a 5. Se suman los diez resultados y el total se multiplica por 2,5 (queda un puntaje de 0 a 100).
 
@@ -55,6 +57,8 @@ Para calcular el puntaje, a cada frase impar se le resta 1 a la nota y en las pa
 
 1. En lo que hizo recién, ¿hubo algún momento en que no supo qué hacer? ¿Qué estaba buscando en ese momento?
 2. ¿Qué hizo distinto de como lo hace hoy en su trabajo?
+
+*(Quien registra anota si la persona habla, sin que se lo preguntemos, de anotar en papel o de traspasar datos a mano. No se le sugiere ninguna solución.)*
 
 > Eso es todo. Le agradezco mucho el tiempo. ¿Tiene alguna pregunta para nosotros?
 

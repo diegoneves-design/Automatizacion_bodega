@@ -389,10 +389,42 @@ Lo hizo Oscar Ynchaustegui el 2026-11-05, con Claude. Lo revisa Sebastián Carmo
 - Corregido. Oscar tiene un conocido que ve la bodega igual que él. Puede participar, pero solo como 1 de los 5 de U1, queda anotado como conocido y lo facilita Sebastián. Así evitamos armar una muestra que solo confirme lo que ya creemos.
 - Corregido. Oscar pidió reescribir los dos documentos con un tono más cercano, en primera persona y con razones sacadas de la bodega real, sin cambiar la estructura, los umbrales ni los perfiles. Las frases del cuestionario SUS no se tocaron, porque es un instrumento estándar.
 - Corregido. Oscar pasó la pauta a limpio en Word, con el encabezado de la universidad y su propia redacción del consentimiento. Su primera versión ocupaba 3 planas. Con Claude se dejó en 2 y se corrigieron detalles como el enlace del prototipo, la numeración de las tareas (4.1 y 4.2), algunas comas y tildes, y la frase "la ayudamos con un ¿Qué está pensando ahora?", que se cambió por "se le pregunta", porque esa pregunta no cuenta como ayuda. El `.md` se ajustó para que diga lo mismo que el PDF. También pidió sacar los dos puntos y los punto y coma de los textos, porque no es como escribimos nosotros.
-- Pendiente. Ensayar la pauta completa dentro del equipo antes de la primera sesión, con Sebastián leyéndola en voz alta sin haber diseñado las tareas.
+- Hecho. El 2026-11-06 ensayamos la pauta completa, con Sebastián leyéndola en voz alta y Oscar como participante. Lo que salió del ensayo está en el Encargo 18.
 
 **Cómo comprobamos que no hubiera sesgo.**
 - Buscamos en los escenarios y en las preguntas de contexto y de cierre las palabras de la interfaz ("botón", "pantalla", "Cargar pedido", "Validar", "Preparar guía", "Registrar cambio", "rojo", "verde", "bloqueado", "no existe") y no aparece ninguna.
 - Buscamos preguntas de opinión o sobre el futuro ("¿le gustó?", "¿usaría…?", "¿le parece…?") y no hay ninguna fuera del cuestionario SUS. El único "¿Está de acuerdo…?" está en el consentimiento, donde se pide permiso para grabar.
 - Revisamos en el prototipo que las dos tareas se pueden terminar solo con lo que dice el escenario, la orden 3001 y la orden 3002 con la extensión `SD-63A20-0315` disponible.
 - Sumamos los tiempos de la pauta (2 + 3 + 1 + 9 + 3 + 2 = 20 minutos) y generamos la versión imprimible, que ocupa 2 planas tamaño carta.
+
+---
+
+## Encargo 18. Ajustes a la pauta después del ensayo (Avance 6)
+
+El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Oscar le pidió los ajustes a Claude, Sebastián los sube y Oscar los revisa en el pull request.
+
+**Objetivo.** Corregir la pauta con lo que notamos al ensayarla, antes de la primera sesión con participantes.
+
+**Instrucción entregada.**
+- Contexto. La pauta del Encargo 17 y lo que pasó en el ensayo, con Sebastián como facilitador, Oscar como participante y el prototipo abierto en bodega-prototipo.vercel.app.
+- Intención. Que las frases del cuestionario se entiendan cuando las lee otra persona y que la sesión pueda mostrar si el papel sigue siendo necesario, sin sugerirle nada al participante.
+- Restricciones. Mantener el sentido y el orden de las frases del SUS, no agregar preguntas que lleven a una respuesta y mantener la pauta en 20 minutos y 2 planas.
+
+**Lo que notamos en el ensayo.**
+- A Oscar le pareció que las frases del SUS no están bien redactadas para leerlas en voz alta. Están escritas como si las dijera el participante ("Pensé que el sistema era fácil de usar"), y cuando las lee quien facilita pueden sonar como su propia opinión.
+- Al hacer las tareas, Oscar notó que el prototipo no elimina el papel. En la bodega se seguiría anotando a mano lo que sale y vuelve, para después traspasarlo al sistema, igual que hoy.
+- Como Oscar es del equipo y ya conocía el prototipo, sus respuestas y su SUS no se cuentan como resultado de la prueba.
+
+**Respuesta obtenida.** Claude propuso dejar las frases del SUS igual, porque si se cambian el puntaje ya no se puede comparar con la meta de 68, y cambiar solo la forma de presentarlas. También propuso no mencionarle el papel al participante, sino observar si lo nombra solo en la pregunta de cierre que ya existe.
+
+**Qué se aceptó y qué se corrigió.**
+- Corregido. Oscar encontró más engorroso que quien facilita tenga que explicar que las frases se leen "como si las dijera usted", y prefirió cambiar la redacción de la tabla. Las diez frases quedaron en tercera persona (por ejemplo, "El sistema le pareció fácil de usar"), con el mismo sentido, el mismo orden y el mismo cálculo. Claude advirtió que así el SUS deja de ser el estándar al pie de la letra, por lo que la meta de 68 queda como referencia. Lo dejamos anotado en `docs/prueba-usuarios.md`.
+- Corregido. A Oscar la frase 2 ("le pareció innecesariamente complejo") le parecía igual a la 3 ("le pareció fácil de usar"). Las dos se mantienen, porque el SUS alterna frases a favor y en contra para notar si alguien responde sin pensar, y el cálculo necesita las diez. Lo que cambió es que la 2 ahora dice más claro a qué se refiere, "El sistema tiene más pasos o cosas de las que hacen falta".
+- Aceptado. En el cierre, quien registra anota si la persona habla del papel o de traspasar datos a mano sin que se lo preguntemos. Lo mismo quedó en el plan de `docs/prueba-usuarios.md`.
+- Corregido. Oscar propuso que Sebastián le comentara al participante, como mejora futura, el uso de lector de código de barras. Lo dejamos fuera de la sesión, porque si se lo sugerimos lo más probable es que diga que sí y eso no nos dice nada.
+- Idea a futuro, todavía sin probar. Registrar las salidas y devoluciones con lector de código de barras, "pistoleando" cada producto como en un supermercado, para no anotar en papel. Calza con el bodeguero de terreno que anota en papel (`docs/etica.md`), pero primero queremos ver si los participantes también hablan del papel.
+
+**Cómo se verificó.**
+- Comparamos una por una las diez frases nuevas con las del Encargo 17. Cada una dice lo mismo, en el mismo orden, y las impares siguen siendo positivas y las pares negativas, así que el cálculo del puntaje no cambia.
+- Revisamos que la nota nueva del cierre no le dice nada al participante, solo a quien registra.
+- Los tiempos de cada parte no cambiaron (20 minutos) y la versión imprimible sigue en 2 planas tamaño carta.
