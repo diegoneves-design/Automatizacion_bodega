@@ -29,10 +29,17 @@ Hoja para tener a mano durante el análisis. A cada observación de la planilla 
 
 Están en la sección 2 de [`docs/prueba-usuarios.md`](../prueba-usuarios.md) y se fijaron **antes de ver a ningún participante**. No se cambian después de ver los resultados.
 
-- **U1, tarea 1:** al menos **4 de 5** la terminan sin ayuda, en menos de **3 minutos** y con 1 desvío como máximo.
-- **U1, tarea 2:** al menos **4 de 5** se dan cuenta solas del código malo, y **3 de 5** terminan sin ayuda en menos de **5 minutos** y con 2 desvíos como máximo.
-- **Satisfacción:** puntaje SUS promedio de **68 o más** en U1.
-- **Nos equivocamos si** 2 o más de 5 no logran la tarea 1 sin ayuda, o 2 o más no ven el código malo.
-- **U2** (quien queda fuera) se informa **aparte** y no cuenta para el umbral de U1: si **3 o más de 5** piden ayuda o dejan la tarea a medias, se confirma que lo dejamos fuera; si 3 o más la terminan solas, nos equivocamos.
+Se leen en **tres tramos, para 5 personas de U1**: a cada medida se le cuenta cuántas de las 5 la cumplen, y todo resultado cae en un tramo.
 
-**Regla propuesta, a confirmar por el equipo antes de la primera sesión:** una falla del sistema (el prototipo se cae) no es una observación sobre la persona. Se anota aparte, no cuenta ni a favor ni en contra de los umbrales y la tarea se repite en otra sesión.
+| Medida | Se cumple | Entorpece | Bloquea |
+|---|---|---|---|
+| Tarea 1: terminan sin ayuda, en menos de **3 minutos** y con 1 desvío como máximo | 4 o 5 de 5 | 3 de 5 | 2 o menos |
+| Tarea 2: se dan cuenta solas del código malo | 4 o 5 de 5 | 3 de 5 | 2 o menos |
+| Tarea 2: terminan sin ayuda, en menos de **5 minutos** y con 2 desvíos como máximo | 3 o más de 5 | 2 de 5 | 1 o menos |
+
+- **Satisfacción:** puntaje SUS promedio de **68 o más** en U1, como referencia.
+- **Nos equivocamos si** solo 2 o menos de las 5 personas terminan la tarea 1 sin ayuda en menos de 3 minutos, o solo 2 o menos ven el código malo.
+- **U2** (quien queda fuera) se informa **aparte** y no cuenta para el umbral de U1: si **3 o más de 5** piden ayuda o dejan la tarea a medias, se confirma que lo dejamos fuera; si 3 o más la terminan solas, nos equivocamos.
+- Los tramos de la última fila de la tabla se agregaron por analogía con los de la tarea 1 y se confirman en el ensayo interno.
+
+**Regla propuesta, aceptada por el equipo como propuesta y por confirmar en el ensayo interno:** una falla del sistema (el prototipo se cae) no es una observación sobre la persona. Se anota aparte, no cuenta ni a favor ni en contra de los umbrales y la tarea se repite en otra sesión.

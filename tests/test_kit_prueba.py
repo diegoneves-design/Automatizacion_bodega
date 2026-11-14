@@ -81,7 +81,7 @@ def test_el_consentimiento_dice_lo_mismo_que_el_texto_oral_de_la_pauta():
         # la hoja puede decirlo en plural ("se borran"); lo importante es que el hecho este en las dos
         escrito = hecho in c or hecho.replace("se borra", "se borran") in c
         assert oral and escrito, hecho
-    assert "20 minutos" in c and "20 minutos" in pauta
+    assert "20 minutos como máximo" in c and "el máximo es 20" in pauta
 
 
 # ---------------------------------------------------------------- regla de decision y umbrales
@@ -95,7 +95,7 @@ def test_la_regla_de_decision_tiene_las_tres_severidades():
 
 def test_los_umbrales_de_la_hoja_coinciden_con_prueba_usuarios():
     hoja, prueba = leer(KIT / "regla-decision.md"), leer(DOCS / "prueba-usuarios.md")
-    for numero in ["4 de 5", "3 de 5", "3 minutos", "5 minutos", "68", "2 o más", "3 o más"]:
+    for numero in ["4 o 5 de 5", "3 de 5", "2 o menos", "1 o menos", "3 minutos", "5 minutos", "68", "3 o más"]:
         assert numero in hoja, f"la hoja no trae '{numero}'"
         assert numero in prueba, f"prueba-usuarios.md no trae '{numero}'"
     assert "1 vez como máximo" in prueba and "2 veces como máximo" in prueba   # los desvios de las tareas 1 y 2
@@ -110,7 +110,7 @@ def test_la_planilla_de_registro_tiene_las_seis_columnas_del_enunciado():
 
 def test_el_plan_de_sesiones_asigna_los_tres_papeles_y_protege_la_evidencia():
     p = leer(KIT / "plan-sesiones.md")
-    for papel in ["**Facilita**", "**Registra**", "**Resguarda la evidencia**"]:
+    for papel in ["**Facilitador**", "**Registrador**", "**Resguardo de evidencia**"]:
         assert papel in p
     assert "20 minutos como máximo" in p and "fuera del repositorio" in p.lower() or "Nunca** en el repositorio" in p
     assert "acceso restringido" in p and "Reiniciar demo" in p
@@ -211,6 +211,7 @@ def test_el_consentimiento_imprimible_cabe_en_dos_planas():
 
 @pytest.mark.parametrize("pdf, md, frase", [
     ("pauta-validacion.pdf", "pauta-validacion.md", "Reiniciar demo"),
+    ("pauta-validacion.pdf", "pauta-validacion.md", "antes de dejar lista la guía, ¿qué revisó?"),
     ("kit-prueba/regla-decision.pdf", "kit-prueba/regla-decision.md", "Entorpece"),
     ("kit-prueba/consentimiento.pdf", "kit-prueba/consentimiento.md", "No tiene espacio para el nombre"),
 ])
@@ -236,3 +237,83 @@ def test_el_repositorio_no_tiene_emojis():
         for c in EMOJI.findall(leer(p)):
             assert c in PERMITIDOS, f"{p.relative_to(RAIZ)} tiene el emoji U+{ord(c):04X}"
     assert EMOJI.search(leer(RAIZ / "README.md")) is None
+
+
+# ---------------------------------------------------------------- decisiones del 14 de noviembre de 2026
+
+def preguntas_numeradas(texto, titulo):
+    inicio = texto.index(titulo)
+    fin = texto.find("\n## ", inicio + 5)
+    fin = len(texto) if fin == -1 else fin
+    return re.findall(r"^\d+\. (.+)$", texto[inicio:fin], re.M)
+
+
+def test_prueba_usuarios_y_pauta_no_llevan_nombres_de_personas():
+    for doc in (DOCS / "prueba-usuarios.md", DOCS / "pauta-validacion.md"):
+        t = leer(doc)
+        for nombre in NOMBRES_DEL_EQUIPO + ["Sebasti", "Oscar", "Diego", "Bastián"]:
+            assert nombre not in t, f"{doc.name} nombra a {nombre}"
+
+
+def test_prueba_usuarios_usa_roles_en_el_plan_de_sesiones():
+    t = leer(DOCS / "prueba-usuarios.md")
+    assert "| Sesión | Facilitador" in t and "Registrador" in t and "Resguardo de evidencia" in t
+    assert "Integrante A" in t and "Integrante B" in t
+    assert "no van en el repositorio" in t
+
+
+def test_el_integrante_de_la_bodega_no_ve_las_grabaciones_en_el_plan_ni_en_el_consentimiento():
+    """El consentimiento promete que esa persona no ve las grabaciones: el plan no puede contradecirlo."""
+    plan = leer(DOCS / "prueba-usuarios.md")
+    fila = [f for f in plan.splitlines() if f.startswith("| Participantes de la bodega del caso")][0]
+    celdas = [c.strip() for c in fila.strip("|").split("|")]
+    assert "Integrante B" not in celdas[1:], "el integrante B no puede tener ningun papel en las sesiones con su gente"
+    assert "ni mira la grabación" in plan
+    assert "no ve las grabaciones" in leer(KIT / "consentimiento.md").replace("ni ve las grabaciones", "no ve las grabaciones")
+
+
+def test_los_resultados_se_leen_en_tres_tramos_sin_zonas_sin_regla():
+    t = leer(DOCS / "prueba-usuarios.md")
+    assert "| 4 o 5 | **Se cumple** |" in t and "| 3 | **Entorpece** |" in t and "| 2 o menos | **Bloquea** |" in t
+    assert "No queda ninguna zona sin regla" in t
+    assert "(3 de 5 entorpece; 2 o menos bloquea)" in t
+    assert "Nos equivocamos si** solo 2 o menos" in t
+
+
+def test_la_pauta_deja_al_menos_un_minuto_de_holgura():
+    total, etapas = md_a_pdf.minutos_de_las_etapas(leer(DOCS / "pauta-validacion.md"))
+    assert len(etapas) == 6 and total <= 19, f"las etapas suman {total} min"
+
+
+def test_la_pauta_tiene_dos_preguntas_de_contexto_sin_las_que_sugerian():
+    pauta = leer(DOCS / "pauta-validacion.md")
+    contexto = preguntas_numeradas(pauta, "## 2. Preguntas de contexto")
+    assert len(contexto) == 2
+    assert contexto[1] == "Esa vez, antes de dejar lista la guía, ¿qué revisó?"
+    assert "cómo revisó que los códigos" not in pauta
+    cierre = preguntas_numeradas(pauta, "## 6. Preguntas de cierre")
+    assert cierre[1] == "Cuando lo hace en su trabajo, ¿en qué se parece o en qué no se parece a lo que acaba de hacer?"
+    assert "¿Qué hizo distinto" not in pauta
+
+
+def test_la_frase_1_del_sus_se_queda():
+    assert "Le gustaría usar este sistema con frecuencia" in leer(DOCS / "pauta-validacion.md")
+
+
+def test_el_exito_de_la_tarea_2_se_verifica_de_oido():
+    t = leer(DOCS / "prueba-usuarios.md")
+    assert "La persona dice en voz alta cuál es el código marcado" in t
+    assert "con el cursor" not in t
+
+
+def test_la_regla_de_fallas_del_sistema_esta_como_propuesta_aceptada():
+    for doc in (DOCS / "prueba-usuarios.md", KIT / "plan-sesiones.md", KIT / "regla-decision.md"):
+        t = leer(doc)
+        assert "a favor ni en contra" in t, doc.name
+        assert "propuesta" in t, doc.name
+
+
+def test_la_pauta_anuncia_la_misma_duracion_que_suman_sus_etapas():
+    pauta = leer(DOCS / "pauta-validacion.md")
+    total, _ = md_a_pdf.minutos_de_las_etapas(pauta)
+    assert f"**Dura {total} minutos en total**" in pauta

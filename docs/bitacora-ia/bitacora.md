@@ -539,3 +539,34 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - **Pantallas chicas:** el prototipo se cargó dentro de un marco de 360 × 640 y de 390 × 844 y se recorrieron 16 estados en cada tamaño, contra una réplica de la base escrita solo para probar la pantalla. Se revisó desplazamiento horizontal, texto cortado, controles de 44 px o más (87 revisados), contraste de texto con la fórmula de WCAG (324 textos, el más bajo 5,63:1), contraste de bordes, estados que dependen solo del color y tamaño de letra de los campos. Para comprobar que la revisión sirve se le inyectaron a propósito cinco problemas y los detectó todos. Mi primer intento de ese control falló porque la política de seguridad de la página bloquea los estilos en línea: eso era un defecto del control y no de la revisión.
 - **No se ejecutó** `supabase/probar_en_supabase.py` ni se tocó Supabase: la demo quedó como estaba.
 - **No se pudo verificar:** un celular real, señal real, otros navegadores, dos personas usando la demo a la vez y el sitio publicado en Vercel. Tampoco se hizo el ensayo de la pauta con una persona ni ninguna medición de línea base: todo eso está escrito, no ejecutado.
+
+
+---
+
+## Encargo 23. Aplicar las decisiones del equipo sobre el instrumento de la prueba con usuarios
+
+**Objetivo.** Aplicar a `docs/prueba-usuarios.md`, `docs/pauta-validacion.md` y al kit las seis decisiones que tomó el equipo tras la revisión del Encargo 22.
+
+**Instrucción entregada.**
+- Contexto: `docs/kit-prueba/revision-avance6.md` (lo que la revisión encontró) y las seis decisiones de Bastián: usar roles en vez de nombres en `prueba-usuarios.md` y dejar la autoría en el README por ahora; reescribir la pregunta 3 de contexto y la 2 de cierre y dejar la frase 1 del SUS; umbral en tres tramos para 5 personas (4 o 5 se cumple, 3 entorpece, 2 o menos bloquea); quitar una pregunta de contexto para dejar 2 o 3 minutos de holgura y regenerar el PDF; en la tarea 2, «dilo en voz alta» en vez de «señala con el cursor o en voz alta»; aceptar la regla de fallas del sistema como propuesta.
+- Restricciones: no subir nada; no tocar el README; no tocar `supabase/` ni las otras ramas; sin emojis; ningún nombre ni dato personal.
+- Verificación: correr las pruebas, regenerar el PDF y contar planas y minutos.
+
+**Respuesta obtenida.** Cambios en `prueba-usuarios.md` (roles con integrante A y B, tres tramos, éxito de la tarea 2 de oído, regla de fallas del sistema), en la pauta (una pregunta de contexto menos, dos preguntas reescritas) y en el kit (hoja de la regla, plan de sesiones, ensayo, índice y revisión). PDF de la pauta y de la hoja de la regla regenerados. Doce pruebas nuevas que fijan estas decisiones.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: las dos preguntas se reescribieron con la redacción que se había propuesto, sin cambios.
+- **La holgura es de 1 minuto y no de 2 o 3.** Al quitar una pregunta de contexto, la etapa pasó de 3 a 2 minutos y el total de 20 a 19. Para llegar a 2 minutos habría que recortar otro minuto de otra etapa, y eso lo decide el equipo. La pauta decía «Dura 20 minutos en total» y quedó desactualizada: se corrigió a 19 y una prueba lo comprueba.
+- **Qué pregunta se quitó:** la 1 de contexto («cuénteme paso a paso»), por ser la más larga y la más general. Las dos que quedan se relacionan con las tareas.
+- **Tramos de la tarea 2.** Los tres tramos eran para la tarea 1. Se aplicaron también a «se dan cuenta solas del código malo». A «terminan sin ayuda en menos de 5 minutos», que ya tenía el umbral de 3 de 5, se le agregaron **por analogía** los tramos de 2 de 5 y de 1 o menos. Eso lo agregó la IA y no lo decidió el equipo: está marcado como tal en los documentos, por confirmar en el ensayo.
+- **El umbral quedó más permisivo en un punto.** Antes se fallaba con «2 o más no lo logran» (3 o menos que lo logran); ahora solo bloquea con 2 o menos que lo cumplen y con 3 entorpece. Se cambia antes de la primera sesión, que es lo que permite el enunciado.
+- **Una inconsistencia que se encontró y se resolvió sin que se pidiera.** El plan de sesiones le asignaba al integrante que trabaja en la bodega del caso registrar mirando la grabación de sus compañeros, mientras la hoja de consentimiento promete a los participantes que esa persona no ve las grabaciones. Al pasar a roles se resolvió protegiendo al participante: en esas sesiones registra quien facilitó, después. **Es un cambio de fondo al plan, hecho por la IA; si el equipo prefiere el original, hay que cambiar también el consentimiento.** Una prueba comprueba que el plan y el consentimiento no se contradigan.
+- Se arreglaron dos defectos de las propias pruebas nuevas: un helper fallaba con la última sección de un documento, y una comprobación de la duración dejó de coincidir con el texto nuevo de la pauta.
+- No se aplicó: quitar los nombres del README, de la bitácora ni de `docs/etica.md` y `docs/entrevistas/`, que también los tienen. La decisión fue solo sobre `prueba-usuarios.md`; el kit y esos dos documentos no llevan nombres.
+
+**Cómo se verificó.**
+- `pytest tests`: 180 pruebas pasan.
+- **PDF de la pauta:** regenerado con el texto nuevo, 2 planas contadas con `pypdf`, las seis etapas suman 19 minutos, y una prueba comprueba que el PDF trae las preguntas reescritas. La hoja de la regla sigue en una plana.
+- Una prueba comprueba que `prueba-usuarios.md` y la pauta no nombran a ningún integrante, y otra que los números de la hoja de la regla coinciden con los de `prueba-usuarios.md`.
+- **Comprobación de que las preguntas nuevas no introducen sesgo:** se releyeron contra la regla del enunciado (ninguna sugiere la respuesta, pide una opinión sobre el futuro ni promueve una idea). **Es una lectura, no una prueba con una persona.** El ensayo interno es donde se confirma que se entienden y que no empujan una respuesta.
+- **No se verificó:** el ensayo con una persona, que la frase de la tarea 2 se pueda comprobar de oído en una grabación real, ni los tiempos por etapa, que siguen siendo los del documento.

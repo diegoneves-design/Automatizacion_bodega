@@ -2,23 +2,23 @@
 
 Este documento **complementa** la sección 5 de [`docs/prueba-usuarios.md`](../prueba-usuarios.md), donde ya están decididos cuántas sesiones hay, cuánto duran, quién facilita, quién registra y quién guarda la evidencia en cada tipo de sesión. Aquí no se repite: se baja a lo que hay que hacer antes, durante y después de cada sesión. Si algo contradice a `prueba-usuarios.md`, manda ese archivo.
 
-**Ya decidido allá:** 10 sesiones con usuarios (5 de U1 y 5 de U2) de **20 minutos como máximo**, y 4 consultas a stakeholders de 10 minutos como máximo. Una sola persona habla con el participante. El integrante que trabaja en la bodega del caso **no facilita ni está presente** en las sesiones con su gente.
+**Ya decidido allá:** 10 sesiones con usuarios (5 de U1 y 5 de U2) de **20 minutos como máximo**, y 4 consultas a stakeholders de 10 minutos como máximo. Una sola persona habla con el participante. El integrante que trabaja en la bodega del caso **no facilita, no está presente y no ve la grabación** en las sesiones con su gente.
 
 ## 1. Los tres papeles de cada sesión
 
 | Papel | Qué hace | Qué no hace |
 |---|---|---|
-| **Facilita** | Lee la pauta tal cual, aplica las reglas de ayuda, es la **única** persona que habla con el participante | No explica la pantalla, no señala nada, no dice «va bien», no registra |
-| **Registra** | Anota en la planilla, con el minuto del reloj, cada ayuda, cada desvío y cada cosa que la persona dice o hace | No habla con el participante; **observado** e **interpretado** van siempre en columnas distintas |
-| **Resguarda la evidencia** | Prueba y detiene la grabación, sube el archivo a la carpeta privada, borra la copia local y comprueba los permisos | No comparte el archivo por ningún otro medio |
+| **Facilitador** | Lee la pauta tal cual, aplica las reglas de ayuda, es la **única** persona que habla con el participante | No explica la pantalla, no señala nada, no dice «va bien», no registra |
+| **Registrador** | Anota en la planilla, con el minuto del reloj, cada ayuda, cada desvío y cada cosa que la persona dice o hace | No habla con el participante; **observado** e **interpretado** van siempre en columnas distintas |
+| **Resguardo de evidencia** | Prueba y detiene la grabación, sube el archivo a la carpeta privada, borra la copia local y comprueba los permisos | No comparte el archivo por ningún otro medio |
 
-Con dos integrantes, uno cumple dos papeles. La combinación que ya define `prueba-usuarios.md` es que quien facilita también resguarda. **Quien facilita nunca registra**, porque no se puede conversar y anotar a la vez sin perder lo observado. Si alguien del equipo conoce personalmente al participante, no facilita esa sesión.
+Con dos integrantes, uno cumple dos papeles. En `prueba-usuarios.md` los dos son el **integrante A** y el **integrante B**, sin nombres: el integrante A resguarda la evidencia en todas las sesiones y el B es quien trabaja en la bodega del caso. **Quien facilita no registra durante la sesión**, porque no se puede conversar y anotar a la vez sin perder lo observado. La única excepción son las sesiones con la gente de la bodega del caso, donde el integrante B no puede participar ni mirar la grabación: ahí quien facilitó registra **después**, viendo la grabación. Si alguien del equipo conoce personalmente al participante, no facilita esa sesión.
 
 ## 2. Registro de sesiones (se completa a mano, sin nombres)
 
 Los códigos se asignan en este orden: P01 a P05 son del perfil U1 y P06 a P10 del perfil U2; S01 a S04 son las consultas a stakeholders. **En esta tabla va solo el código, nunca el nombre ni el contacto de la persona.** Una tabla con los códigos y los nombres, si hace falta para coordinar, se guarda en la carpeta privada de Drive, no aquí.
 
-| Código | Perfil | Fecha | Lugar (bodega del caso, otra empresa o a distancia) | Facilita | Registra | Resguarda | ¿Grabó? | Evidencia subida | Planilla completa |
+| Código | Perfil | Fecha | Lugar (bodega del caso, otra empresa o a distancia) | Facilitador | Registrador | Resguardo de evidencia | ¿Grabó? | Evidencia subida | Planilla completa |
 |---|---|---|---|---|---|---|---|---|---|
 | P01 | U1 | | | | | | | | |
 | P02 | U1 | | | | | | | | |
@@ -87,7 +87,7 @@ Si no hay forma de grabar sin cámara, **no se graba** y se anota a mano. Una gr
 |---|---|
 | La persona pide parar | Se detiene en el acto, sin pedir explicaciones. Se anota «terminó antes» y en qué etapa. Si pide que se borre lo grabado, se borra |
 | El prototipo muestra «No hay conexión» o «problema del sistema» | Se anota como **falla del sistema** con el minuto. Se reintenta una vez. Si sigue, se reprograma la sesión |
-| La falla es del prototipo y no de la persona | **Regla propuesta, a confirmar por el equipo antes de la primera sesión** (porque los umbrales ya están fijados): una falla del sistema no cuenta ni a favor ni en contra de los umbrales; esa tarea se repite en otra sesión |
+| La falla es del prototipo y no de la persona | **Regla propuesta, aceptada por el equipo como propuesta (14 de noviembre de 2026) y por confirmar en el ensayo interno, antes de la primera sesión:** una falla del sistema no cuenta ni a favor ni en contra de los umbrales; esa tarea se repite en otra sesión |
 | Alguien del equipo conoce al participante | Esa persona no facilita ni registra esa sesión |
 | Se descubre que se anotó un nombre o un contacto | Se borra de inmediato de la planilla y de cualquier archivo; si llegó a un commit, se avisa al equipo para sacarlo del historial antes de subir nada |
 

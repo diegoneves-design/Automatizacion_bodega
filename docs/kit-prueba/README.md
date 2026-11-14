@@ -20,9 +20,9 @@ Fuera de esta carpeta, pero parte de lo mismo: [`docs/linea-base.md`](../linea-b
 
 ## En qué orden se usa
 
-1. **Decidir lo pendiente** de [`revision-avance6.md`](revision-avance6.md): las preguntas de la pauta que rozan la regla, la zona intermedia del umbral, la regla de fallas del sistema.
+1. **Revisar lo decidido y lo pendiente** en [`revision-avance6.md`](revision-avance6.md): qué se cambió el 14 de noviembre de 2026 y qué sigue abierto.
 2. **Pedir los permisos.** Si la persona trabaja en una organización que exige autorización, pedir al profesor el certificado (por correo, con la organización y la persona a quien se dirige) o invitar a alguien del mismo cargo en otra empresa.
-3. **Ensayar** con [`ensayo-interno.md`](ensayo-interno.md) hasta que no quede ninguna tarea ambigua y la suma esté por debajo de los 20 minutos.
+3. **Ensayar** con [`ensayo-interno.md`](ensayo-interno.md) hasta que no quede ninguna tarea ambigua y la suma esté por debajo de los 20 minutos (la pauta suma 19).
 4. **Preparar el material**: imprimir la pauta, el consentimiento y la regla de decisión, y revisar [`plan-sesiones.md`](plan-sesiones.md).
 5. **Hacer las sesiones**, una persona a la vez y con **Reiniciar demo** entre una y otra.
 6. **Analizar** con [`regla-decision.md`](regla-decision.md): primero lo que bloquea, después lo que entorpece según cuántas personas lo vivieron, y lo estético espera.
