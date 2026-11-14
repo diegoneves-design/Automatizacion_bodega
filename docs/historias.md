@@ -21,16 +21,28 @@ Como jefe de bodega, quiero validar los productos del pedido contra el inventari
 
 Como jefe de bodega, quiero cargar de una vez el listado de productos del pedido de venta, para no digitar a mano hasta 60 productos por guía.
 
+- **Escenario principal.** Dado que el jefe de bodega pegó un listado de entre 1 y 60 productos, cuando presiona "Cargar pedido", entonces ve "N productos detectados" y pasa a validar el pedido.
+- **Escenario alternativo.** Dado que el listado está vacío o tiene más de 60 productos, cuando presiona "Cargar pedido", entonces ve junto al campo cómo corregirlo y no avanza.
+
 ## HU-03 · Registrar un cambio de último minuto
 
 Como supervisor de mantenimiento, quiero registrar en el sistema el cambio de un equipo de una orden, para que bodega se entere sin depender de una llamada o un WhatsApp.
+
+- **Escenario principal.** Dado que el supervisor de mantenimiento elige el equipo que sale y el que entra, cuando presiona "Guardar cambio", entonces vuelve a la validación con esa línea destacada, con quién lo cambió y a qué hora.
+- **Escenario alternativo.** Dado que falta el equipo que entra, o es igual al que sale o ya está en el pedido, cuando presiona "Guardar cambio", entonces ve el error junto al campo y no se guarda nada.
 
 ## HU-04 · Ver los cambios destacados
 
 Como jefe de bodega, quiero ver destacado qué equipo cambió, quién lo cambió y a qué hora, para corregir solo esa línea de la guía y tener respaldo cuando la gente sale más tarde de lo esperado.
 
-## HU-05 · Dejar lista la guía
+- **Escenario principal.** Dado que hay un cambio registrado en la orden, cuando el jefe de bodega ve la validación, entonces la línea cambiada sale destacada con "Cambiado por X a las HH:MM" y la línea anterior se conserva como no vigente.
+- **Escenario alternativo.** Dado que la orden no tiene cambios, cuando el jefe de bodega ve la validación, entonces ninguna línea sale destacada.
 
-Como jefe de bodega, quiero que la guía quede lista con los productos validados, para pasarla al ERP sin volver a digitarlos.
+## HU-05 · Preparar la guía con los productos validados
+
+Como jefe de bodega, quiero preparar la guía solo con los productos validados, para pasarla al ERP sin volver a digitarlos.
+
+- **Escenario principal.** Dado que todos los productos están en verde, cuando el jefe de bodega presiona "Preparar guía", entonces ve la guía solo con las líneas vigentes y "Lista para pasar al ERP".
+- **Escenario alternativo.** Dado que algún producto no validó, cuando el jefe de bodega está en la validación, entonces "Preparar guía" está bloqueado y no se llega a la guía.
 
 Wireframes: ver [docs/wireframes/](wireframes/)

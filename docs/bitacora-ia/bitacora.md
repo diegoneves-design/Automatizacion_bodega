@@ -428,3 +428,26 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - Comparamos una por una las diez frases nuevas con las del Encargo 17. Cada una dice lo mismo, en el mismo orden, y las impares siguen siendo positivas y las pares negativas, así que el cálculo del puntaje no cambia.
 - Revisamos que la nota nueva del cierre no le dice nada al participante, solo a quien registra.
 - Los tiempos de cada parte no cambiaron (20 minutos) y la versión imprimible sigue en 2 planas tamaño carta.
+
+---
+
+## Encargo 19. Atender la retroalimentación de los Avances 3 a 5 y revisar el Avance 6
+
+**Objetivo.** Corregir lo que la profesora pidió en los Avances 4 y 5 y revisar `docs/prueba-usuarios.md` y `docs/pauta-validacion.md` contra las instrucciones del Avance 6.
+
+**Instrucción entregada.**
+- Contexto: las instrucciones del Avance 6, la retroalimentación de los Avances 3, 4 y 5, y los archivos `docs/historias.md`, `docs/etica.md`, `docs/prototipo.md` y `docs/pauta-validacion.md`.
+- Intención: dejar HU-05 con una acción de la persona, pasar a `historias.md` los criterios de HU-02 a HU-05 que estaban como borrador, y proponer un plazo de conservación con número.
+- Restricciones: no cambiar la prueba de usuarios ni sus umbrales; no tocar la aplicación Streamlit; no inventar datos de participantes.
+- Verificación: decir qué cambió en cada archivo y qué no se pudo comprobar.
+
+**Respuesta obtenida.** HU-05 reescrita como "preparar la guía solo con los productos validados"; criterios de HU-02 a HU-05 movidos de `prototipo.md` a `historias.md`; plazo de 24 meses desde la emisión de la guía en la ficha de `etica.md`. Además, una comparación del sitio publicado con `prototipo/`: el CSS de Vercel no tiene el borde de tarjetas corregido.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: los criterios de HU-02 a HU-05 tal como estaban en el borrador, con redacción mínima ("el jefe de bodega" explícito).
+- Pendiente: los criterios los propuso la IA; la profesora pidió que los escriba el equipo, así que **el equipo debe revisarlos y aprobarlos** antes del pull request.
+- Pendiente: el plazo de 24 meses es una propuesta, a confirmar con administración.
+- No resuelto: volver a publicar el prototipo en Vercel requiere acceso del equipo a ese servicio.
+
+**Cómo se verificó.** Se comparó con `curl` cada archivo del sitio publicado con el del repositorio: `index.html`, `js/app.js` y `js/datos.js` coinciden; `css/estilos.css` no. Se revisó con `grep` que no queden referencias a "borrador" de HU-02 a HU-05 ni al texto antiguo de HU-05. No se imprimió ni se contó las planas del PDF de la pauta.
+

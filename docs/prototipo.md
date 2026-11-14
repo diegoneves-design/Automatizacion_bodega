@@ -140,14 +140,14 @@ Líneas continuas: ruta principal y retornos. Líneas punteadas: los dos caminos
 
 ## Registro de decisiones
 
-Una fila por pantalla. Los criterios de HU-02 a HU-05 son un **BORRADOR** para que el equipo los revise (ver más abajo); solo la HU-01 tiene criterios aprobados en `docs/historias.md`.
+Una fila por pantalla. Los criterios de aceptación de HU-01 a HU-05 están en `docs/historias.md`; aquí se resume cómo los cumple cada pantalla.
 
 | Pantalla | Historia que resuelve | Criterio que verifica | Funcional | Simulado |
 |---|---|---|---|---|
-| **P1 Cargar pedido** | HU-02 | Borrador HU-02: con 1 a 60 productos avanza; con listado vacío o excedido muestra el error junto al campo y no avanza | Contador en vivo, límite de 60, error de campo vacío o excedido, SKU en mayúsculas y sin repetidos, precarga al cambiar de orden, *Cancelar* | Que *Cargar pedido* "guarda" la orden: solo la deja en memoria durante la visita |
-| **P2 Validar pedido** | HU-01 (principal), HU-04 | **HU-01 principal:** todos ok en verde y *Preparar guía* habilitado. **HU-01 alternativo:** SKU en rojo con motivo "no existe", mensaje "Corrige 1 producto para continuar" y *Preparar guía* bloqueado. Borrador HU-04: la línea cambiada se destaca con quién y a qué hora | Validación real de cada SKU contra el inventario de ejemplo, estados pendiente, validando, ok y error, bloqueo de *Preparar guía* (también por la dirección), destacado del cambio, *Volver* | La espera de 600 ms al validar; el inventario es ficticio |
-| **P3 Registrar cambio** | HU-03 | Borrador HU-03: con equipo que sale y que entra, guarda y vuelve a la validación con la línea destacada; si falta uno, o es igual o ya está en el pedido, muestra el error junto al campo y no guarda | Validación de campos con error junto a cada uno, motivo y responsable por opciones, hora tomada del reloj, el cambio modifica la línea de P2 | Que *Guardar cambio* "registra": queda en memoria; no hay inicio de sesión, el responsable se elige de la lista |
-| **P4 Guía lista** | HU-05 | Borrador HU-05: con todo ok muestra la guía solo con las líneas vigentes y "Lista para pasar al ERP"; si algún producto no validó, no se llega aquí | Solo las líneas vigentes, descarga de un archivo de texto generado en el navegador, espera al descargar, *Volver a cargar pedido* | El contenido de la guía y el archivo (`.txt` de ejemplo, sin número de guía ni valor legal) |
+| **P1 Cargar pedido** | HU-02 | HU-02: con 1 a 60 productos avanza; con listado vacío o excedido muestra el error junto al campo y no avanza | Contador en vivo, límite de 60, error de campo vacío o excedido, SKU en mayúsculas y sin repetidos, precarga al cambiar de orden, *Cancelar* | Que *Cargar pedido* "guarda" la orden: solo la deja en memoria durante la visita |
+| **P2 Validar pedido** | HU-01 (principal), HU-04 | **HU-01 principal:** todos ok en verde y *Preparar guía* habilitado. **HU-01 alternativo:** SKU en rojo con motivo "no existe", mensaje "Corrige 1 producto para continuar" y *Preparar guía* bloqueado. HU-04: la línea cambiada se destaca con quién y a qué hora | Validación real de cada SKU contra el inventario de ejemplo, estados pendiente, validando, ok y error, bloqueo de *Preparar guía* (también por la dirección), destacado del cambio, *Volver* | La espera de 600 ms al validar; el inventario es ficticio |
+| **P3 Registrar cambio** | HU-03 | HU-03: con equipo que sale y que entra, guarda y vuelve a la validación con la línea destacada; si falta uno, o es igual o ya está en el pedido, muestra el error junto al campo y no guarda | Validación de campos con error junto a cada uno, motivo y responsable por opciones, hora tomada del reloj, el cambio modifica la línea de P2 | Que *Guardar cambio* "registra": queda en memoria; no hay inicio de sesión, el responsable se elige de la lista |
+| **P4 Guía lista** | HU-05 | HU-05: con todo ok muestra la guía solo con las líneas vigentes y "Lista para pasar al ERP"; si algún producto no validó, no se llega aquí | Solo las líneas vigentes, descarga de un archivo de texto generado en el navegador, espera al descargar, *Volver a cargar pedido* | El contenido de la guía y el archivo (`.txt` de ejemplo, sin número de guía ni valor legal) |
 
 ### Ayudas simuladas
 
@@ -195,23 +195,6 @@ Los nombres de los campos son los de [`docs/datos/estructura_datos.md`](datos/es
 | Número de guía | `GUIAS.numero_guia` es obligatorio; el wireframe P4 no lo muestra | No se muestra; la guía oficial se emite en el ERP |
 | Fecha y hora | P3 muestra 09:55 de ejemplo | Se toma del reloj del dispositivo al guardar |
 | Archivo de la guía | `archivo_pdf` | Archivo de texto generado en el navegador, marcado como ejemplo |
-
-## Criterios de aceptación en BORRADOR (HU-02 a HU-05)
-
-Propuesta para que el equipo la revise antes de pasarla a `docs/historias.md`. Hoy solo la HU-01 tiene criterios.
-
-- **HU-02**
-  - *Principal:* dado que el jefe de bodega pegó un listado de entre 1 y 60 productos, cuando presiona "Cargar pedido", entonces ve "N productos detectados" y pasa a validar el pedido.
-  - *Alternativo:* dado que el listado está vacío o tiene más de 60, cuando presiona "Cargar pedido", entonces ve junto al campo cómo corregirlo y no avanza.
-- **HU-03**
-  - *Principal:* dado que elige el equipo que sale y el que entra, cuando presiona "Guardar cambio", entonces vuelve a la validación con esa línea destacada, con quién y a qué hora.
-  - *Alternativo:* dado que falta el equipo que entra, o es igual al que sale o ya está en el pedido, cuando presiona "Guardar cambio", entonces ve el error junto al campo y no se guarda nada.
-- **HU-04**
-  - *Principal:* dado que hay un cambio registrado, cuando el jefe de bodega ve la validación, entonces la línea cambiada sale destacada con "Cambiado por X a las HH:MM", y la línea anterior se conserva como no vigente.
-  - *Alternativo:* dado que la orden no tiene cambios, entonces ninguna línea sale destacada.
-- **HU-05**
-  - *Principal:* dado que todos los productos están ok, cuando presiona "Preparar guía", entonces ve la guía solo con las líneas vigentes y "Lista para pasar al ERP".
-  - *Alternativo:* dado que algún producto no validó, entonces "Preparar guía" está bloqueado y no se llega a la guía.
 
 ## Cómo se verificó
 
