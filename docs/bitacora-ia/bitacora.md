@@ -503,3 +503,39 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - **Sin probar:** celular, poca señal real, otros navegadores y uso simultáneo de dos personas.
 - La demo quedó reiniciada: 2 órdenes con 4 líneas pendientes, sin guías ni cambios.
 
+
+---
+
+## Encargo 22. Kit para ejecutar la prueba con usuarios, línea base y chequeo del celular
+
+**Objetivo.** Dejar listo lo que falta para ejecutar de verdad la prueba diseñada en el Avance 6 y para reforzar la prueba de concepto: protocolo de línea base, kit de la prueba y chequeo en pantallas chicas.
+
+**Instrucción entregada.**
+- Contexto: `docs/prueba-usuarios.md` y `docs/pauta-validacion.md` (en `main` y en `feature/mejora-avance6`), las instrucciones del Avance 6 con sus criterios de revisión, la ficha de datos con los 24 meses propuestos y el prototipo conectado a Supabase.
+- Intención: complementar y enlazar lo que ya existe, sin duplicarlo; escribir cómo se mide la línea base, el consentimiento, la planilla, el ensayo, el plan de sesiones, la regla de decisión y el checklist del celular; revisar todo contra los criterios del Avance 6.
+- Restricciones: no tocar `supabase/` ni las otras ramas; no ejecutar `supabase/probar_en_supabase.py`; ningún nombre, teléfono ni correo de personas reales; grabaciones y evidencia fuera del repositorio; corregir solo CSS o textos en un commit aparte y sin cambiar reglas de validación; si se agrega un script, agregarle pruebas.
+- Verificación: decir qué se verificó y qué no.
+
+**Respuesta obtenida.**
+- `docs/linea-base.md`, `docs/plantillas/linea_base_registro.csv` y `herramientas/calcular_linea_base.py`, con 49 pruebas.
+- `docs/kit-prueba/`: consentimiento, planilla, ensayo interno, plan de sesiones, regla de decisión, revisión contra el Avance 6 y un índice.
+- `herramientas/md_a_pdf.py` (con 12 pruebas) y los PDF imprimibles de la pauta, el consentimiento y la regla.
+- `docs/checklist-celular.md` y una corrección de CSS en un commit aparte.
+- `tests/test_kit_prueba.py`: coherencia entre el kit, la pauta y `prueba-usuarios.md`, enlaces, ausencia de datos personales, de nombres del equipo y de emojis.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: la rama parte de `feature/poc-supabase` con `feature/mejora-avance6` unido por un merge local, para que el kit y el PDF salgan de los documentos en su estado final. Hubo un conflicto en esta bitácora, resuelto dejando los Encargos 19, 20 y 21 en orden.
+- Corregido, borde del campo «Cliente»: la revisión de pantallas chicas encontró que el borde del campo de solo lectura medía 1,59:1 (mínimo 3:1). Se cambió solo el CSS y ahora mide 4,37:1. Es el mismo hallazgo pendiente de `docs/etica.md`.
+- Corregido, convertidor de PDF: escapaba dos veces el `&` de los enlaces (`&amp;amp;`). Lo encontró una prueba.
+- Corregido, línea base: la guarda de datos personales marcaba una fecha (`2026-11-16`) como si fuera un teléfono. Se limitó a las columnas de texto libre.
+- Corregido, pruebas del kit: tres falsos positivos de mi propia revisión de datos personales (el nombre de una imagen, el RUT ficticio del modelo y los datos de prueba de la guarda); se afinaron las reglas sin aflojarlas, de modo que un RUT, correo o teléfono real siga haciendo fallar la prueba.
+- Corregido, emojis: la revisión del kit (`revision-avance6.md`) usaba emojis para marcar el estado. Bastián pidió que no haya emojis en el repositorio; se reemplazaron por palabras y se agregó una prueba que los detecta. Se dejaron los símbolos «✓» y «✕» del prototipo, que acompañan siempre a un texto.
+- Corregido, herramienta de escritura: dos secuencias de escape (` ` y `\b`) se convirtieron en caracteres invisibles dentro de archivos. Se detectó con las pruebas, se corrigió y se revisó que ningún archivo del repositorio tenga caracteres de control.
+- **No se aplicó:** el cambio de redacción de tres preguntas de la pauta que rozan la regla de no sugerir la respuesta. Está propuesto en `revision-avance6.md` y lo decide el equipo, porque cambiar una pregunta cambia lo que se mide.
+
+**Cómo se verificó.**
+- `pytest tests`: 169 pruebas pasan (las 71 anteriores más las nuevas).
+- **PDF de la pauta:** regenerado desde el texto actual, 2 planas contadas con `pypdf`, y las seis etapas suman exactamente 20 minutos (sin holgura). La hoja de la regla y el consentimiento ocupan una plana cada uno. Se revisaron visualmente.
+- **Pantallas chicas:** el prototipo se cargó dentro de un marco de 360 × 640 y de 390 × 844 y se recorrieron 16 estados en cada tamaño, contra una réplica de la base escrita solo para probar la pantalla. Se revisó desplazamiento horizontal, texto cortado, controles de 44 px o más (87 revisados), contraste de texto con la fórmula de WCAG (324 textos, el más bajo 5,63:1), contraste de bordes, estados que dependen solo del color y tamaño de letra de los campos. Para comprobar que la revisión sirve se le inyectaron a propósito cinco problemas y los detectó todos. Mi primer intento de ese control falló porque la política de seguridad de la página bloquea los estilos en línea: eso era un defecto del control y no de la revisión.
+- **No se ejecutó** `supabase/probar_en_supabase.py` ni se tocó Supabase: la demo quedó como estaba.
+- **No se pudo verificar:** un celular real, señal real, otros navegadores, dos personas usando la demo a la vez y el sitio publicado en Vercel. Tampoco se hizo el ensayo de la pauta con una persona ni ninguna medición de línea base: todo eso está escrito, no ejecutado.

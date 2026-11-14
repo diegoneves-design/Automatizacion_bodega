@@ -24,7 +24,10 @@ Documentación del proyecto:
 - Análisis ético del prototipo (Avance 5): [docs/etica.md](docs/etica.md)
 - Prueba de concepto con Supabase (reglas, mensajes de error y pruebas de rotura): [docs/poc-supabase.md](docs/poc-supabase.md)
 - Diseño de la prueba de usuarios (Avance 6): [docs/prueba-usuarios.md](docs/prueba-usuarios.md)
-- Guion para cada sesión de la prueba (Avance 6): [docs/pauta-validacion.md](docs/pauta-validacion.md)
+- Guion para cada sesión de la prueba (Avance 6): [docs/pauta-validacion.md](docs/pauta-validacion.md) · [versión para imprimir](docs/pauta-validacion.pdf)
+- Kit para ejecutar la prueba (consentimiento, planilla, ensayo, plan de sesiones y regla de decisión): [docs/kit-prueba/](docs/kit-prueba/)
+- Línea base: cómo medir hoy una guía a mano y el indicador de éxito: [docs/linea-base.md](docs/linea-base.md)
+- Chequeo del prototipo en un celular real: [docs/checklist-celular.md](docs/checklist-celular.md)
 
 ### Estructura del repositorio
 
@@ -36,6 +39,9 @@ docs/bitacora-ia/     registro de encargos a un agente de IA
 docs/datos/           diseño de la base de datos y su diagrama
 supabase/             esquema SQL y datos de ejemplo de la base (se prueba en SQLite y en Supabase)
 docs/historias.md     historias de usuario y criterios de aceptación (Avance 4)
+docs/kit-prueba/      kit para ejecutar la prueba con usuarios (Avance 6)
+docs/plantillas/      plantillas vacías en CSV (línea base)
+herramientas/         scripts de apoyo: cálculo de la línea base y PDF imprimible, con pruebas
 docs/wireframes/      wireframes del flujo principal, con sus notas (Avance 4)
 docs/entrevistas/     conversación con el usuario y su guion (Avance 4)
 docs/recorrido-usuario/ borrador del mapa de recorrido (ensayo, sin validar)
@@ -199,8 +205,8 @@ Al 5 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance
 
 | Hecho | Pendiente |
 |---|---|
-| Problema, caso de uso y maqueta de tres pantallas | Medir cuánto demoran hoy las guías y cuántas se rehacen |
-| Conversación con el usuario (`docs/entrevistas`) | Ejecutar la prueba de usuarios diseñada en el Avance 6 (`docs/prueba-usuarios.md`) |
+| Problema, caso de uso y maqueta de tres pantallas | Medir cuánto demoran hoy las guías y cuántas se rehacen, con el protocolo de `docs/linea-base.md` (escrito, todavía sin medir) |
+| Conversación con el usuario (`docs/entrevistas`) | Ejecutar la prueba de usuarios diseñada en el Avance 6 (`docs/prueba-usuarios.md`), con el kit de `docs/kit-prueba/` |
 | Historias HU-01 a HU-05 con criterios principal y alternativo (`docs/historias.md`) | Que el equipo confirme los criterios de HU-02 a HU-05, propuestos con ayuda de IA |
 | Wireframes del flujo principal con sus notas (`docs/wireframes`) | Subir el límite de 50 a 60 productos por guía en la app (máximo real del ERP; el prototipo ya usa 60) |
 | Prototipo navegable P1 a P4 con sistema mínimo, mapa de navegación y registro de decisiones (`prototipo/`, `docs/prototipo.md`) | Destacar los cambios de último minuto en el validador de la app (HU-04) |
@@ -210,6 +216,7 @@ Al 5 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance
 | Base SQLite con inventario simulado, tests y CI en GitHub Actions. Los cuatro scripts de `supabase/` corrieron en Supabase y las 82 comprobaciones con la clave publicable pasan (`supabase/probar_en_supabase.py`) | Cerrar el acceso con inicio de sesión antes de usar datos reales: hoy las políticas son abiertas |
 | | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
 | Diseño de la prueba con usuarios y guion de cada sesión (`docs/prueba-usuarios.md`, `docs/pauta-validacion.md`) | |
+| Kit de la prueba escrito (consentimiento, planilla, ensayo, plan de sesiones, regla de decisión, pauta imprimible de 2 planas), protocolo de la línea base con su herramienta de cálculo, y checklist del celular. El prototipo se revisó en pantallas de 360 y 390 px de ancho (`docs/checklist-celular.md`) | Ensayar la pauta, medir la línea base y revisar el prototipo en un celular real con datos móviles: nada de eso se ha hecho |
 | Prueba de concepto escrita: el prototipo lee órdenes, valida SKU, registra cambios (con motivo obligatorio) y prepara la guía en Supabase, con validación en tres capas (`prototipo/`, `supabase/`, `docs/poc-supabase.md`), probada en Supabase: las reglas de la base y la pantalla en un navegador contra la base real | Probarla en un celular, con poca señal y con personas ajenas al equipo (prueba de usuarios, `docs/prueba-usuarios.md`) |
 
 ### Prueba de concepto con Supabase: qué hay que configurar
