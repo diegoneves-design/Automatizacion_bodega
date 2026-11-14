@@ -121,7 +121,9 @@ select, input, textarea {
   font: inherit;
 }
 textarea { min-height: calc(var(--u) * 20); resize: vertical; font-family: ui-monospace, "SF Mono", Consolas, "Liberation Mono", monospace; }
-input[readonly] { background: var(--tinte-neutro); border-color: var(--borde-suave); }
+/* Solo lectura: fondo gris y borde discontinuo. El borde usa --borde (contraste minimo 3:1 sobre el blanco);
+   con --borde-suave medía 1,59:1 y el campo casi no se distinguía. */
+input[readonly] { background: var(--tinte-neutro); border-color: var(--borde); border-style: dashed; }
 select[aria-invalid="true"], textarea[aria-invalid="true"], input[aria-invalid="true"] { border-color: var(--alerta); background: var(--tinte-alerta); }
 
 .ayuda { margin: var(--u) 0 0; color: var(--apoyo); }
