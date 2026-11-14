@@ -97,8 +97,27 @@ Probadas en el navegador contra la réplica en memoria (ver el estado de las pru
 ## 4. Qué se supone y qué falta
 
 - **Los datos son compartidos.** Todas las personas que abran el prototipo ven y cambian las mismas órdenes. En una sesión de prueba, una persona a la vez, y se presiona «Reiniciar demo» entre una y otra.
-- **«Validar» en un retiro exige que el equipo esté disponible,** igual que en un despacho, para mantener el prototipo como estaba. Falta confirmar con el jefe de bodega qué debe comprobarse en un retiro (por ejemplo, que el equipo figure arrendado).
-- **El motivo del retiro** tiene solo falla y mantención preventiva. Falta confirmar con el jefe de bodega que no haya otros y si existe un retiro normal sin motivo (ver `docs/datos/estructura_datos.md`, sección 5).
 - **La guía no actualiza el estado ni la ubicación de los equipos.** El modelo lo prevé, pero en la prueba de concepto no se hace para poder repetir la demo. La guía oficial se emite en el ERP.
-- **Sin sesión.** Quién prepara la guía y quién registra un cambio lo elige la persona en la pantalla: sirve para la demo, no es seguridad. Las políticas de acceso son abiertas y solo valen con datos ficticios (ver el README).
 - **El límite de 60 productos y el largo del motivo viven en dos lugares:** `prototipo/js/reglas.js` y `supabase/funciones.sql`. Si cambian, hay que cambiarlos en ambos; la base es la que manda.
+
+### Pendiente para la entrevista con el jefe de bodega
+
+Estas dos preguntas quedan abiertas hasta esa entrevista. Mientras tanto, el prototipo hace lo que se indica.
+
+| Pregunta | Qué hace hoy el prototipo | Qué cambiaría según la respuesta |
+|---|---|---|
+| ¿Qué motivos tiene un retiro? ¿Existe un retiro normal, sin motivo? | El retiro exige uno de dos motivos: falla o mantención preventiva | Si hay más motivos, se agregan a la lista; si existe un retiro sin motivo, `motivo_retiro` deja de ser obligatorio (ver `docs/datos/estructura_datos.md`, sección 5) |
+| ¿Qué debe comprobar «Validar» en un retiro? | Exige que el equipo esté disponible, igual que en un despacho, para mantener el prototipo como estaba | Por ejemplo, que el equipo figure arrendado en el cliente en vez de disponible en bodega |
+
+## 5. Acceso: qué puede hacer cualquiera
+
+**El prototipo no tiene inicio de sesión, así que todo lo siguiente lo puede hacer cualquier persona que tenga la clave publicable.** La clave va dentro de la página y se ve en el navegador: esto es así por diseño y no es una filtración.
+
+- **Leer** todas las tablas del flujo. De los usuarios solo se leen el nombre, el cargo y si está activo; el correo y el teléfono no salen por la API.
+- **Llamar a cualquiera de las cinco funciones:** cargar un pedido, validar, registrar un cambio, preparar una guía y **Reiniciar demo**.
+- **Reiniciar demo borra** las guías, los cambios y las líneas de todas las órdenes y las deja como al inicio. Cualquiera puede hacerlo en cualquier momento, también mientras otra persona está en plena sesión.
+- **Quién registra** un cambio o prepara una guía lo elige la persona en la pantalla, y las funciones no pueden comprobar que sea cierto. Que solo el jefe de bodega prepare la guía es coherencia de la demo, no seguridad.
+
+Lo que sí limita a cualquiera: no puede escribir directo en las tablas ni saltarse las reglas, porque toda escritura pasa por las funciones y estas, junto con las restricciones de las tablas, rechazan lo que no cumpla.
+
+**Antes de usar datos reales hay que cerrar el acceso con inicio de sesión:** que las funciones y las políticas se apliquen según la persona y su cargo, quitar o restringir Reiniciar demo, y tomar quién registra o prepara de la sesión y no de la pantalla. Mientras tanto, solo datos ficticios.
