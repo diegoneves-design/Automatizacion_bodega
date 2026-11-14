@@ -448,6 +448,7 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - Pendiente: los criterios los propuso la IA; la profesora pidió que los escriba el equipo, así que **el equipo debe revisarlos y aprobarlos** antes del pull request.
 - Pendiente: el plazo de 24 meses es una propuesta, a confirmar con administración.
 - No resuelto: volver a publicar el prototipo en Vercel requiere acceso del equipo a ese servicio.
+- Ajuste posterior: con la prueba de concepto el prototipo queda conectado a Supabase, así que `docs/prueba-usuarios.md` ya no dice que "no está conectado a nada" y deja escrito que las sesiones son de una persona a la vez, con Reiniciar demo entre una y otra; `docs/pauta-validacion.md` lo agrega a la preparación. El PDF `pauta-validacion.pdf` no se regeneró y queda desactualizado en esa frase.
 
 **Cómo se verificó.** Se comparó con `curl` cada archivo del sitio publicado con el del repositorio: `index.html`, `js/app.js` y `js/datos.js` coinciden; `css/estilos.css` no. Se revisó con `grep` que no queden referencias a "borrador" de HU-02 a HU-05 ni al texto antiguo de HU-05. No se imprimió ni se contó las planas del PDF de la pauta.
 
