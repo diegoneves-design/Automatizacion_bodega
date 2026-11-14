@@ -431,6 +431,27 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 
 ---
 
+## Encargo 19. Atender la retroalimentación de los Avances 3 a 5 y revisar el Avance 6
+
+**Objetivo.** Corregir lo que la profesora pidió en los Avances 4 y 5 y revisar `docs/prueba-usuarios.md` y `docs/pauta-validacion.md` contra las instrucciones del Avance 6.
+
+**Instrucción entregada.**
+- Contexto: las instrucciones del Avance 6, la retroalimentación de los Avances 3, 4 y 5, y los archivos `docs/historias.md`, `docs/etica.md`, `docs/prototipo.md` y `docs/pauta-validacion.md`.
+- Intención: dejar HU-05 con una acción de la persona, pasar a `historias.md` los criterios de HU-02 a HU-05 que estaban como borrador, y proponer un plazo de conservación con número.
+- Restricciones: no cambiar la prueba de usuarios ni sus umbrales; no tocar la aplicación Streamlit; no inventar datos de participantes.
+- Verificación: decir qué cambió en cada archivo y qué no se pudo comprobar.
+
+**Respuesta obtenida.** HU-05 reescrita como "preparar la guía solo con los productos validados"; criterios de HU-02 a HU-05 movidos de `prototipo.md` a `historias.md`; plazo de 24 meses desde la emisión de la guía en la ficha de `etica.md`. Además, una comparación del sitio publicado con `prototipo/`: el CSS de Vercel no tiene el borde de tarjetas corregido.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: los criterios de HU-02 a HU-05 tal como estaban en el borrador, con redacción mínima ("el jefe de bodega" explícito).
+- Pendiente: los criterios los propuso la IA; la profesora pidió que los escriba el equipo, así que **el equipo debe revisarlos y aprobarlos** antes del pull request.
+- Pendiente: el plazo de 24 meses es una propuesta, a confirmar con administración.
+- No resuelto: volver a publicar el prototipo en Vercel requiere acceso del equipo a ese servicio.
+- Ajuste posterior: con la prueba de concepto el prototipo queda conectado a Supabase, así que `docs/prueba-usuarios.md` ya no dice que "no está conectado a nada" y deja escrito que las sesiones son de una persona a la vez, con Reiniciar demo entre una y otra; `docs/pauta-validacion.md` lo agrega a la preparación. El PDF `pauta-validacion.pdf` no se regeneró y queda desactualizado en esa frase.
+
+**Cómo se verificó.** Se comparó con `curl` cada archivo del sitio publicado con el del repositorio: `index.html`, `js/app.js` y `js/datos.js` coinciden; `css/estilos.css` no. Se revisó con `grep` que no queden referencias a "borrador" de HU-02 a HU-05 ni al texto antiguo de HU-05. No se imprimió ni se contó las planas del PDF de la pauta.
+
 ## Encargo 20. Corregir la modalidad y el motivo en el modelo de datos y dejarlo ejecutable
 
 **Objetivo.** Responder a la retroalimentación del Avance 3 sobre la modalidad y el motivo obligatorios en toda orden, y dejar el modelo como esquema SQL que se pueda probar.
