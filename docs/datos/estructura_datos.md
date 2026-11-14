@@ -1,8 +1,8 @@
 # Estructura de datos preliminar
 
-Grupo 6 · Automatizacion_bodega · Versión del 2026-10-04 (Avance 3), actualizada el 2026-10-15 y el 2026-11-01 (correcciones de la revisión del Avance 3)
+Grupo 6 · Automatizacion_bodega · Versión del 2026-10-04 (Avance 3), actualizada el 2026-10-15, el 2026-11-01 y el 2026-11-14 (correcciones de la revisión del Avance 3)
 
-Las tablas salen de los sustantivos del caso de uso del Avance 2 (emisión automática de guía): cliente, usuario, orden, equipo, detalle de orden, guía y cambio de último minuto. Este es el diseño preliminar; todavía no se crea la base en Supabase.
+Las tablas salen de los sustantivos del caso de uso del Avance 2 (emisión automática de guía): cliente, usuario, orden, equipo, detalle de orden, guía y cambio de último minuto. Este es el diseño preliminar. El esquema ejecutable, con las reglas como restricciones, está en [`supabase/schema.sql`](../../supabase/schema.sql) y los datos de ejemplo de la sección 4 en [`supabase/seed_ejemplo.sql`](../../supabase/seed_ejemplo.sql); `tests/test_modelo_datos.py` comprueba que no haya claves externas rotas y que las reglas se cumplan. Todavía no se crea la base en Supabase.
 
 > El MVP actual usa SQLite con tres tablas (`inventario`, `ordenes`, `log_cambios`), definidas en `src/app.py`. Este modelo es el objetivo: separa la orden de su detalle, agrega `CLIENTES`, `USUARIOS` y `GUIAS`, y reemplaza `log_cambios` por `REGISTRO_CAMBIOS`.
 
@@ -52,8 +52,8 @@ erDiagram
         numero id_usuario_carga FK
         fecha_hora fecha_orden
         lista tipo_movimiento "despacho, retiro"
-        lista modalidad "convencional, alternativo"
-        lista motivo_alternativo "mantencion_preventiva, falla"
+        lista modalidad "convencional, alternativo (solo despacho)"
+        lista motivo_retiro "mantencion_preventiva, falla (solo retiro)"
         lista estado "pendiente, bloqueada, validada, emitida"
     }
     DETALLE_ORDEN {
@@ -107,8 +107,8 @@ Las claves externas siempre van en el lado "muchos" de la relación.
 - **Claves externas en vez de nombres.** La orden guarda `id_cliente`, no el nombre del cliente.
 - **SKU_INFORMADO** guarda el SKU tal como llegó en el listado. Si no existe en EQUIPOS, `id_equipo` queda vacío, la validación marca `no_existe` y la orden pasa a `bloqueada`, que es la extensión del caso de uso.
 - **VIGENTE** conserva el historial: cuando un equipo se cambia a último minuto, la línea antigua no se borra, sino que queda `vigente = no` y se agrega la nueva. La guía sólo usa las líneas vigentes.
-- **MODALIDAD Y MOTIVO_ALTERNATIVO.** Según la conversación con el subjefe de bodega (pregunta D1), un despacho o un retiro puede ser `convencional` (el movimiento normal) o `alternativo` (el cambio de un equipo por mantención o por falla). Por eso `modalidad` es obligatoria en toda orden, y `motivo_alternativo` (`mantencion_preventiva` o `falla`) es obligatorio **solo** cuando `modalidad = alternativo`; en una orden convencional queda vacío, en lugar de llevar un valor de relleno.
-- **MOTIVO_CAMBIO es obligatorio.** Un cambio de último minuto sin motivo no sirve como respaldo cuando la gente sale tarde (conversación, preguntas 12 y 13). La regla la pone el negocio, y los ejemplos se ajustan a ella. El prototipo todavía ofrece "Sin motivo"; corregirlo es el riesgo 3 de `docs/etica.md`.
+- **MODALIDAD solo para despacho y MOTIVO_RETIRO solo para retiro.** Cada campo describe un solo tipo de movimiento, así que ninguno es obligatorio en toda orden. Un despacho es `convencional` (el normal) o `alternativo` (un equipo que reemplaza a otro por mantención o por falla), y exige `modalidad`; un retiro es por `mantencion_preventiva` o por `falla`, y exige `motivo_retiro`. En el otro tipo de movimiento el campo queda vacío, en lugar de llevar un valor de relleno. Es lo que dice el negocio (conversación, preguntas 3 y D1: «el retiro por mantenimiento y el retiro por falla») y lo que ya ofrece la aplicación (`CLAUDE.md`). Un retiro normal, sin motivo, no aparece en la conversación; si existe, habría que agregar un valor a `motivo_retiro`.
+- **MOTIVO_CAMBIO es obligatorio.** Un cambio de último minuto sin motivo no sirve como respaldo cuando la gente sale tarde (conversación, preguntas 12 y 13). La regla la pone el negocio, y los ejemplos se ajustan a ella. El prototipo del Avance 5 todavía ofrece "Sin motivo"; se corrige en la prueba de concepto (riesgo 3 de `docs/etica.md`).
 - **La ubicación del equipo se actualiza con cada guía.** Al emitir un despacho, el equipo pasa a `arrendado` en `cliente`; al emitir un retiro, vuelve como `en_mantencion` en `taller`, porque mantenimiento lo revisa antes de volver a arrendarlo (conversación, pregunta 3).
 - Los accesorios genéricos sin SKU (ductos, transiciones), que se cortan o se dañan en terreno, quedan fuera de este diseño preliminar y se incorporarán en la siguiente versión del modelo.
 
@@ -117,8 +117,8 @@ Las claves externas siempre van en el lado "muchos" de la relación.
 Los campos marcados con `*` son obligatorios (no pueden quedar vacíos); los demás pueden quedar vacíos. Los ejemplos cuentan **una misma mañana de bodega**, así que cada clave externa apunta a un registro que existe en su tabla:
 
 - **Orden 3001** (despacho convencional): se cargó con el equipo 503, que estaba en mantención; a las 09:55 mantenimiento lo cambió por el 502, y a las 10:02 se emitió la guía 70. Los equipos 501 y 502 quedaron en el cliente.
-- **Orden 3002** (retiro alternativo por falla): trae el SKU `SD-63A20-9999`, que no existe, así que quedó bloqueada y no tiene guía.
-- **Orden 3003** (retiro convencional): el pedido traía un código mal digitado (507); a las 11:10 el jefe de bodega lo cambió por el 505, que es el que volvía, y a las 11:30 se emitió la guía 71. El 505 quedó en el taller para su mantención.
+- **Orden 3002** (retiro por falla): trae el SKU `SD-63A20-9999`, que no existe, así que quedó bloqueada y no tiene guía.
+- **Orden 3003** (retiro por mantención preventiva): el pedido traía un código mal digitado (507); a las 11:10 el jefe de bodega lo cambió por el 505, que es el que volvía, y a las 11:30 se emitió la guía 71. El 505 quedó en el taller para su mantención.
 
 Los SKU de las extensiones siguen el formato real de la empresa: en `SD-63A20-0314`, `SD` indica extensión, `63A` el amperaje, `20` los metros y `0314` el número de la unidad. Los demás datos son ilustrativos.
 
@@ -151,11 +151,11 @@ El 504 sigue en el cliente porque su retiro (orden 3002) está bloqueado. El 507
 
 **ORDENES**
 
-| id_orden* | id_cliente* | id_usuario_carga* | fecha_orden* | tipo_movimiento* | modalidad* | motivo_alternativo (* si es alternativo) | estado* |
+| id_orden* | id_cliente* | id_usuario_carga* | fecha_orden* | tipo_movimiento* | modalidad (* si es despacho) | motivo_retiro (* si es retiro) | estado* |
 |---|---|---|---|---|---|---|---|
 | 3001 | 10 | 1 | 2026-10-05 08:15 | despacho | convencional | (vacío) | emitida |
-| 3002 | 11 | 1 | 2026-10-05 09:40 | retiro | alternativo | falla | bloqueada |
-| 3003 | 10 | 1 | 2026-10-05 10:30 | retiro | convencional | (vacío) | emitida |
+| 3002 | 11 | 1 | 2026-10-05 09:40 | retiro | (vacío) | falla | bloqueada |
+| 3003 | 10 | 1 | 2026-10-05 10:30 | retiro | (vacío) | mantencion_preventiva | emitida |
 
 **DETALLE_ORDEN**
 
@@ -190,6 +190,8 @@ La orden 3002 no tiene guía porque está bloqueada.
 Cada cambio ocurre antes de la guía de su orden, y los equipos que salen y entran corresponden a las líneas 9002 → 9003 y 9006 → 9007 de DETALLE_ORDEN.
 
 ## 5. Pendientes del modelo
+
+**Por validar con el jefe de bodega.** El retiro tiene solo dos motivos, `falla` y `mantencion_preventiva`, y es obligatorio. Falta confirmar que no haya otros, y si existe un **retiro normal sin motivo** (por ejemplo, el cierre de un arriendo). Si existe, `motivo_retiro` dejaría de ser obligatorio o tendría un tercer valor.
 
 Tres ajustes posibles al modelo. Son **hipótesis**: salieron de un ensayo con personajes ficticios y se confirmarán o descartarán con las conversaciones con bodega (la primera, del 10 de octubre, está en `docs/entrevistas/`). No cambian las tablas ni el diagrama de este documento.
 

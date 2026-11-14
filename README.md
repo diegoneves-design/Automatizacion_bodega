@@ -33,6 +33,7 @@ tests/                pruebas automáticas
 docs/unidad1/         Avances 2 y 3 de la Unidad 1 (PDF)
 docs/bitacora-ia/     registro de encargos a un agente de IA
 docs/datos/           diseño de la base de datos y su diagrama
+supabase/             esquema SQL y datos de ejemplo de la base (se prueba en SQLite y en Supabase)
 docs/historias.md     historias de usuario y criterios de aceptación (Avance 4)
 docs/wireframes/      wireframes del flujo principal, con sus notas (Avance 4)
 docs/entrevistas/     conversación con el usuario y su guion (Avance 4)
@@ -204,9 +205,14 @@ Al 5 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance
 | Prototipo navegable P1 a P4 con sistema mínimo, mapa de navegación y registro de decisiones (`prototipo/`, `docs/prototipo.md`) | Destacar los cambios de último minuto en el validador de la app (HU-04) |
 | Análisis ético: exclusión, datos personales, accesibilidad, sostenibilidad y riesgos (`docs/etica.md`) | Hacer obligatorio el motivo del cambio y corregir el borde del campo Cliente (riesgos 3 y 5 de `docs/etica.md`) |
 | Carga masiva, validador de SKU y ajuste de última hora con registro de cambios; la app bloquea la emisión de la guía si algún SKU no valida | Cuentas y permisos; pasar la base a Supabase |
-| Diseño preliminar de la base de datos (`docs/datos`) | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
-| Base SQLite con inventario simulado, tests y CI en GitHub Actions | |
+| Diseño de la base de datos con el esquema SQL y datos de ejemplo consistentes (`docs/datos`, `supabase/`) | Validar con el jefe de bodega que el retiro tenga solo los motivos falla y mantención preventiva, y si existe un retiro normal sin motivo |
+| Base SQLite con inventario simulado, tests y CI en GitHub Actions | Probar el esquema en un proyecto real de Supabase (hasta ahora solo se probó en SQLite) |
+| | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
 | Diseño de la prueba con usuarios y guion de cada sesión (`docs/prueba-usuarios.md`, `docs/pauta-validacion.md`) | |
+
+### Seguridad de la base en esta etapa
+
+El prototipo **no tiene inicio de sesión**: cualquier persona con el enlace lo usa. Por eso, cuando se conecte a Supabase, las políticas de acceso a las tablas (RLS) serán **abiertas** en esta etapa de prueba de concepto: quien abra el prototipo podrá leer y registrar datos. Es aceptable solo porque los datos son de ejemplo y ficticios. Lo que sí se protege desde ya es la regla de cada dato (restricciones de la base y funciones que validan antes de guardar). Antes de usar datos reales hay que agregar sesión y cerrar las políticas por rol.
 
 ## Quiénes la desarrollan
 
