@@ -471,7 +471,11 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 
 **Cómo se verificó.**
 - `pytest tests`: pasan, incluidas las pruebas estáticas de los scripts y de que no haya claves en el repositorio.
-- Sintaxis de los scripts de PostgreSQL con un analizador (`pglast`), incluido el código de las seis funciones. **No se ejecutaron en PostgreSQL ni en Supabase.**
+- Sintaxis de los scripts de PostgreSQL con un analizador (`pglast`), incluido el código de las funciones. Eso no detectó ninguno de los dos defectos de abajo: solo revisa la forma, no cómo se comporta en Supabase.
 - La pantalla, en un navegador real, contra una réplica en memoria de Supabase escrita solo para probar (no es parte del proyecto): flujo completo de las tareas 1 y 2, campos vacíos, 61 productos, motivo vacío, tres envíos seguidos, corte de conexión y error del sistema. Es una prueba de la pantalla; no prueba las funciones SQL.
-- Contra el proyecto real se hizo solo una lectura, antes de crear las tablas: devolvió el error esperado `PGRST205` (la tabla no existe) y la pantalla mostró el mensaje de error con «Reintentar». Con esa lectura se comprobó que la clave publicable es válida.
+- Antes de que existieran las tablas se hizo una sola lectura contra el proyecto real: devolvió el error esperado `PGRST205` y la pantalla mostró el mensaje con «Reintentar». Con eso se comprobó que la clave publicable es válida.
+- **Los cuatro scripts los ejecutó Bastián en el editor SQL de Supabase, sin error, con los conteos esperados.** Después se probó la base real con la clave publicable, llamando a cada función (`supabase/probar_en_supabase.py`): 73 de 80 comprobaciones pasaron en la primera ejecución.
+- **Dos defectos que solo aparecieron al probar en Supabase y que la IA no había previsto:** (1) `reiniciar_demo` fallaba desde la API con `DELETE requires a WHERE clause`, porque Supabase rechaza un `DELETE` sin `WHERE` para las llamadas de la API; (2) una línea con solo una tabulación se aceptaba como SKU, porque `btrim` solo quita espacios normales. Se corrigieron en `funciones.sql` (`where true` y una función `_limpiar`) y se agregó una restricción de PostgreSQL para el motivo del cambio.
+- La primera ejecución de la prueba ignoraba el error de `reiniciar_demo` y siguió con datos sucios; se corrigió el script para que verifique el reinicio. Esa ejecución dejó los datos de la demo modificados en Supabase.
+- **Falta confirmar las correcciones en Supabase:** volver a ejecutar `funciones.sql` y `seed_poc.sql`, repetir la prueba y probar la pantalla contra la base real.
 

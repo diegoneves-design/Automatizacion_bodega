@@ -22,6 +22,17 @@ begin
 end;
 $$;
 
+-- Quita espacios, tabulaciones, saltos de linea y espacios duros de los extremos. btrim() solo quita espacios
+-- normales, y una linea con solo una tabulacion pasaria por texto.
+create or replace function public._limpiar(p_texto text)
+returns text
+language sql
+immutable
+set search_path = public
+as $$
+  select btrim(coalesce(p_texto, ''), E' \t\r\n\f\v' || chr(160));
+$$;
+
 -- ---------------------------------------------------------------------------------------------------------
 -- cargar_pedido: crea las lineas del pedido (HU-02). Reemplaza lo que hubiera cargado antes para esa orden.
 -- ---------------------------------------------------------------------------------------------------------
@@ -48,10 +59,10 @@ begin
   select coalesce(array_agg(s.sku order by s.primero), '{}')
     into v_skus
     from (
-      select upper(btrim(t.x)) as sku, min(t.ord) as primero
+      select upper(_limpiar(t.x)) as sku, min(t.ord) as primero
         from unnest(coalesce(p_skus, '{}'::text[])) with ordinality as t(x, ord)
-       where btrim(t.x) <> ''
-       group by upper(btrim(t.x))
+       where _limpiar(t.x) <> ''
+       group by upper(_limpiar(t.x))
     ) s;
   v_n := coalesce(array_length(v_skus, 1), 0);
 
@@ -159,9 +170,9 @@ security definer
 set search_path = public
 as $$
 declare
-  v_sale    text := upper(btrim(coalesce(p_sku_sale, '')));
-  v_entra   text := upper(btrim(coalesce(p_sku_entra, '')));
-  v_motivo  text := btrim(coalesce(p_motivo, ''));
+  v_sale    text := upper(_limpiar(p_sku_sale));
+  v_entra   text := upper(_limpiar(p_sku_entra));
+  v_motivo  text := _limpiar(p_motivo);
   v_linea   detalle_orden%rowtype;
   v_equipo  equipos%rowtype;
   v_id      integer;
@@ -305,10 +316,11 @@ as $$
 begin
   perform pg_advisory_xact_lock(7001);
 
-  delete from guias;
-  delete from registro_cambios;
-  delete from detalle_orden;
-  delete from ordenes;
+  -- "where true": desde la API Supabase rechaza un DELETE sin WHERE (pg_safeupdate)
+  delete from guias            where true;
+  delete from registro_cambios where true;
+  delete from detalle_orden    where true;
+  delete from ordenes          where true;
 
   insert into ordenes (id_orden, id_cliente, id_usuario_carga, fecha_orden, tipo_movimiento, modalidad, motivo_retiro, estado) values
     (3001, 10, 1, now(), 'despacho', 'convencional', null,    'pendiente'),
@@ -331,6 +343,7 @@ $$;
 -- Permisos: solo las funciones de la pagina se pueden llamar desde la API; la ayuda interna no.
 -- ---------------------------------------------------------------------------------------------------------
 revoke all on function public._fallo(text, text) from public, anon, authenticated;
+revoke all on function public._limpiar(text)     from public, anon, authenticated;
 
 revoke all on function public.cargar_pedido(integer, text, text, text, text[]) from public;
 revoke all on function public.validar_pedido(integer)                          from public;
@@ -343,6 +356,11 @@ grant execute on function public.validar_pedido(integer)                        
 grant execute on function public.registrar_cambio(integer, text, text, integer, text) to anon, authenticated;
 grant execute on function public.preparar_guia(integer, integer)                  to anon, authenticated;
 grant execute on function public.reiniciar_demo()                                 to anon, authenticated;
+
+-- Tercera capa para el motivo: debe tener al menos un caracter que no sea espacio, tabulacion ni salto de linea.
+-- (La restriccion de schema.sql, que tambien se prueba en SQLite, solo mira espacios normales.)
+alter table public.registro_cambios drop constraint if exists registro_cambios_motivo_con_texto;
+alter table public.registro_cambios add constraint registro_cambios_motivo_con_texto check (motivo_cambio ~ '\S');
 
 -- Que la API vea las funciones nuevas sin esperar
 notify pgrst, 'reload schema';

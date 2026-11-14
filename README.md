@@ -207,10 +207,10 @@ Al 5 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance
 | Análisis ético: exclusión, datos personales, accesibilidad, sostenibilidad y riesgos (`docs/etica.md`) | Hacer obligatorio el motivo del cambio y corregir el borde del campo Cliente (riesgos 3 y 5 de `docs/etica.md`) |
 | Carga masiva, validador de SKU y ajuste de última hora con registro de cambios; la app bloquea la emisión de la guía si algún SKU no valida | Cuentas y permisos (la app Streamlit queda congelada hasta validar el flujo con usuarios) |
 | Diseño de la base de datos con el esquema SQL y datos de ejemplo consistentes (`docs/datos`, `supabase/`) | Validar con el jefe de bodega que el retiro tenga solo los motivos falla y mantención preventiva, y si existe un retiro normal sin motivo |
-| Base SQLite con inventario simulado, tests y CI en GitHub Actions | Correr los scripts de `supabase/` en el proyecto de Supabase y repetir contra la base real las pruebas de `docs/poc-supabase.md` (hasta ahora solo se probó en SQLite y con una réplica en memoria) |
+| Base SQLite con inventario simulado, tests y CI en GitHub Actions. Los cuatro scripts de `supabase/` corrieron en Supabase y 73 de 80 comprobaciones con la clave publicable pasaron | Volver a ejecutar `funciones.sql` y `seed_poc.sql` en Supabase (dos defectos corregidos) y repetir `supabase/probar_en_supabase.py` y la pantalla contra la base real |
 | | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
 | Diseño de la prueba con usuarios y guion de cada sesión (`docs/prueba-usuarios.md`, `docs/pauta-validacion.md`) | |
-| Prueba de concepto escrita: el prototipo lee órdenes, valida SKU, registra cambios (con motivo obligatorio) y prepara la guía en Supabase, con validación en tres capas (`prototipo/`, `supabase/`, `docs/poc-supabase.md`) | Probarla contra la base real: los scripts todavía no se han corrido en Supabase |
+| Prueba de concepto escrita: el prototipo lee órdenes, valida SKU, registra cambios (con motivo obligatorio) y prepara la guía en Supabase, con validación en tres capas (`prototipo/`, `supabase/`, `docs/poc-supabase.md`) | Confirmar en Supabase las dos correcciones (reinicio de la demo y limpieza de espacios) y probar la pantalla contra la base real |
 
 ### Prueba de concepto con Supabase: qué hay que configurar
 
@@ -224,6 +224,8 @@ El proyecto de Supabase del Grupo 6 ya existe (plan gratis). Se creó sin expone
 | 2 | `acceso.sql` | Activa RLS, da permiso de lectura y crea las políticas |
 | 3 | `funciones.sql` | Crea las cinco funciones que validan y guardan |
 | 4 | `seed_poc.sql` | Carga los datos de la demo (órdenes 3001 y 3002). Se puede volver a ejecutar |
+
+Para comprobar que quedó bien, desde la raíz del repositorio y con `.env` completo: `py supabase/probar_en_supabase.py --si`. Llama a cada función con la clave publicable y muestra las fallas; **modifica y reinicia los datos de la demo**, así que no lo ejecutes durante una sesión de prueba de usuarios.
 
 `seed_ejemplo.sql` es aparte: son los datos del documento `docs/datos/estructura_datos.md`, para comprobar el modelo. No se ejecuta junto con `seed_poc.sql`; si se ejecutó, `seed_poc.sql` lo reemplaza. Si se vuelve a ejecutar `acceso.sql`, hay que ejecutar `funciones.sql` otra vez.
 

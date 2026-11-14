@@ -2,7 +2,7 @@
 
 Grupo 6 · Automatizacion_bodega · Versión del 2026-10-04 (Avance 3), actualizada el 2026-10-15, el 2026-11-01 y el 2026-11-14 (correcciones de la revisión del Avance 3)
 
-Las tablas salen de los sustantivos del caso de uso del Avance 2 (emisión automática de guía): cliente, usuario, orden, equipo, detalle de orden, guía y cambio de último minuto. Este es el diseño preliminar. El esquema ejecutable, con las reglas como restricciones, está en [`supabase/schema.sql`](../../supabase/schema.sql) y los datos de ejemplo de la sección 4 en [`supabase/seed_ejemplo.sql`](../../supabase/seed_ejemplo.sql); `tests/test_modelo_datos.py` comprueba que no haya claves externas rotas y que las reglas se cumplan. Todavía no se crea la base en Supabase.
+Las tablas salen de los sustantivos del caso de uso del Avance 2 (emisión automática de guía): cliente, usuario, orden, equipo, detalle de orden, guía y cambio de último minuto. Este es el diseño preliminar. El esquema ejecutable, con las reglas como restricciones, está en [`supabase/schema.sql`](../../supabase/schema.sql) y los datos de ejemplo de la sección 4 en [`supabase/seed_ejemplo.sql`](../../supabase/seed_ejemplo.sql); `tests/test_modelo_datos.py` comprueba que no haya claves externas rotas y que las reglas se cumplan. La base ya existe en Supabase y los scripts se ejecutaron ahí; el estado de las pruebas está en [`docs/poc-supabase.md`](../poc-supabase.md).
 
 > El MVP actual usa SQLite con tres tablas (`inventario`, `ordenes`, `log_cambios`), definidas en `src/app.py`. Este modelo es el objetivo: separa la orden de su detalle, agrega `CLIENTES`, `USUARIOS` y `GUIAS`, y reemplaza `log_cambios` por `REGISTRO_CAMBIOS`.
 

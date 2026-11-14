@@ -53,7 +53,8 @@ def test_cada_funcion_de_la_pagina_tiene_su_permiso():
     for n in nombres:
         assert re.search(rf"grant execute on function public\.{n}\(", funciones), n
     # la ayuda interna no se expone
-    assert not re.search(r"grant execute on function public\._fallo", funciones)
+    assert not re.search(r"grant execute on function public\._(fallo|limpiar)", funciones)
+    assert "revoke all on function public._limpiar" in funciones
 
 
 def test_las_funciones_fijan_search_path_y_corren_como_el_dueno():
@@ -98,3 +99,23 @@ def test_config_js_esta_ignorado_por_git():
     gitignore = (RAIZ / ".gitignore").read_text(encoding="utf-8")
     assert "prototipo/js/config.js" in gitignore
     assert re.search(r"^\.env$", gitignore, re.M)
+
+
+def test_reiniciar_demo_no_borra_sin_where():
+    """Supabase rechaza un DELETE sin WHERE desde la API (pg_safeupdate): hay que escribir where true."""
+    funciones = leer("funciones.sql")
+    cuerpo = funciones[funciones.index("function public.reiniciar_demo"):]
+    cuerpo = cuerpo[:cuerpo.index("$$;", cuerpo.index("as $$") + 5)]
+    borrados = re.findall(r"delete from [^;]*;", cuerpo)
+    assert len(borrados) == 4 and all(" where " in b for b in borrados), borrados
+
+
+def test_el_texto_se_limpia_con_tabulaciones_y_saltos_de_linea():
+    """btrim() solo quita espacios: el texto debe pasar por _limpiar en cargar_pedido y registrar_cambio."""
+    funciones = leer("funciones.sql")
+    assert "btrim(t.x)" not in funciones
+    for usado in ("_limpiar(t.x)", "_limpiar(p_sku_sale)", "_limpiar(p_sku_entra)", "_limpiar(p_motivo)"):
+        assert usado in funciones, usado
+    # la lista de caracteres se escribe con secuencias de escape, no con caracteres invisibles
+    assert all(ord(c) >= 32 or c in "\n\r" for c in funciones)
+    assert "\xa0" not in funciones
