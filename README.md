@@ -207,10 +207,10 @@ Al 5 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance
 | Análisis ético: exclusión, datos personales, accesibilidad, sostenibilidad y riesgos (`docs/etica.md`) | Hacer obligatorio el motivo del cambio y corregir el borde del campo Cliente (riesgos 3 y 5 de `docs/etica.md`) |
 | Carga masiva, validador de SKU y ajuste de última hora con registro de cambios; la app bloquea la emisión de la guía si algún SKU no valida | Cuentas y permisos (la app Streamlit queda congelada hasta validar el flujo con usuarios) |
 | Diseño de la base de datos con el esquema SQL y datos de ejemplo consistentes (`docs/datos`, `supabase/`) | Validar con el jefe de bodega que el retiro tenga solo los motivos falla y mantención preventiva, y si existe un retiro normal sin motivo |
-| Base SQLite con inventario simulado, tests y CI en GitHub Actions. Los cuatro scripts de `supabase/` corrieron en Supabase y 73 de 80 comprobaciones con la clave publicable pasaron | Volver a ejecutar `funciones.sql` y `seed_poc.sql` en Supabase (dos defectos corregidos) y repetir `supabase/probar_en_supabase.py` y la pantalla contra la base real |
+| Base SQLite con inventario simulado, tests y CI en GitHub Actions. Los cuatro scripts de `supabase/` corrieron en Supabase y las 82 comprobaciones con la clave publicable pasan (`supabase/probar_en_supabase.py`) | Cerrar el acceso con inicio de sesión antes de usar datos reales: hoy las políticas son abiertas |
 | | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
 | Diseño de la prueba con usuarios y guion de cada sesión (`docs/prueba-usuarios.md`, `docs/pauta-validacion.md`) | |
-| Prueba de concepto escrita: el prototipo lee órdenes, valida SKU, registra cambios (con motivo obligatorio) y prepara la guía en Supabase, con validación en tres capas (`prototipo/`, `supabase/`, `docs/poc-supabase.md`) | Confirmar en Supabase las dos correcciones (reinicio de la demo y limpieza de espacios) y probar la pantalla contra la base real |
+| Prueba de concepto escrita: el prototipo lee órdenes, valida SKU, registra cambios (con motivo obligatorio) y prepara la guía en Supabase, con validación en tres capas (`prototipo/`, `supabase/`, `docs/poc-supabase.md`), probada en Supabase: las reglas de la base y la pantalla en un navegador contra la base real | Probarla en un celular, con poca señal y con personas ajenas al equipo (prueba de usuarios, `docs/prueba-usuarios.md`) |
 
 ### Prueba de concepto con Supabase: qué hay que configurar
 

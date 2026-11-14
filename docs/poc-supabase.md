@@ -4,13 +4,13 @@ Grupo 6 · Automatizacion_bodega
 
 La prueba de concepto lleva el prototipo navegable a una base de datos real, solo en lo mínimo: leer las órdenes, validar los SKU, registrar un cambio y preparar la guía. No es la aplicación final y no cambia lo que se va a probar con usuarios (`docs/prueba-usuarios.md`): las órdenes 3001 y 3002 quedan igual que en el prototipo.
 
-> **Estado de las pruebas (14 de noviembre de 2026).**
+> **Estado de las pruebas (14 de noviembre de 2026): probada en Supabase.**
 >
-> - **Se probó en Supabase.** Los cuatro scripts (`schema.sql`, `acceso.sql`, `funciones.sql` y `seed_poc.sql`) se ejecutaron en el proyecto sin error y los conteos coincidieron: 2 clientes, 2 usuarios, 7 equipos, 2 órdenes y 8 líneas. Después se probó la base real con la clave publicable, llamando a cada función (`supabase/probar_en_supabase.py`). En la primera ejecución, **73 de 80 comprobaciones pasaron** y la prueba encontró **dos defectos**, ambos de `funciones.sql`:
->   1. **`reiniciar_demo` fallaba desde la API** con `DELETE requires a WHERE clause`: Supabase rechaza un `DELETE` sin `WHERE` para las llamadas de la API, aunque en el editor SQL no se nota.
->   2. **Una línea con solo una tabulación se aceptaba como SKU.** La limpieza del texto solo quitaba espacios normales. El mismo hueco existía en el motivo del cambio; en la base real solo se observó con el SKU, y en el motivo se deduce del código.
-> - **Corregido en este repositorio, falta confirmarlo en Supabase.** Hay que volver a ejecutar `funciones.sql` y `seed_poc.sql` y repetir `supabase/probar_en_supabase.py`. Hasta entonces el reinicio no funciona y los datos de la demo en Supabase están modificados por la prueba.
-> - **La pantalla** se probó en un navegador contra una réplica en memoria de Supabase, no contra la base real. Esa prueba falta.
+> - **Los scripts corrieron en el proyecto.** `schema.sql`, `acceso.sql`, `funciones.sql` y `seed_poc.sql` se ejecutaron en Supabase sin error y los conteos coincidieron: 2 clientes, 2 usuarios, 7 equipos, 2 órdenes y 8 líneas.
+> - **Las reglas de la base, probadas con la clave publicable:** `supabase/probar_en_supabase.py` llama a cada función y pasan **82 de 82 comprobaciones**. La primera ejecución (73 de 80) encontró dos defectos de `funciones.sql`: `reiniciar_demo` fallaba desde la API porque Supabase rechaza un `DELETE` sin `WHERE`, y una línea con solo una tabulación se aceptaba como SKU. Se corrigieron, se volvió a ejecutar `funciones.sql` en Supabase y la prueba se repitió.
+> - **La pantalla, probada contra la base real:** en un navegador, el flujo completo de las tareas 1 y 2 y las pruebas de rotura (45 comprobaciones, todas correctas). El corte de conexión y el fallo interno se simularon interceptando la red del navegador, no con una caída real de Supabase.
+> - **Lo que no se probó:** en un celular ni con poca señal real, otros navegadores, dos personas a la vez, ni con personas ajenas al equipo (eso es la prueba de usuarios).
+> - La demo quedó reiniciada al terminar: 2 órdenes con 4 líneas pendientes cada una, sin guías ni cambios.
 
 ## 1. Cómo se arma
 
@@ -88,24 +88,26 @@ Cada mensaje sale junto al campo. Los errores 4xx (de quien escribe) dicen qué 
 
 ## 3. Pruebas de rotura
 
-Dos pruebas distintas: la **pantalla** se probó en el navegador contra una réplica en memoria de Supabase, y las **reglas de la base** se probaron llamando a las funciones reales con la clave publicable. Falta probar la pantalla contra la base real.
+Contra el Supabase real, de dos maneras: llamando a las funciones con la clave publicable (`supabase/probar_en_supabase.py`) y recorriendo la pantalla en un navegador. «Red simulada» significa que se interceptó la red del navegador para provocar el fallo.
 
-| Intento | Resultado esperado | Pantalla (réplica) | Reglas en Supabase real |
+| Intento | Resultado esperado | Reglas de la base (funciones) | Pantalla |
 |---|---|---|---|
-| Dejar el listado vacío | Error junto al campo; no se llama a la base | Pasó | Pasó: la función rechaza con el mensaje exacto |
-| Listado de solo espacios, tabulaciones o saltos de línea | Se trata como vacío | No probado | **Falló con una tabulación** (defecto 2, corregido; falta confirmar) |
-| Pegar 61 productos | Mensaje exacto; con 60 se acepta | Pasó | Pasó: 61 se rechaza con «Hay 61 productos y el máximo es 60. Quita 1 para continuar.» y 60 se aceptan |
-| Guardar un cambio sin motivo | «Elige el motivo del cambio.» junto al campo; no se guarda | Pasó | Pasó con vacío, solo espacios y nulo; sin registro. Con tabulación: ver defecto 2 |
-| Cambio con el equipo que entra igual al que sale, inexistente o ya en el pedido | Mensaje exacto junto al campo | Pasó | Pasó: tres mensajes exactos |
-| Preparar la guía con productos sin validar, con un SKU que no existe o con un usuario que no es jefe de bodega | Se rechaza y no se crea la guía | Pasó | Pasó: tres mensajes exactos y sin guías creadas |
-| Preparar la guía dos veces, o cambiar una orden que ya tiene guía | Se rechaza | No probado | Pasó |
-| Escribir directo en las tablas (insertar, actualizar o borrar) | Rechazado sin cambiar nada | No aplica | Pasó: rechazado en las tres operaciones |
-| Leer el correo o el teléfono de los usuarios | Rechazado | No aplica | Pasó |
-| Reiniciar la demo | Las dos órdenes vuelven a su estado inicial | Pasó | **Falló** (defecto 1, corregido; falta confirmar) |
-| Apretar «Guardar cambio» tres veces seguidas | Una sola llamada a la base; el botón queda desactivado | Pasó | Pendiente |
-| Cortar la conexión al guardar | Aviso claro; lo escrito se conserva; el botón vuelve a estar activo | Pasó | Pendiente |
-| Error interno de la base | Mensaje genérico, sin códigos técnicos | Pasó | Pendiente |
-| Entrar directo a la pantalla de la guía sin haberla preparado | Vuelve a la validación | Pasó | Pendiente |
+| Dejar el listado vacío | Error junto al campo; no avanza | Pasó | Pasó |
+| Listado de solo espacios, tabulaciones o saltos de línea | Se trata como vacío | Pasó | Pasó |
+| Pegar 61 productos | Mensaje exacto; con 60 se acepta | Pasó | Pasó |
+| Saltarse la validación del navegador con 61 productos | La base los rechaza y el mensaje sale junto al campo | Pasó | Pasó: el botón vuelve a estar activo y lo escrito sigue |
+| Guardar un cambio sin motivo (vacío, solo espacios, tabulación, salto de línea o nulo) | «Elige el motivo del cambio.»; no se guarda | Pasó | Pasó (motivo vacío, junto al campo y con el foco en él) |
+| Cambio con el equipo que entra igual al que sale, inexistente o ya en el pedido | Mensaje exacto junto al campo | Pasó | Pasó (ya en el pedido) |
+| Preparar la guía con productos sin validar, con un SKU que no existe o con un usuario que no es jefe de bodega | Se rechaza y no se crea la guía | Pasó | Pasó (con un SKU que no existe: guía bloqueada) |
+| Preparar la guía dos veces, o cambiar una orden que ya tiene guía | Se rechaza | Pasó | No probado en pantalla |
+| Escribir directo en las tablas (insertar, actualizar o borrar) | Rechazado sin cambiar nada | Pasó | No aplica |
+| Leer el correo o el teléfono de los usuarios | Rechazado | Pasó | No aplica |
+| Reiniciar la demo | Las dos órdenes vuelven a su estado inicial | Pasó | Pasó |
+| Apretar «Guardar cambio» tres veces seguidas | Un solo cambio en la base; el botón queda desactivado | No aplica | Pasó: un solo cambio en la base |
+| Cortar la conexión (al validar y al guardar) | Aviso claro; lo escrito se conserva; el botón vuelve a estar activo | No aplica | Pasó (red simulada) |
+| Error interno de la base | Mensaje genérico, sin códigos técnicos | No aplica | Pasó (red simulada) |
+| Entrar directo a la pantalla de la guía sin haberla preparado | Vuelve a la validación | No aplica | Pasó |
+| Los intentos fallidos no dejan datos a medias | Sin cambios ni guías en la base | Pasó | Pasó |
 
 ## 4. Qué se supone y qué falta
 
