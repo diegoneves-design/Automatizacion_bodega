@@ -317,3 +317,12 @@ def test_la_pauta_anuncia_la_misma_duracion_que_suman_sus_etapas():
     pauta = leer(DOCS / "pauta-validacion.md")
     total, _ = md_a_pdf.minutos_de_las_etapas(pauta)
     assert f"**Dura {total} minutos en total**" in pauta
+
+
+def test_la_hipotesis_dice_que_solo_4_o_5_cuentan_y_que_3_de_5_no_pasa():
+    prueba = leer(DOCS / "prueba-usuarios.md")
+    hipotesis = prueba[prueba.index("**Hipótesis.**"):prueba.index("**Nos equivocamos si**")]
+    assert "Solo 4 o 5 de 5 cuentan como «se cumple»" in hipotesis
+    assert "Con 3 de 5 la hipótesis no se confirma" in hipotesis
+    hoja = leer(KIT / "regla-decision.md")
+    assert "Solo 4 o 5 de 5 es «se cumple»; con 3 de 5 no pasa" in hoja

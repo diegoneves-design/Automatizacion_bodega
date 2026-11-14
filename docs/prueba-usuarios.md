@@ -10,7 +10,7 @@ Esta prueba todavía no se hace. Aquí dejamos escrito qué vamos a observar, co
 
 **Pregunta.** ¿Una persona que arma guías en una bodega puede validar un pedido, corregir un equipo que no corresponde y dejar la guía lista para el ERP, sin que nadie le explique cómo?
 
-**Hipótesis.** Creemos que un jefe o subjefe de bodega, sin ninguna explicación previa, puede revisar un pedido, darse cuenta de que un código no existe y corregirlo antes de dejar la guía lista. Lo sabremos cuando observemos que 4 o 5 de 5 personas del perfil U1 terminan la tarea 1 sin ayuda en menos de 3 minutos, y que 4 o 5 de 5 se dan cuenta solas del código que no existe en la tarea 2.
+**Hipótesis.** Creemos que un jefe o subjefe de bodega, sin ninguna explicación previa, puede revisar un pedido, darse cuenta de que un código no existe y corregirlo antes de dejar la guía lista. Lo sabremos cuando observemos que 4 o 5 de 5 personas del perfil U1 terminan la tarea 1 sin ayuda en menos de 3 minutos, y que 4 o 5 de 5 se dan cuenta solas del código que no existe en la tarea 2. **Solo 4 o 5 de 5 cuentan como «se cumple». Con 3 de 5 la hipótesis no se confirma:** ese resultado es «entorpece» y se corrige (ver los tres tramos más abajo).
 
 **Nos equivocamos si** solo 2 o menos de esas 5 personas terminan la tarea 1 sin ayuda en menos de 3 minutos, o si solo 2 o menos ven el código malo y se quedan intentando avanzar sin entender por qué la guía no se deja preparar.
 

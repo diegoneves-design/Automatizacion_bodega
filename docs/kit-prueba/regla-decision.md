@@ -29,7 +29,7 @@ Hoja para tener a mano durante el análisis. A cada observación de la planilla 
 
 Están en la sección 2 de [`docs/prueba-usuarios.md`](../prueba-usuarios.md) y se fijaron **antes de ver a ningún participante**. No se cambian después de ver los resultados.
 
-Se leen en **tres tramos, para 5 personas de U1**: a cada medida se le cuenta cuántas de las 5 la cumplen, y todo resultado cae en un tramo.
+Se leen en **tres tramos, para 5 personas de U1**: a cada medida se le cuenta cuántas de las 5 la cumplen, y todo resultado cae en un tramo. **Solo 4 o 5 de 5 es «se cumple»; con 3 de 5 no pasa** (entorpece).
 
 | Medida | Se cumple | Entorpece | Bloquea |
 |---|---|---|---|
