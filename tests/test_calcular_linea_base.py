@@ -163,7 +163,7 @@ def test_la_causa_es_obligatoria_si_hubo_error_o_reproceso_y_solo_entonces():
     assert probar_fila(error_detectado="si", causa="otro") == []
 
 
-@pytest.mark.parametrize("texto", ["avisar a ana@empresa.cl", "llamar al +56 9 1234 5678", "fono 912345678", "(2) 2345-6789"])
+@pytest.mark.parametrize("texto", ["avisar a persona@ejemplo.cl", "llamar al +56 9 0000 0000", "fono 900000000", "(2) 0000-0000"])
 def test_se_niega_a_leer_correos_y_telefonos(texto):
     errores = probar_fila(observaciones=texto)
     assert any("correo o un telefono" in e for e in errores), errores
