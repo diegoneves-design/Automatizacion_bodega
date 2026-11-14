@@ -75,7 +75,8 @@ erDiagram
     REGISTRO_CAMBIOS {
         numero id_cambio PK
         numero id_orden FK
-        numero id_equipo_sale FK
+        texto sku_sale "el SKU tal como estaba en el pedido"
+        numero id_equipo_sale FK "vacío si el SKU no existe"
         numero id_equipo_entra FK
         numero id_usuario FK
         fecha_hora fecha_hora_cambio
@@ -182,12 +183,12 @@ La orden 3002 no tiene guía porque está bloqueada.
 
 **REGISTRO_CAMBIOS**
 
-| id_cambio* | id_orden* | id_equipo_sale* | id_equipo_entra* | id_usuario* | fecha_hora_cambio* | motivo_cambio* |
-|---|---|---|---|---|---|---|
-| 1 | 3001 | 503 | 502 | 2 | 2026-10-05 09:55 | Equipo en mantención |
-| 2 | 3003 | 507 | 505 | 1 | 2026-10-05 11:10 | Código mal digitado en el pedido |
+| id_cambio* | id_orden* | sku_sale* | id_equipo_sale | id_equipo_entra* | id_usuario* | fecha_hora_cambio* | motivo_cambio* |
+|---|---|---|---|---|---|---|---|
+| 1 | 3001 | SD-63A20-0316 | 503 | 502 | 2 | 2026-10-05 09:55 | Equipo en mantención |
+| 2 | 3003 | MP-0107 | 507 | 505 | 1 | 2026-10-05 11:10 | Código mal digitado en el pedido |
 
-Cada cambio ocurre antes de la guía de su orden, y los equipos que salen y entran corresponden a las líneas 9002 → 9003 y 9006 → 9007 de DETALLE_ORDEN.
+Cada cambio ocurre antes de la guía de su orden. `sku_sale` guarda el SKU que estaba en el pedido, y `id_equipo_sale` queda vacío cuando ese SKU no existe en el inventario (el error más común, como el `SD-63A20-9999` de la orden 3002): sin esa columna no se podría registrar el cambio de un código mal digitado. Los equipos que salen y entran corresponden a las líneas 9002 → 9003 y 9006 → 9007 de DETALLE_ORDEN.
 
 ## 5. Pendientes del modelo
 

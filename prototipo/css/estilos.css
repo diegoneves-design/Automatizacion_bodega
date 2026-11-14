@@ -255,3 +255,15 @@ a.enlace { display: inline-flex; align-items: center; }
 .guia-lista li { overflow-wrap: anywhere; }
 .guia-lista li + li { margin-top: var(--u); }
 .preparada { color: var(--apoyo); margin-bottom: calc(var(--u) * 2); }
+
+/* ---------- Estados de pantalla: error, vacio y cargando ---------- */
+.aviso-error { border-color: var(--alerta); background: var(--tinte-alerta); color: var(--alerta); }
+.estado-carga { display: flex; align-items: center; gap: var(--u); color: var(--apoyo); }
+.vacio {
+  padding: calc(var(--u) * 3);
+  border: 2px dashed var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+}
+.vacio p { margin: 0 0 var(--u); }
+

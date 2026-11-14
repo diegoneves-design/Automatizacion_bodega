@@ -1,3 +1,4 @@
+-- Datos de ejemplo (solo para comprobar el modelo; para la demo del prototipo usar seed_poc.sql).
 -- Datos de ejemplo de docs/datos/estructura_datos.md, seccion 4: una misma manana de bodega.
 -- Todos son ficticios (nombres, correos, telefonos y RUT de ejemplo).
 
@@ -36,6 +37,6 @@ insert into guias (id_guia, id_orden, id_usuario_emite, numero_guia, fecha_emisi
   (70, 3001, 1, 15230, '2026-10-05 10:02:00', 'guia_15230.pdf'),
   (71, 3003, 1, 15231, '2026-10-05 11:30:00', null);
 
-insert into registro_cambios (id_cambio, id_orden, id_equipo_sale, id_equipo_entra, id_usuario, fecha_hora_cambio, motivo_cambio) values
-  (1, 3001, 503, 502, 2, '2026-10-05 09:55:00', 'Equipo en mantención'),
-  (2, 3003, 507, 505, 1, '2026-10-05 11:10:00', 'Código mal digitado en el pedido');
+insert into registro_cambios (id_cambio, id_orden, sku_sale, id_equipo_sale, id_equipo_entra, id_usuario, fecha_hora_cambio, motivo_cambio) values
+  (1, 3001, 'SD-63A20-0316', 503, 502, 2, '2026-10-05 09:55:00', 'Equipo en mantención'),
+  (2, 3003, 'MP-0107',       507, 505, 1, '2026-10-05 11:10:00', 'Código mal digitado en el pedido');

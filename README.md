@@ -22,6 +22,7 @@ Documentación del proyecto:
 - Conversación con el usuario (Avance 4): [docs/entrevistas/entrevista_subjefe_bodega.md](docs/entrevistas/entrevista_subjefe_bodega.md)
 - Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app)
 - Análisis ético del prototipo (Avance 5): [docs/etica.md](docs/etica.md)
+- Prueba de concepto con Supabase (reglas, mensajes de error y pruebas de rotura): [docs/poc-supabase.md](docs/poc-supabase.md)
 - Diseño de la prueba de usuarios (Avance 6): [docs/prueba-usuarios.md](docs/prueba-usuarios.md)
 - Guion para cada sesión de la prueba (Avance 6): [docs/pauta-validacion.md](docs/pauta-validacion.md)
 
@@ -38,7 +39,7 @@ docs/historias.md     historias de usuario y criterios de aceptación (Avance 4)
 docs/wireframes/      wireframes del flujo principal, con sus notas (Avance 4)
 docs/entrevistas/     conversación con el usuario y su guion (Avance 4)
 docs/recorrido-usuario/ borrador del mapa de recorrido (ensayo, sin validar)
-prototipo/            prototipo navegable del flujo principal (Avance 5), en HTML, CSS y JS sin build
+prototipo/            prototipo del flujo principal (Avance 5), en HTML, CSS y JS sin build; conectado a Supabase en la prueba de concepto
 README.md             portada del proyecto
 .gitignore            archivos locales que no se suben (base de datos, .env)
 .env.example          nombres de variables de entorno, sin valores
@@ -204,15 +205,42 @@ Al 5 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance
 | Wireframes del flujo principal con sus notas (`docs/wireframes`) | Subir el límite de 50 a 60 productos por guía en la app (máximo real del ERP; el prototipo ya usa 60) |
 | Prototipo navegable P1 a P4 con sistema mínimo, mapa de navegación y registro de decisiones (`prototipo/`, `docs/prototipo.md`) | Destacar los cambios de último minuto en el validador de la app (HU-04) |
 | Análisis ético: exclusión, datos personales, accesibilidad, sostenibilidad y riesgos (`docs/etica.md`) | Hacer obligatorio el motivo del cambio y corregir el borde del campo Cliente (riesgos 3 y 5 de `docs/etica.md`) |
-| Carga masiva, validador de SKU y ajuste de última hora con registro de cambios; la app bloquea la emisión de la guía si algún SKU no valida | Cuentas y permisos; pasar la base a Supabase |
+| Carga masiva, validador de SKU y ajuste de última hora con registro de cambios; la app bloquea la emisión de la guía si algún SKU no valida | Cuentas y permisos (la app Streamlit queda congelada hasta validar el flujo con usuarios) |
 | Diseño de la base de datos con el esquema SQL y datos de ejemplo consistentes (`docs/datos`, `supabase/`) | Validar con el jefe de bodega que el retiro tenga solo los motivos falla y mantención preventiva, y si existe un retiro normal sin motivo |
-| Base SQLite con inventario simulado, tests y CI en GitHub Actions | Probar el esquema en un proyecto real de Supabase (hasta ahora solo se probó en SQLite) |
+| Base SQLite con inventario simulado, tests y CI en GitHub Actions | Correr los scripts de `supabase/` en el proyecto de Supabase y repetir contra la base real las pruebas de `docs/poc-supabase.md` (hasta ahora solo se probó en SQLite y con una réplica en memoria) |
 | | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
 | Diseño de la prueba con usuarios y guion de cada sesión (`docs/prueba-usuarios.md`, `docs/pauta-validacion.md`) | |
+| Prueba de concepto escrita: el prototipo lee órdenes, valida SKU, registra cambios (con motivo obligatorio) y prepara la guía en Supabase, con validación en tres capas (`prototipo/`, `supabase/`, `docs/poc-supabase.md`) | Probarla contra la base real: los scripts todavía no se han corrido en Supabase |
+
+### Prueba de concepto con Supabase: qué hay que configurar
+
+El proyecto de Supabase del Grupo 6 ya existe (plan gratis). Se creó sin exponer automáticamente las tablas y con RLS automático, así que cada permiso está escrito en los scripts.
+
+**1. La base (una sola vez).** En Supabase, **SQL Editor**, pega y ejecuta estos archivos de `supabase/` **en este orden**, cada uno en una consulta nueva:
+
+| Orden | Archivo | Qué hace |
+|---|---|---|
+| 1 | `schema.sql` | Crea las siete tablas con sus restricciones |
+| 2 | `acceso.sql` | Activa RLS, da permiso de lectura y crea las políticas |
+| 3 | `funciones.sql` | Crea las cinco funciones que validan y guardan |
+| 4 | `seed_poc.sql` | Carga los datos de la demo (órdenes 3001 y 3002). Se puede volver a ejecutar |
+
+`seed_ejemplo.sql` es aparte: son los datos del documento `docs/datos/estructura_datos.md`, para comprobar el modelo. No se ejecuta junto con `seed_poc.sql`; si se ejecutó, `seed_poc.sql` lo reemplaza. Si se vuelve a ejecutar `acceso.sql`, hay que ejecutar `funciones.sql` otra vez.
+
+**2. El prototipo.** Necesita la dirección del proyecto y la clave **publicable** (empieza con `sb_publishable_`). Nunca uses la clave secreta ni `service_role`: no se necesitan.
+
+- **En el computador:** copia `.env.example` a `.env`, completa `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`, y ejecuta `node prototipo/generar-config.mjs`. Eso crea `prototipo/js/config.js`. Luego, desde la carpeta `prototipo`, abre el sitio con un servidor local, por ejemplo `py -m http.server 8000`, y entra a `http://127.0.0.1:8000`.
+- **En Vercel:** en el proyecto, agrega las variables de entorno `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`, y como **Build Command** `node generar-config.mjs` (si la carpeta raíz del proyecto es `prototipo`) o `node prototipo/generar-config.mjs` (si es la raíz del repositorio). Sin eso el sitio muestra «Falta la configuración de la base de datos».
+
+`.env` y `prototipo/js/config.js` no se suben a git (están en `.gitignore`).
 
 ### Seguridad de la base en esta etapa
 
-El prototipo **no tiene inicio de sesión**: cualquier persona con el enlace lo usa. Por eso, cuando se conecte a Supabase, las políticas de acceso a las tablas (RLS) serán **abiertas** en esta etapa de prueba de concepto: quien abra el prototipo podrá leer y registrar datos. Es aceptable solo porque los datos son de ejemplo y ficticios. Lo que sí se protege desde ya es la regla de cada dato (restricciones de la base y funciones que validan antes de guardar). Antes de usar datos reales hay que agregar sesión y cerrar las políticas por rol.
+El prototipo **no tiene inicio de sesión**: cualquier persona con el enlace lo usa. Por eso, en esta etapa de prueba de concepto las políticas de acceso (RLS) son **abiertas**: quien abra el prototipo puede **leer** todas las tablas (de la tabla de usuarios solo el nombre, el cargo y si está activo; el correo y el teléfono no salen por la API) y puede llamar a las funciones. Es aceptable solo porque **los datos son de ejemplo y ficticios**: no cargues datos reales.
+
+Lo que sí se protege desde ya: las tablas **no aceptan escribir directo** desde el navegador; todo cambio pasa por funciones de la base que vuelven a validar antes de guardar, y las restricciones de las tablas son la última barrera. Como no hay sesión, quién prepara la guía o registra un cambio lo elige la persona en la pantalla: sirve para la demo, no es seguridad. Cualquiera puede además presionar «Reiniciar demo» y borrar lo hecho por otra persona.
+
+Antes de usar datos reales hay que agregar inicio de sesión y cerrar las políticas por rol.
 
 ## Quiénes la desarrollan
 

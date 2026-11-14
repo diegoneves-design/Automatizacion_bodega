@@ -1,4 +1,4 @@
--- Modelo de datos de Automatizacion_bodega (docs/datos/estructura_datos.md).
+-- 1/4 Tablas. Modelo de datos de Automatizacion_bodega (docs/datos/estructura_datos.md).
 -- Compatible con PostgreSQL (Supabase) y con SQLite, para poder probarlo sin internet.
 -- Las reglas del negocio viven aqui como restricciones: la base es la ultima capa de validacion.
 
@@ -37,7 +37,7 @@ create table ordenes (
   id_orden         integer primary key,
   id_cliente       integer   not null references clientes (id_cliente),
   id_usuario_carga integer   not null references usuarios (id_usuario),
-  fecha_orden      timestamp not null,
+  fecha_orden      timestamptz not null,
   tipo_movimiento  text      not null check (tipo_movimiento in ('despacho', 'retiro')),
   modalidad        text      check (modalidad in ('convencional', 'alternativo')),
   motivo_retiro    text      check (motivo_retiro in ('mantencion_preventiva', 'falla')),
@@ -69,18 +69,20 @@ create table guias (
   id_orden         integer   not null unique references ordenes (id_orden),
   id_usuario_emite integer   not null references usuarios (id_usuario),
   numero_guia      integer   not null unique,
-  fecha_emision    timestamp not null,
+  fecha_emision    timestamptz not null,
   archivo_pdf      text
 );
 
 create table registro_cambios (
   id_cambio         integer primary key,
-  id_orden          integer   not null references ordenes (id_orden),
-  id_equipo_sale    integer   not null references equipos (id_equipo),
-  id_equipo_entra   integer   not null references equipos (id_equipo),
-  id_usuario        integer   not null references usuarios (id_usuario),
-  fecha_hora_cambio timestamp not null,
+  id_orden          integer     not null references ordenes (id_orden),
+  -- SKU tal como estaba en el pedido; si no existe en el inventario (el error mas comun), no hay equipo al que apuntar
+  sku_sale          text        not null,
+  id_equipo_sale    integer references equipos (id_equipo),
+  id_equipo_entra   integer     not null references equipos (id_equipo),
+  id_usuario        integer     not null references usuarios (id_usuario),
+  fecha_hora_cambio timestamptz not null,
   -- el motivo es obligatorio y no puede ser solo espacios
-  motivo_cambio     text      not null check (length(trim(motivo_cambio)) > 0),
-  check (id_equipo_sale <> id_equipo_entra)
+  motivo_cambio     text        not null check (length(trim(motivo_cambio)) > 0),
+  check (id_equipo_sale is null or id_equipo_sale <> id_equipo_entra)
 );

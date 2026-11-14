@@ -428,3 +428,50 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - Comparamos una por una las diez frases nuevas con las del Encargo 17. Cada una dice lo mismo, en el mismo orden, y las impares siguen siendo positivas y las pares negativas, así que el cálculo del puntaje no cambia.
 - Revisamos que la nota nueva del cierre no le dice nada al participante, solo a quien registra.
 - Los tiempos de cada parte no cambiaron (20 minutos) y la versión imprimible sigue en 2 planas tamaño carta.
+
+---
+
+## Encargo 20. Corregir la modalidad y el motivo en el modelo de datos y dejarlo ejecutable
+
+**Objetivo.** Responder a la retroalimentación del Avance 3 sobre la modalidad y el motivo obligatorios en toda orden, y dejar el modelo como esquema SQL que se pueda probar.
+
+**Instrucción entregada.**
+- Contexto: `docs/datos/estructura_datos.md`, la retroalimentación de la profesora, `CLAUDE.md` (despacho convencional o alternativo, retiro preventivo o por falla) y la conversación con el subjefe de bodega (preguntas 3 y D1).
+- Intención: que `modalidad` aplique solo al despacho y el motivo solo al retiro, sin valores de relleno; que las claves externas del ejemplo existan; que el motivo del cambio sea obligatorio.
+- Restricciones: no tocar la aplicación Streamlit; los ejemplos se ajustan a la regla, no al revés.
+- Verificación: pruebas que fallen si una clave externa apunta a un registro que no existe o si una regla se rompe.
+
+**Respuesta obtenida.** `modalidad` solo en despacho y `motivo_retiro` (antes `motivo_alternativo`) solo en retiro; ejemplos ajustados (3002 retiro por falla, 3003 retiro por mantención preventiva); `supabase/schema.sql` con las reglas como restricciones y `supabase/seed_ejemplo.sql`; `tests/test_modelo_datos.py`; diagrama regenerado con Mermaid.
+
+**Qué se aceptó y qué se corrigió.**
+- Ya estaban corregidos desde el Encargo 15 las claves externas rotas, el equipo 501 y el motivo del cambio obligatorio; solo faltaba la modalidad. Se convirtieron en restricciones de la base.
+- La interpretación de que el retiro tiene solo los motivos falla y mantención preventiva es de la IA a partir de `CLAUDE.md` y de la pregunta 3. **Queda por validar con el jefe de bodega**, igual que si existe un retiro normal sin motivo.
+
+**Cómo se verificó.** `pytest tests`: pasan las pruebas, incluidas las de `test_modelo_datos.py` (en SQLite). El diagrama se revisó a ojo contra el Mermaid.
+
+---
+
+## Encargo 21. Prueba de concepto del prototipo con Supabase
+
+**Objetivo.** Conectar el prototipo a Supabase en lo mínimo (leer órdenes, validar SKU, registrar cambio y preparar guía) aplicando la validación en tres capas de la clase 7.
+
+**Instrucción entregada.**
+- Contexto: el prototipo (`prototipo/`), `supabase/schema.sql`, los apuntes de la clase 7 (CRUD, validación en tres capas, mensajes de error, estados de pantalla, pruebas de rotura) y las opciones del proyecto de Supabase (sin exponer tablas automáticamente, con RLS automático).
+- Intención: que la regla "la guía solo incluye productos validados" y "el motivo del cambio es obligatorio" las haga cumplir la base, no solo la pantalla.
+- Restricciones: no tocar la app Streamlit ni otras ramas; sin sesión, así que políticas abiertas solo de lectura y escritura únicamente por funciones; ninguna clave en el repositorio; no pedir la contraseña de la base ni la clave `service_role`; no marcar nada como probado en Supabase hasta confirmarlo.
+- Verificación: decir qué se probó y contra qué.
+
+**Respuesta obtenida.** `supabase/acceso.sql` (RLS, permisos y políticas), `supabase/funciones.sql` (cinco funciones), `supabase/seed_poc.sql`; `prototipo/js/api.js`, `reglas.js` y `app.js` reescritos; `prototipo/generar-config.mjs` para generar la configuración desde variables de entorno; `docs/poc-supabase.md`; pruebas estáticas en `tests/test_supabase_scripts.py`.
+
+**Qué se aceptó y qué se corrigió.**
+- Corregido por la IA en el esquema: un cambio de un SKU que no existe no se podía registrar, porque el equipo que sale era una clave externa obligatoria. Se agregó `sku_sale` y `id_equipo_sale` quedó opcional.
+- Corregido tras probar la pantalla: al reiniciar la demo, el aviso de confirmación se borraba por dibujar la pantalla dos veces.
+- Decisión: las tablas solo se leen desde el navegador y toda escritura pasa por funciones que validan; es más estricto que "políticas abiertas" y evita saltarse las reglas escribiendo directo en las tablas.
+- Pendiente de decisión del equipo: qué debe comprobar «Validar» en un retiro (hoy exige disponible, igual que el despacho).
+
+**Cómo se verificó.**
+- `pytest tests`: pasan, incluidas las pruebas estáticas de los scripts y de que no haya claves en el repositorio.
+- Sintaxis de los scripts de PostgreSQL con un analizador (`pglast`), incluido el código de las seis funciones. **No se ejecutaron en PostgreSQL ni en Supabase.**
+- La pantalla, en un navegador real, contra una réplica en memoria de Supabase escrita solo para probar (no es parte del proyecto): flujo completo de las tareas 1 y 2, campos vacíos, 61 productos, motivo vacío, tres envíos seguidos, corte de conexión y error del sistema. Es una prueba de la pantalla; no prueba las funciones SQL.
+- Contra el proyecto real se hizo solo una lectura, antes de crear las tablas: devolvió el error esperado `PGRST205` (la tabla no existe) y la pantalla mostró el mensaje de error con «Reintentar». Con esa lectura se comprobó que la clave publicable es válida.
+
