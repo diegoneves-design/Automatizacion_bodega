@@ -90,7 +90,7 @@ def test_no_hay_claves_en_los_archivos_versionables():
     for base in revisar:
         archivos = [base] if base.is_file() else [p for p in base.rglob("*") if p.is_file()]
         for p in archivos:
-            if p.name in ignorados or p.suffix.lower() in {".png", ".pdf", ".docx", ".jpg"}:
+            if p.name in ignorados or "__pycache__" in p.parts or p.suffix.lower() in {".png", ".pdf", ".docx", ".jpg", ".pyc"}:
                 continue
             assert not patron.search(p.read_text(encoding="utf-8", errors="ignore")), f"posible clave en {p}"
 
