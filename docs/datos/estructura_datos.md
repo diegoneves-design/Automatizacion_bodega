@@ -191,6 +191,8 @@ Cada cambio ocurre antes de la guía de su orden, y los equipos que salen y entr
 
 ## 5. Pendientes del modelo
 
+**Por validar con el jefe de bodega.** El retiro tiene solo dos motivos, `falla` y `mantencion_preventiva`, y es obligatorio. Falta confirmar que no haya otros, y si existe un **retiro normal sin motivo** (por ejemplo, el cierre de un arriendo). Si existe, `motivo_retiro` dejaría de ser obligatorio o tendría un tercer valor.
+
 Tres ajustes posibles al modelo. Son **hipótesis**: salieron de un ensayo con personajes ficticios y se confirmarán o descartarán con las conversaciones con bodega (la primera, del 10 de octubre, está en `docs/entrevistas/`). No cambian las tablas ni el diagrama de este documento.
 
 1. **Accesorios sin SKU (hipótesis).** Los ductos y las transiciones no tienen código y hoy quedan fuera del modelo (ver "Decisiones de diseño"). La idea es registrarlos por tipo y cantidad, aparte de los SKU. La conversación del 10 de octubre confirmó que hoy se anotan en el ERP como «genérico» con una descripción escrita a mano, y que son los que más alargan la guía (preguntas 7 y 9). Queda en el roadmap, columna "Después".
