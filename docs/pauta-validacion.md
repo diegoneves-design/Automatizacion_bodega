@@ -2,7 +2,7 @@
 
 Este es el guion que lee quien facilita, en este orden. El diseño completo de la prueba está en [docs/prueba-usuarios.md](prueba-usuarios.md). La versión para imprimir, en dos planas, es [pauta-validacion.pdf](pauta-validacion.pdf).
 
-**Dura 20 minutos en total.** Antes de que llegue la persona, el prototipo debe estar abierto en [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app), en la primera pantalla, y la planilla lista con su código (P01, P02, P03…). Quien facilita es la única persona que habla con el participante, y **en ningún momento le explica la pantalla**.
+**Dura 20 minutos en total.** Antes de que llegue la persona, el prototipo debe estar abierto en [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app), con **Reiniciar demo** ya presionado y las órdenes 3001 y 3002 sin cambios en la primera pantalla, y la planilla lista con su código (P01, P02, P03…). Una persona a la vez: los datos se comparten entre sesiones. Quien facilita es la única persona que habla con el participante, y **en ningún momento le explica la pantalla**.
 
 ## 1. Bienvenida y consentimiento (2 min)
 
