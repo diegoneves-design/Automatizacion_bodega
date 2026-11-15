@@ -34,7 +34,7 @@ Una fila por cada campo del formulario del prototipo (P1 y P3) y por los datos q
 
 **Plazo de conservación:** la guía oficial se emite en el ERP y se sube al SII (conversación, preguntas 1 y D5), así que su respaldo tributario queda en el ERP. Para los datos de este sistema proponemos conservarlos **24 meses desde la emisión de la guía**, y después borrarlos o anonimizar el nombre de quien registró. Es una **propuesta del equipo, a confirmar con el gerente de administración**; si el plazo cambia, se actualiza esta ficha.
 
-**Campos revisados por privacidad desde el diseño:** el prototipo **no** incluye `USUARIOS.correo` ni un teléfono, aunque el modelo de datos los considera, porque ninguna pantalla del flujo principal los necesita. Se usarán solo si se agrega inicio de sesión. Tampoco se pide el motivo de una orden alternativa (`ORDENES.motivo_alternativo`), porque ninguna historia del flujo principal lo justifica.
+**Campos revisados por privacidad desde el diseño:** el prototipo **no** incluye `USUARIOS.correo` ni un teléfono, aunque el modelo de datos los considera, porque ninguna pantalla del flujo principal los necesita. Se usarán solo si se agrega inicio de sesión. Tampoco se pide el motivo del retiro (`ORDENES.motivo_retiro`), porque ninguna historia del flujo principal lo justifica.
 
 ## B3 · Sesgo, accesibilidad y transparencia
 

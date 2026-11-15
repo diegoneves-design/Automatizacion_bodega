@@ -174,7 +174,7 @@ Los nombres de los campos son los de [`docs/datos/estructura_datos.md`](datos/es
 | P3 | Equipo que sale (`id_equipo_sale`), equipo que entra (`id_equipo_entra`), Motivo (`motivo_cambio`), Quién lo registra (`id_usuario`), fecha y hora (`fecha_hora_cambio`) | REGISTRO_CAMBIOS |
 | P4 | Líneas con `vigente = sí`, quién la prepara (`id_usuario_emite`), cuándo (`fecha_emision`), archivo (`archivo_pdf`) | DETALLE_ORDEN, GUIAS |
 
-- **Órdenes:** 3001, despacho convencional para Constructora Andes SpA, con 4 productos que validan. 3002, retiro alternativo para Minera Cordillera S.A., con `SD-63A20-9999`, que no existe.
+- **Órdenes:** 3001, despacho convencional para Constructora Andes SpA, con 4 productos que validan. 3002, retiro por falla para Minera Cordillera S.A., con `SD-63A20-9999`, que no existe.
 - **Equipos:** `SD-63A20-0314`, `SD-63A20-0315`, `SD-32A10-0102`, `SD-32A10-0108`, `ST-0042` y `MP-0107` están disponibles. `SD-63A20-0316` está en mantención (sin stock).
 - **Usuarios:** Pedro Soto (jefe de bodega), que prepara la guía, y Camila Rojas (mantenimiento), precargada como quien registra el cambio.
 
@@ -191,7 +191,7 @@ Los nombres de los campos son los de [`docs/datos/estructura_datos.md`](datos/es
 | *Cancelar* de P1 | Dice "vuelve al inicio", y no hay pantalla de inicio | Limpia el formulario y muestra "Carga cancelada. No se guardó nada." |
 | Acción primaria | Los wireframes dibujan siempre *Preparar guía* o *Guardar cambio* como botón dominante | Hay un solo botón dominante por pantalla y cambia con el estado: *Validar* antes de validar, *Registrar cambio* si hay un error y *Preparar guía* cuando todo está ok |
 | SKU que no existe | `id_equipo_sale` es una clave a EQUIPOS, y un SKU inexistente no tiene equipo | "Equipo que sale" es la línea del pedido tal como se informó |
-| Motivo de la orden alternativa | `ORDENES.motivo_alternativo` existe en el modelo y es obligatorio solo si la modalidad es alternativa; el wireframe P1 no lo muestra | No se incluye, como en el wireframe |
+| Motivo del retiro | `ORDENES.motivo_retiro` existe en el modelo y es obligatorio solo si el movimiento es un retiro; el wireframe P1 no lo muestra | No se incluye en el prototipo del Avance 5; la prueba de concepto sí lo pide |
 | Número de guía | `GUIAS.numero_guia` es obligatorio; el wireframe P4 no lo muestra | No se muestra; la guía oficial se emite en el ERP |
 | Fecha y hora | P3 muestra 09:55 de ejemplo | Se toma del reloj del dispositivo al guardar |
 | Archivo de la guía | `archivo_pdf` | Archivo de texto generado en el navegador, marcado como ejemplo |
