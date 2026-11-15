@@ -201,23 +201,57 @@ py -m pytest -v
 
 ## En qué estado está
 
-Al 5 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance 6**. Ya está diseñado cómo vamos a probar el prototipo con personas de fuera del equipo, pero la prueba todavía no se hace. A partir de la conversación con un subjefe de bodega que hoy hace la tarea (integrante del equipo), de las historias de usuario y de los wireframes del Avance 4, se construyó un prototipo navegable del flujo principal, publicado en [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app) e independiente de la app, y se hizo su análisis ético. Ni el prototipo ni la app están probados con usuarios reales, y varias decisiones pueden cambiar.
+Al 15 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance 6**. A partir de la conversación con un subjefe de bodega que hoy hace la tarea (integrante del equipo), de las historias de usuario y de los wireframes del Avance 4, se construyó un prototipo navegable del flujo principal, independiente de la aplicación Streamlit, y se hizo su análisis ético. Después se conectó a una base real en Supabase como prueba de concepto. Ya está diseñado y preparado cómo se va a probar con personas de fuera del equipo, pero **esa prueba todavía no se hace**. Ni el prototipo ni la aplicación están probados con usuarios reales, y varias decisiones pueden cambiar.
 
-| Hecho | Pendiente |
+La profesora indicó en la retroalimentación del Avance 5 que, mientras la prueba con usuarios no confirme el flujo, no se le dediquen más horas a la aplicación Streamlit. Por eso el estado se ordena en cuatro bloques.
+
+### Hecho
+
+| Qué | Dónde |
 |---|---|
-| Problema, caso de uso y maqueta de tres pantallas | Medir cuánto demoran hoy las guías y cuántas se rehacen, con el protocolo de `docs/linea-base.md` (escrito, todavía sin medir) |
-| Conversación con el usuario (`docs/entrevistas`) | Ejecutar la prueba de usuarios diseñada en el Avance 6 (`docs/prueba-usuarios.md`), con el kit de `docs/kit-prueba/` |
-| Historias HU-01 a HU-05 con criterios principal y alternativo (`docs/historias.md`) | Que el equipo confirme los criterios de HU-02 a HU-05, propuestos con ayuda de IA |
-| Wireframes del flujo principal con sus notas (`docs/wireframes`) | Subir el límite de 50 a 60 productos por guía en la app (máximo real del ERP; el prototipo ya usa 60) |
-| Prototipo navegable P1 a P4 con sistema mínimo, mapa de navegación y registro de decisiones (`prototipo/`, `docs/prototipo.md`) | Destacar los cambios de último minuto en el validador de la app (HU-04) |
-| Análisis ético: exclusión, datos personales, accesibilidad, sostenibilidad y riesgos (`docs/etica.md`) | Hacer obligatorio el motivo del cambio y corregir el borde del campo Cliente (riesgos 3 y 5 de `docs/etica.md`) |
-| Carga masiva, validador de SKU y ajuste de última hora con registro de cambios; la app bloquea la emisión de la guía si algún SKU no valida | Cuentas y permisos (la app Streamlit queda congelada hasta validar el flujo con usuarios) |
-| Diseño de la base de datos con el esquema SQL y datos de ejemplo consistentes (`docs/datos`, `supabase/`) | Validar con el jefe de bodega que el retiro tenga solo los motivos falla y mantención preventiva, y si existe un retiro normal sin motivo |
-| Base SQLite con inventario simulado, tests y CI en GitHub Actions. Los cuatro scripts de `supabase/` corrieron en Supabase y las 82 comprobaciones con la clave publicable pasan (`supabase/probar_en_supabase.py`) | Cerrar el acceso con inicio de sesión antes de usar datos reales: hoy las políticas son abiertas |
-| | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
-| Diseño de la prueba con usuarios y guion de cada sesión (`docs/prueba-usuarios.md`, `docs/pauta-validacion.md`) | |
-| Kit de la prueba escrito (consentimiento, planilla, ensayo, plan de sesiones, regla de decisión, pauta imprimible de 2 planas), protocolo de la línea base con su herramienta de cálculo, y checklist del celular. El prototipo se revisó en pantallas de 360 y 390 px de ancho (`docs/checklist-celular.md`) | Ensayar la pauta, medir la línea base y revisar el prototipo en un celular real con datos móviles: nada de eso se ha hecho |
-| Prueba de concepto escrita: el prototipo lee órdenes, valida SKU, registra cambios (con motivo obligatorio) y prepara la guía en Supabase, con validación en tres capas (`prototipo/`, `supabase/`, `docs/poc-supabase.md`), probada en Supabase: las reglas de la base y la pantalla en un navegador contra la base real | Probarla en un celular, con poca señal y con personas ajenas al equipo (prueba de usuarios, `docs/prueba-usuarios.md`) |
+| Problema, caso de uso y maqueta de tres pantallas | `docs/unidad1` |
+| Conversación con el usuario | `docs/entrevistas` |
+| Historias HU-01 a HU-05 con criterios principal y alternativo, y HU-05 con una acción de la persona | `docs/historias.md` |
+| Wireframes del flujo principal con sus notas | `docs/wireframes` |
+| Prototipo navegable P1 a P4 con sistema mínimo, mapa de navegación y registro de decisiones; borde del campo Cliente corregido (contraste 3:1) | `prototipo/`, `docs/prototipo.md` |
+| Análisis ético: exclusión, datos personales, accesibilidad, sostenibilidad y riesgos; plazo de conservación propuesto de 24 meses | `docs/etica.md` |
+| Aplicación Streamlit: carga masiva, validador de SKU, ajuste de última hora con registro de cambios y bloqueo de la guía si algún SKU no valida; base SQLite con inventario simulado, pruebas y CI en GitHub Actions | `src/`, `tests/` |
+| Diseño de la base de datos con el esquema SQL y datos de ejemplo consistentes (modalidad solo en el despacho y motivo solo en el retiro) | `docs/datos`, `supabase/` |
+| Prueba de concepto en Supabase: el prototipo lee órdenes, valida SKU, registra cambios con motivo obligatorio y prepara la guía, con validación en tres capas. Los cuatro scripts corrieron en Supabase, las 82 comprobaciones con la clave publicable pasan y la pantalla se probó en un navegador contra la base real | `prototipo/`, `supabase/`, `docs/poc-supabase.md` |
+| Diseño de la prueba con usuarios y guion de cada sesión, con pauta imprimible de 2 planas | `docs/prueba-usuarios.md`, `docs/pauta-validacion.md` |
+| Kit para ejecutar la prueba (consentimiento, planilla, ensayo, plan de sesiones, regla de decisión), protocolo de la línea base con su herramienta de cálculo y checklist del celular. El prototipo se revisó en pantallas de 360 y 390 px de ancho | `docs/kit-prueba/`, `docs/linea-base.md`, `docs/checklist-celular.md` |
+
+### Pendiente del avance
+
+| Qué | Por qué falta |
+|---|---|
+| Que el equipo confirme los criterios de HU-02 a HU-05 | Se propusieron con ayuda de IA y la profesora pidió que los revise el equipo |
+| Confirmar con administración el plazo de conservación de 24 meses | Es una propuesta del equipo (`docs/etica.md`, ficha B2) |
+| Configurar Vercel (variables `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` y comando de construcción) y volver a publicar desde `main` | Hasta entonces el sitio publicado no es la versión conectada a Supabase |
+
+### Congelado, no se hará por ahora
+
+Todo esto es de la **aplicación Streamlit**. La razón: la profesora pidió no invertirle más horas mientras la prueba con usuarios no confirme el flujo, y el prototipo ya cubre lo que la etapa pide.
+
+| Qué | Estado |
+|---|---|
+| Subir el límite de 50 a 60 productos por guía en la aplicación | El prototipo y la base ya usan 60. En la aplicación hay un cambio hecho en la rama local `feature/avance5-pendientes-app`, sin subir ni fusionar |
+| Destacar los cambios de último minuto en el validador de la aplicación (HU-04) | Igual: en esa rama local. El prototipo ya los destaca |
+| Hacer obligatorio el motivo del cambio en la aplicación | Igual: en esa rama local. El prototipo y la base ya lo exigen |
+| Corregir el borde del campo Cliente en la aplicación | La aplicación no tiene ese campo. El del prototipo ya se corrigió |
+| Cuentas y permisos en la aplicación | Hay un inicio de sesión por jerarquía en la rama local `feature/login-etapa1`, sin subir ni fusionar |
+
+### Siguiente etapa (no es pendiente del avance)
+
+| Qué | Dónde |
+|---|---|
+| Línea base: medir cuánto demoran hoy las guías y cuántas se rehacen | `docs/linea-base.md` (protocolo y herramienta escritos, sin medir) |
+| Ensayo interno de la pauta, con alguien que no diseñó las tareas | `docs/kit-prueba/ensayo-interno.md` |
+| Prueba del prototipo en un celular real, con datos móviles | `docs/checklist-celular.md` |
+| Prueba con usuarios de fuera del equipo | `docs/prueba-usuarios.md` y el kit de `docs/kit-prueba/` |
+| Dos preguntas al jefe de bodega: qué motivos tiene un retiro y si existe un retiro normal sin motivo; y qué debe comprobar «Validar» en un retiro | `docs/poc-supabase.md` (sección 4) y `docs/datos/estructura_datos.md` (sección 5) |
+
+Quedan fuera del alcance del MVP la integración con el ERP, y antes de usar datos reales hay que cerrar el acceso con inicio de sesión (ver «Seguridad de la base en esta etapa»).
 
 ### Prueba de concepto con Supabase: qué hay que configurar
 
