@@ -133,8 +133,8 @@ Los SKU de las extensiones siguen el formato real de la empresa: en `SD-63A20-03
 
 | id_cliente* | razon_social* | rut* | direccion* |
 |---|---|---|---|
-| 10 | Constructora Andes SpA | 76.123.456-7 | Av. Matta 1200, Santiago |
-| 11 | Minera Cordillera S.A. | 77.987.654-3 | Camino a Farellones km 12, Lo Barnechea |
+| 10 | Constructora Andes SpA | 11.111.111-1 | Av. Matta 1200, Santiago |
+| 11 | Minera Cordillera S.A. | 22.222.222-2 | Camino a Farellones km 12, Lo Barnechea |
 
 **EQUIPOS** (estado y ubicación al final de la mañana)
 
