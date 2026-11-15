@@ -571,3 +571,30 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - Una prueba comprueba que `prueba-usuarios.md` y la pauta no nombran a ningún integrante, y otra que los números de la hoja de la regla coinciden con los de `prueba-usuarios.md`.
 - **Comprobación de que las preguntas nuevas no introducen sesgo:** se releyeron contra la regla del enunciado (ninguna sugiere la respuesta, pide una opinión sobre el futuro ni promueve una idea). **Es una lectura, no una prueba con una persona.** El ensayo interno es donde se confirma que se entienden y que no empujan una respuesta.
 - **No se verificó:** el ensayo con una persona, que la frase de la tarea 2 se pueda comprobar de oído en una grabación real, ni los tiempos por etapa, que siguen siendo los del documento.
+
+
+---
+
+## Encargo 24. Cerrar los pendientes del avance y preparar la fusión de las ramas
+
+**Objetivo.** Ordenar en el README lo hecho, lo pendiente del avance, lo congelado y la siguiente etapa, según la retroalimentación de la profesora, y dejar las ramas listas para abrir sus pull requests una por una.
+
+**Instrucción entregada.**
+- Contexto: la retroalimentación del Avance 5 («no le dediquen más horas a la aplicación Streamlit mientras la prueba con usuarios no confirme el flujo»), el PR #24 ya fusionado en `main` y el estado de las ramas.
+- Intención: pasar a «Hecho» lo que ya está hecho; marcar como «Congelado, no se hará por ahora», con su razón, lo de la aplicación Streamlit (límite de 60, cambios destacados en el validador, motivo obligatorio, borde del campo Cliente, cuentas y permisos); dejar como «Siguiente etapa» y no como pendiente del avance la línea base, el ensayo, la prueba en un celular real, la prueba con usuarios y las dos preguntas al jefe de bodega.
+- Restricciones: traer los cambios de `origin/main` a cada rama antes de su pull request, resolver los conflictos, correr las pruebas y avisar, en el orden `mejora-avance6`, `poc-supabase`, `kit-validacion`; no subir ni abrir ningún pull request sin confirmación; una rama a la vez.
+
+**Respuesta obtenida.** La sección «En qué estado está» del README en cuatro bloques (hecho, pendiente del avance, congelado, siguiente etapa) y la sincronización de `mejora-avance6` con `main`.
+
+**Qué se aceptó y qué se corrigió.**
+- **Se agregó un bloque que no se pidió, «Pendiente del avance»,** porque quedan tres cosas reales que no son de la siguiente etapa: que el equipo confirme los criterios de HU-02 a HU-05 (propuestos con ayuda de IA), confirmar con administración los 24 meses y configurar Vercel. Si el equipo prefiere otra clasificación, es un cambio de texto.
+- **El borde del campo Cliente** estaba en la lista de lo congelado, pero la aplicación Streamlit no tiene ese campo (se comprobó buscando «cliente» en `src/`). El que existía era el del prototipo y ya está corregido. El README lo dice así.
+- **Lo congelado no se perdió:** el trabajo de la aplicación está en dos ramas locales que no se suben ni se fusionan (`feature/avance5-pendientes-app` y `feature/login-etapa1`), y el README las nombra.
+- La fecha del README («Al 5 de noviembre») estaba desactualizada y pasó al 15 de noviembre de 2026.
+- **Sincronización de `mejora-avance6`:** se simularon las tres ramas contra `main` y ninguna tenía conflictos. Se hizo el merge de `origin/main` en `mejora-avance6`, sin conflictos (commit `4a4e2b5`), y sus 56 pruebas pasan. No se hizo todavía en `poc-supabase` ni en `kit-validacion`, porque cada una debe sincronizarse después de que la anterior se fusione. Se simuló `poc-supabase` contra `mejora-avance6` ya fusionada: habrá un conflicto en la bitácora, que se resuelve dejando los Encargos 19, 20 y 21 en orden.
+
+**Cómo se verificó.**
+- `pytest tests`: 181 pruebas pasan en `kit-validacion` y 56 en `mejora-avance6`.
+- Se comprobó que no hay emojis ni caracteres de control ocultos, que no hay `config.js` ni `.env` versionados y que ningún commit lleva líneas de Claude.
+- Se repitió, sin cambiar nada, el barrido de nombres de personas ajenas al equipo, teléfonos y correos: no hay teléfonos ni correos reales en los archivos. Los hallazgos están en la respuesta de la sesión.
+- **No se verificó:** el contenido de las 27 imágenes, la carpeta anidada que git excluye ni `bodega.db`.
