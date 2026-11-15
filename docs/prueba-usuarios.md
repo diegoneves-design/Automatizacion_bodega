@@ -17,7 +17,7 @@ Esta prueba todavía no se hace. Aquí dejamos escrito qué vamos a observar, co
 **Una segunda hipótesis, sobre a quién dejamos fuera.** En el Avance 5 dijimos que el bodeguero de terreno queda excluido, porque no arma guías y casi no usa computador en su trabajo ([docs/etica.md](etica.md), B1). Creemos que, si le damos la tarea 2, va a necesitar ayuda. Lo sabremos cuando 3 o más de 5 personas del perfil U2 pidan ayuda o dejen la tarea a medias. Si 3 o más la terminan solas, nos equivocamos sobre quién queda fuera, y hay que revisar el riesgo 1 de `docs/etica.md`.
 
 **Lo que esta prueba no puede responder.**
-- El prototipo funciona con datos de ejemplo y no está conectado a nada. No sirve para saber si el sistema funciona técnicamente, si el inventario está al día ni si la guía la acepta el ERP o el SII.
+- El prototipo guarda sus datos de ejemplo en una base de Supabase compartida (prueba de concepto con Supabase). Sirve para ver si la persona entiende y logra el flujo. No sirve para saber si el sistema funciona técnicamente con datos reales, si el inventario está al día ni si la guía la acepta el ERP o el SII, ni mide cuánto tarda la base en responder en una bodega con poca señal.
 - No compara el prototipo con la forma en que se trabaja hoy, en papel, ni mide cuánto se demora una guía real.
 - No prueba lo que el prototipo todavía no tiene, como cargar un archivo, iniciar sesión o los permisos de cada área.
 
@@ -75,6 +75,8 @@ Para la prueba vamos a estar dos integrantes. Hay algo que nos importa cuidar. U
 | Participantes de la bodega del caso, y el conocido del equipo | Sebastián Carmona | Oscar Ynchaustegui, **después de la sesión**, mirando la grabación | Sebastián Carmona |
 | Participantes de otras empresas | Oscar Ynchaustegui | Sebastián Carmona, en vivo | Sebastián Carmona |
 | Consultas a stakeholders | Oscar Ynchaustegui | Sebastián Carmona, en vivo | Sebastián Carmona |
+
+**Una persona a la vez, y la demo vuelve a empezar entre una y otra.** Todas las sesiones usan la misma base de datos: lo que hace un participante lo ve el siguiente. Por eso nunca hay dos personas probando al mismo tiempo, y antes de cada sesión quien facilita presiona **Reiniciar demo** y comprueba que la primera pantalla muestre las órdenes 3001 y 3002 sin cambios. El botón Reiniciar demo está visible en la pantalla, pero no se le menciona al participante. Si lo presiona, se anota como desvío en la planilla y se reinicia antes de seguir.
 
 **Cómo grabamos.** Solo la pantalla y la voz del computador o celular en que se usa el prototipo, **nunca la cara**. Empezamos a grabar después de leer el consentimiento y solo si la persona dice que sí. El sí queda grabado en voz, sin decir su nombre.
 

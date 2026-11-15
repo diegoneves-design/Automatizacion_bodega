@@ -20,19 +20,19 @@ Una fila por cada campo del formulario del prototipo (P1 y P3) y por los datos q
 
 | Campo del prototipo | Campo en `estructura_datos.md` | ¿Dato personal? | Finalidad (historia) | Quién accede | Cuánto se conserva |
 |---|---|---|---|---|---|
-| Orden (P1) | `ORDENES.id_orden` | No | HU-02: elegir el pedido que se carga | Jefe y subjefe de bodega | Mientras exista la guía asociada |
-| Cliente (P1, solo lectura) | `ORDENES.id_cliente` → `CLIENTES.razon_social` | No (empresa) | HU-02 y HU-05: la guía debe ir al cliente correcto | Jefe y subjefe de bodega, comercial | Mientras exista la guía asociada |
-| Tipo de movimiento (P1) | `ORDENES.tipo_movimiento` | No | HU-02: distinguir despacho de retiro | Jefe y subjefe de bodega | Mientras exista la guía asociada |
-| Modalidad (P1) | `ORDENES.modalidad` | No | HU-02: distinguir convencional de alternativo (cambio por mantención o falla) | Jefe y subjefe de bodega | Mientras exista la guía asociada |
-| Productos del pedido (P1) | `DETALLE_ORDEN.sku_informado` | No | HU-01 y HU-02: validar cada SKU contra el inventario | Jefe y subjefe de bodega | Mientras exista la guía asociada |
-| Equipo que sale (P3) | `REGISTRO_CAMBIOS.id_equipo_sale` | No | HU-03 y HU-04: saber qué equipo se reemplazó | Jefe y subjefe de bodega, mantenimiento | Igual que el historial de la orden |
-| Equipo que entra (P3) | `REGISTRO_CAMBIOS.id_equipo_entra` | No | HU-03 y HU-04: saber qué equipo lo reemplaza | Jefe y subjefe de bodega, mantenimiento | Igual que el historial de la orden |
-| Motivo (P3) | `REGISTRO_CAMBIOS.motivo_cambio` | No | HU-04: tener respaldo cuando la gente sale más tarde de lo esperado | Jefe y subjefe de bodega, gerente de administración | Igual que el historial de la orden |
-| **Quién lo registra (P3)** | `REGISTRO_CAMBIOS.id_usuario` → `USUARIOS.nombre` | **Sí** | HU-04: mostrar "Cambiado por X a las HH:MM" | Jefe y subjefe de bodega, gerente de administración. **No** se publica a todo el personal | Igual que el historial de la orden; se usa para reconstruir un error, no para evaluar a personas |
-| Fecha y hora del cambio (automática) | `REGISTRO_CAMBIOS.fecha_hora_cambio` | Asociado a una persona | HU-04: saber a qué hora fue el cambio | Igual que "Quién lo registra" | Igual que el historial de la orden |
-| **Quién prepara la guía (P4, automático)** | `GUIAS.id_usuario_emite` → `USUARIOS.nombre` | **Sí** | HU-05: responsable de la guía antes de pasarla al ERP | Jefe y subjefe de bodega, gerente de administración | Mientras exista la guía asociada |
+| Orden (P1) | `ORDENES.id_orden` | No | HU-02: elegir el pedido que se carga | Jefe y subjefe de bodega | 24 meses desde la emisión de la guía (propuesta) |
+| Cliente (P1, solo lectura) | `ORDENES.id_cliente` → `CLIENTES.razon_social` | No (empresa) | HU-02 y HU-05: la guía debe ir al cliente correcto | Jefe y subjefe de bodega, comercial | 24 meses desde la emisión de la guía (propuesta) |
+| Tipo de movimiento (P1) | `ORDENES.tipo_movimiento` | No | HU-02: distinguir despacho de retiro | Jefe y subjefe de bodega | 24 meses desde la emisión de la guía (propuesta) |
+| Modalidad (P1) | `ORDENES.modalidad` | No | HU-02: distinguir convencional de alternativo (cambio por mantención o falla) | Jefe y subjefe de bodega | 24 meses desde la emisión de la guía (propuesta) |
+| Productos del pedido (P1) | `DETALLE_ORDEN.sku_informado` | No | HU-01 y HU-02: validar cada SKU contra el inventario | Jefe y subjefe de bodega | 24 meses desde la emisión de la guía (propuesta) |
+| Equipo que sale (P3) | `REGISTRO_CAMBIOS.id_equipo_sale` | No | HU-03 y HU-04: saber qué equipo se reemplazó | Jefe y subjefe de bodega, mantenimiento | 24 meses desde la emisión de la guía (propuesta) |
+| Equipo que entra (P3) | `REGISTRO_CAMBIOS.id_equipo_entra` | No | HU-03 y HU-04: saber qué equipo lo reemplaza | Jefe y subjefe de bodega, mantenimiento | 24 meses desde la emisión de la guía (propuesta) |
+| Motivo (P3) | `REGISTRO_CAMBIOS.motivo_cambio` | No | HU-04: tener respaldo cuando la gente sale más tarde de lo esperado | Jefe y subjefe de bodega, gerente de administración | 24 meses desde la emisión de la guía (propuesta) |
+| **Quién lo registra (P3)** | `REGISTRO_CAMBIOS.id_usuario` → `USUARIOS.nombre` | **Sí** | HU-04: mostrar "Cambiado por X a las HH:MM" | Jefe y subjefe de bodega, gerente de administración. **No** se publica a todo el personal | 24 meses desde la emisión de la guía (propuesta); se usa para reconstruir un error, no para evaluar a personas |
+| Fecha y hora del cambio (automática) | `REGISTRO_CAMBIOS.fecha_hora_cambio` | Asociado a una persona | HU-04: saber a qué hora fue el cambio | Igual que "Quién lo registra" | 24 meses desde la emisión de la guía (propuesta) |
+| **Quién prepara la guía (P4, automático)** | `GUIAS.id_usuario_emite` → `USUARIOS.nombre` | **Sí** | HU-05: responsable de la guía antes de pasarla al ERP | Jefe y subjefe de bodega, gerente de administración | 24 meses desde la emisión de la guía (propuesta) |
 
-**Plazo de conservación:** la guía oficial se emite en el ERP y se sube al SII (conversación, preguntas 1 y D5), así que su respaldo tributario queda en el ERP. El plazo exacto para los datos de este sistema es una **propuesta del equipo por confirmar con administración**.
+**Plazo de conservación:** la guía oficial se emite en el ERP y se sube al SII (conversación, preguntas 1 y D5), así que su respaldo tributario queda en el ERP. Para los datos de este sistema proponemos conservarlos **24 meses desde la emisión de la guía**, y después borrarlos o anonimizar el nombre de quien registró. Es una **propuesta del equipo, a confirmar con el gerente de administración**; si el plazo cambia, se actualiza esta ficha.
 
 **Campos revisados por privacidad desde el diseño:** el prototipo **no** incluye `USUARIOS.correo` ni un teléfono, aunque el modelo de datos los considera, porque ninguna pantalla del flujo principal los necesita. Se usarán solo si se agrega inicio de sesión. Tampoco se pide el motivo del retiro (`ORDENES.motivo_retiro`), porque ninguna historia del flujo principal lo justifica.
 
