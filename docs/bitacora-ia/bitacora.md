@@ -598,3 +598,34 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - Se comprobó que no hay emojis ni caracteres de control ocultos, que no hay `config.js` ni `.env` versionados y que ningún commit lleva líneas de Claude.
 - Se repitió, sin cambiar nada, el barrido de nombres de personas ajenas al equipo, teléfonos y correos: no hay teléfonos ni correos reales en los archivos. Los hallazgos están en la respuesta de la sesión.
 - **No se verificó:** el contenido de las 27 imágenes, la carpeta anidada que git excluye ni `bodega.db`.
+
+
+---
+
+## Encargo 25. Abrir el PR de `mejora-avance6` y reemplazar los RUT de ejemplo
+
+**Objetivo.** Subir `feature/mejora-avance6` y abrir su pull request como borrador, con un revisor, y reemplazar los RUT de las empresas de ejemplo por valores claramente falsos.
+
+**Instrucción entregada.**
+- Contexto: el barrido de datos personales del Encargo 24 (un RUT de ejemplo con dígito verificador válido) y la orden de fusión decidida: `mejora-avance6`, `poc-supabase` y `kit-validacion`.
+- Intención: subir solo `mejora-avance6`; abrir el PR hacia `main` como borrador, asignar a `sebastiancarmonap-web` como revisor y no fusionarlo; reemplazar el RUT de ejemplo con dígito verificador válido (el de Minera Cordillera) por `11.111.111-1` y `22.222.222-2` en las semillas, los documentos y las pruebas, en un commit aparte.
+- Restricciones: no subir nada más; detenerse después de abrir el PR hasta que Bastián avise que se fusionó; sin líneas de Claude; avisar antes de que se vuelva a ejecutar `seed_poc.sql` en Supabase.
+
+**Respuesta obtenida.**
+- Push de `feature/mejora-avance6` y PR #25 en borrador, con `sebastiancarmonap-web` como revisor solicitado. No se fusionó.
+- Commit `871d0c8` en `feature/kit-validacion` con el reemplazo de los RUT.
+
+**Qué se aceptó y qué se corrigió.**
+- **Interpretación del reemplazo:** la instrucción nombraba un RUT y dos valores nuevos. Se entendió que los dos RUT de ejemplo cambian, en orden: el de Constructora Andes pasa a `11.111.111-1` y el de Minera Cordillera a `22.222.222-2`.
+- **Los dos valores nuevos tienen dígito verificador válido** (el que corresponde a `11.111.111` es 1 y a `22.222.222` es 2) y están en el rango de las personas naturales, no en el de las empresas. Son placeholders muy usados, y se aplicaron porque así se decidió; lo que ya no existe es la coincidencia posible con una empresa real.
+- **El commit va en `feature/kit-validacion` y no en el PR #25,** porque es la única rama donde existen a la vez las semillas, los documentos y la prueba que lista los RUT permitidos. Llegará a `main` con esa rama, la última de la fila.
+- **No se cambió** el PDF `docs/unidad1/Avance_3_grupo_6.pdf` (plana 11 y 12), que es un documento entregado y todavía trae los RUT anteriores.
+- **La base real de Supabase sigue con los RUT anteriores** hasta que Bastián vuelva a ejecutar `seed_poc.sql`; no se ejecutó nada ni se tocó Supabase.
+- Una prueba nueva impide que los RUT anteriores vuelvan a las semillas y al modelo de datos. Al escribirla, mi primera versión contenía los RUT anteriores como texto y la revisión de datos personales del repositorio la marcó: se corrigió armándolos por partes.
+- El primer intento de `push` no se ejecutó porque mi comando encadenaba un `grep -c` que devuelve error cuando cuenta cero; se repitió el push solo.
+
+**Cómo se verificó.**
+- `pytest tests`: 182 pruebas pasan en `kit-validacion`.
+- Antes del push se comprobó que los tres commits de `mejora-avance6` no llevan trailers de Claude ni `config.js` ni `.env`.
+- El borrador y el revisor se verificaron en la página del PR #25. Las 3 verificaciones automáticas de GitHub estaban pendientes cuando se cerró la pestaña.
+- **No se verificó:** que la semilla con los RUT nuevos corra en Supabase; se ejecuta después de este aviso.
