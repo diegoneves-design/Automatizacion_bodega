@@ -150,7 +150,7 @@ CORREO = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 TELEFONO = re.compile(r"(?<![\w.])\+?\d[\d\s().-]{7,}\d(?![\d])")
 NOMBRES_DEL_EQUIPO = ["Carmona", "Ynchaustegui", "Neves", "Vargas"]
 RUT = re.compile(r"(?<![\w.])\d{1,2}\.\d{3}\.\d{3}-[\dkK](?!\w)")
-RUT_FICTICIOS = {"76.123.456-7", "77.987.654-3"}   # los de las empresas de ejemplo del modelo de datos
+RUT_FICTICIOS = {"11.111.111-1", "22.222.222-2"}   # los de las empresas de ejemplo del modelo de datos
 
 
 def archivos_de_texto():
@@ -326,3 +326,15 @@ def test_la_hipotesis_dice_que_solo_4_o_5_cuentan_y_que_3_de_5_no_pasa():
     assert "Con 3 de 5 la hipótesis no se confirma" in hipotesis
     hoja = leer(KIT / "regla-decision.md")
     assert "Solo 4 o 5 de 5 es «se cumple»; con 3 de 5 no pasa" in hoja
+
+
+# Los RUT que se reemplazaron, escritos por partes para que este archivo no los contenga.
+ANTERIORES = ("76.123.456" + "-7", "77.987.654" + "-3")
+
+
+def test_los_rut_de_ejemplo_son_los_decididos_por_el_equipo():
+    """Los RUT de las empresas de ejemplo son 11.111.111-1 y 22.222.222-2 en las semillas y en el modelo de datos."""
+    for ruta in (RAIZ / "supabase" / "seed_poc.sql", RAIZ / "supabase" / "seed_ejemplo.sql", DOCS / "datos" / "estructura_datos.md"):
+        t = leer(ruta)
+        assert "11.111.111-1" in t and "22.222.222-2" in t, ruta.name
+        assert not any(a in t for a in ANTERIORES), f"{ruta.name} conserva un RUT anterior"

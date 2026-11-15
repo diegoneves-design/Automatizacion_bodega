@@ -9,8 +9,8 @@
 truncate table guias, registro_cambios, detalle_orden, ordenes, equipos, usuarios, clientes;
 
 insert into clientes (id_cliente, razon_social, rut, direccion) values
-  (10, 'Constructora Andes SpA', '76.123.456-7', 'Av. Matta 1200, Santiago'),
-  (11, 'Minera Cordillera S.A.', '77.987.654-3', 'Camino a Farellones km 12, Lo Barnechea');
+  (10, 'Constructora Andes SpA', '11.111.111-1', 'Av. Matta 1200, Santiago'),
+  (11, 'Minera Cordillera S.A.', '22.222.222-2', 'Camino a Farellones km 12, Lo Barnechea');
 
 insert into usuarios (id_usuario, nombre, correo, telefono, rol, activo) values
   (1, 'Pedro Soto',   'psoto@ejemplo.cl',  '+56 9 1111 1111', 'jefe_bodega',   true),
