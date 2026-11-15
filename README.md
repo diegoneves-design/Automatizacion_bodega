@@ -200,7 +200,7 @@ Al 5 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance
 |---|---|
 | Problema, caso de uso y maqueta de tres pantallas | Medir cuánto demoran hoy las guías y cuántas se rehacen |
 | Conversación con el usuario (`docs/entrevistas`) | Ejecutar la prueba de usuarios diseñada en el Avance 6 (`docs/prueba-usuarios.md`) |
-| Historias HU-01 a HU-05 y criterios de la historia principal (`docs/historias.md`) | Revisar y aprobar los criterios en borrador de HU-02 a HU-05 (`docs/prototipo.md`) |
+| Historias HU-01 a HU-05 con criterios principal y alternativo (`docs/historias.md`) | Que el equipo confirme los criterios de HU-02 a HU-05, propuestos con ayuda de IA |
 | Wireframes del flujo principal con sus notas (`docs/wireframes`) | Subir el límite de 50 a 60 productos por guía en la app (máximo real del ERP; el prototipo ya usa 60) |
 | Prototipo navegable P1 a P4 con sistema mínimo, mapa de navegación y registro de decisiones (`prototipo/`, `docs/prototipo.md`) | Destacar los cambios de último minuto en el validador de la app (HU-04) |
 | Análisis ético: exclusión, datos personales, accesibilidad, sostenibilidad y riesgos (`docs/etica.md`) | Hacer obligatorio el motivo del cambio y corregir el borde del campo Cliente (riesgos 3 y 5 de `docs/etica.md`) |
