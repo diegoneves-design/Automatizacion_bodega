@@ -38,3 +38,16 @@ Thumbs.db
 
 # Configuracion del prototipo (se genera con prototipo/generar-config.mjs)
 prototipo/js/config.js
+
+# Evidencia de la prueba con usuarios y mediciones reales: van en Drive con acceso restringido, nunca al repositorio
+evidencia/
+datos-medicion/
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.avi
+*.m4a
+*.mp3
+*.wav
+*.aac

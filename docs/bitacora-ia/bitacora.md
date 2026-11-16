@@ -503,3 +503,159 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - **Sin probar:** celular, poca señal real, otros navegadores y uso simultáneo de dos personas.
 - La demo quedó reiniciada: 2 órdenes con 4 líneas pendientes, sin guías ni cambios.
 
+
+---
+
+## Encargo 22. Kit para ejecutar la prueba con usuarios, línea base y chequeo del celular
+
+**Objetivo.** Dejar listo lo que falta para ejecutar de verdad la prueba diseñada en el Avance 6 y para reforzar la prueba de concepto: protocolo de línea base, kit de la prueba y chequeo en pantallas chicas.
+
+**Instrucción entregada.**
+- Contexto: `docs/prueba-usuarios.md` y `docs/pauta-validacion.md` (en `main` y en `feature/mejora-avance6`), las instrucciones del Avance 6 con sus criterios de revisión, la ficha de datos con los 24 meses propuestos y el prototipo conectado a Supabase.
+- Intención: complementar y enlazar lo que ya existe, sin duplicarlo; escribir cómo se mide la línea base, el consentimiento, la planilla, el ensayo, el plan de sesiones, la regla de decisión y el checklist del celular; revisar todo contra los criterios del Avance 6.
+- Restricciones: no tocar `supabase/` ni las otras ramas; no ejecutar `supabase/probar_en_supabase.py`; ningún nombre, teléfono ni correo de personas reales; grabaciones y evidencia fuera del repositorio; corregir solo CSS o textos en un commit aparte y sin cambiar reglas de validación; si se agrega un script, agregarle pruebas.
+- Verificación: decir qué se verificó y qué no.
+
+**Respuesta obtenida.**
+- `docs/linea-base.md`, `docs/plantillas/linea_base_registro.csv` y `herramientas/calcular_linea_base.py`, con 49 pruebas.
+- `docs/kit-prueba/`: consentimiento, planilla, ensayo interno, plan de sesiones, regla de decisión, revisión contra el Avance 6 y un índice.
+- `herramientas/md_a_pdf.py` (con 12 pruebas) y los PDF imprimibles de la pauta, el consentimiento y la regla.
+- `docs/checklist-celular.md` y una corrección de CSS en un commit aparte.
+- `tests/test_kit_prueba.py`: coherencia entre el kit, la pauta y `prueba-usuarios.md`, enlaces, ausencia de datos personales, de nombres del equipo y de emojis.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: la rama parte de `feature/poc-supabase` con `feature/mejora-avance6` unido por un merge local, para que el kit y el PDF salgan de los documentos en su estado final. Hubo un conflicto en esta bitácora, resuelto dejando los Encargos 19, 20 y 21 en orden.
+- Corregido, borde del campo «Cliente»: la revisión de pantallas chicas encontró que el borde del campo de solo lectura medía 1,59:1 (mínimo 3:1). Se cambió solo el CSS y ahora mide 4,37:1. Es el mismo hallazgo pendiente de `docs/etica.md`.
+- Corregido, convertidor de PDF: escapaba dos veces el `&` de los enlaces (`&amp;amp;`). Lo encontró una prueba.
+- Corregido, línea base: la guarda de datos personales marcaba una fecha (`2026-11-16`) como si fuera un teléfono. Se limitó a las columnas de texto libre.
+- Corregido, pruebas del kit: tres falsos positivos de mi propia revisión de datos personales (el nombre de una imagen, el RUT ficticio del modelo y los datos de prueba de la guarda); se afinaron las reglas sin aflojarlas, de modo que un RUT, correo o teléfono real siga haciendo fallar la prueba.
+- Corregido, emojis: la revisión del kit (`revision-avance6.md`) usaba emojis para marcar el estado. Bastián pidió que no haya emojis en el repositorio; se reemplazaron por palabras y se agregó una prueba que los detecta. Se dejaron los símbolos «✓» y «✕» del prototipo, que acompañan siempre a un texto.
+- Corregido, herramienta de escritura: dos secuencias de escape (` ` y `\b`) se convirtieron en caracteres invisibles dentro de archivos. Se detectó con las pruebas, se corrigió y se revisó que ningún archivo del repositorio tenga caracteres de control.
+- **No se aplicó:** el cambio de redacción de tres preguntas de la pauta que rozan la regla de no sugerir la respuesta. Está propuesto en `revision-avance6.md` y lo decide el equipo, porque cambiar una pregunta cambia lo que se mide.
+
+**Cómo se verificó.**
+- `pytest tests`: 169 pruebas pasan (las 71 anteriores más las nuevas).
+- **PDF de la pauta:** regenerado desde el texto actual, 2 planas contadas con `pypdf`, y las seis etapas suman exactamente 20 minutos (sin holgura). La hoja de la regla y el consentimiento ocupan una plana cada uno. Se revisaron visualmente.
+- **Pantallas chicas:** el prototipo se cargó dentro de un marco de 360 × 640 y de 390 × 844 y se recorrieron 16 estados en cada tamaño, contra una réplica de la base escrita solo para probar la pantalla. Se revisó desplazamiento horizontal, texto cortado, controles de 44 px o más (87 revisados), contraste de texto con la fórmula de WCAG (324 textos, el más bajo 5,63:1), contraste de bordes, estados que dependen solo del color y tamaño de letra de los campos. Para comprobar que la revisión sirve se le inyectaron a propósito cinco problemas y los detectó todos. Mi primer intento de ese control falló porque la política de seguridad de la página bloquea los estilos en línea: eso era un defecto del control y no de la revisión.
+- **No se ejecutó** `supabase/probar_en_supabase.py` ni se tocó Supabase: la demo quedó como estaba.
+- **No se pudo verificar:** un celular real, señal real, otros navegadores, dos personas usando la demo a la vez y el sitio publicado en Vercel. Tampoco se hizo el ensayo de la pauta con una persona ni ninguna medición de línea base: todo eso está escrito, no ejecutado.
+
+
+---
+
+## Encargo 23. Aplicar las decisiones del equipo sobre el instrumento de la prueba con usuarios
+
+**Objetivo.** Aplicar a `docs/prueba-usuarios.md`, `docs/pauta-validacion.md` y al kit las seis decisiones que tomó el equipo tras la revisión del Encargo 22.
+
+**Instrucción entregada.**
+- Contexto: `docs/kit-prueba/revision-avance6.md` (lo que la revisión encontró) y las seis decisiones de Bastián: usar roles en vez de nombres en `prueba-usuarios.md` y dejar la autoría en el README por ahora; reescribir la pregunta 3 de contexto y la 2 de cierre y dejar la frase 1 del SUS; umbral en tres tramos para 5 personas (4 o 5 se cumple, 3 entorpece, 2 o menos bloquea); quitar una pregunta de contexto para dejar 2 o 3 minutos de holgura y regenerar el PDF; en la tarea 2, «dilo en voz alta» en vez de «señala con el cursor o en voz alta»; aceptar la regla de fallas del sistema como propuesta.
+- Restricciones: no subir nada; no tocar el README; no tocar `supabase/` ni las otras ramas; sin emojis; ningún nombre ni dato personal.
+- Verificación: correr las pruebas, regenerar el PDF y contar planas y minutos.
+
+**Respuesta obtenida.** Cambios en `prueba-usuarios.md` (roles con integrante A y B, tres tramos, éxito de la tarea 2 de oído, regla de fallas del sistema), en la pauta (una pregunta de contexto menos, dos preguntas reescritas) y en el kit (hoja de la regla, plan de sesiones, ensayo, índice y revisión). PDF de la pauta y de la hoja de la regla regenerados. Doce pruebas nuevas que fijan estas decisiones.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado: las dos preguntas se reescribieron con la redacción que se había propuesto, sin cambios.
+- **La holgura es de 1 minuto y no de 2 o 3.** Al quitar una pregunta de contexto, la etapa pasó de 3 a 2 minutos y el total de 20 a 19. Para llegar a 2 minutos habría que recortar otro minuto de otra etapa, y eso lo decide el equipo. La pauta decía «Dura 20 minutos en total» y quedó desactualizada: se corrigió a 19 y una prueba lo comprueba.
+- **Qué pregunta se quitó:** la 1 de contexto («cuénteme paso a paso»), por ser la más larga y la más general. Las dos que quedan se relacionan con las tareas.
+- **Tramos de la tarea 2.** Los tres tramos eran para la tarea 1. Se aplicaron también a «se dan cuenta solas del código malo». A «terminan sin ayuda en menos de 5 minutos», que ya tenía el umbral de 3 de 5, se le agregaron **por analogía** los tramos de 2 de 5 y de 1 o menos. Eso lo agregó la IA y no lo decidió el equipo: está marcado como tal en los documentos, por confirmar en el ensayo.
+- **El umbral quedó más permisivo en un punto.** Antes se fallaba con «2 o más no lo logran» (3 o menos que lo logran); ahora solo bloquea con 2 o menos que lo cumplen y con 3 entorpece. Se cambia antes de la primera sesión, que es lo que permite el enunciado.
+- **Una inconsistencia que se encontró y se resolvió sin que se pidiera.** El plan de sesiones le asignaba al integrante que trabaja en la bodega del caso registrar mirando la grabación de sus compañeros, mientras la hoja de consentimiento promete a los participantes que esa persona no ve las grabaciones. Al pasar a roles se resolvió protegiendo al participante: en esas sesiones registra quien facilitó, después. **Es un cambio de fondo al plan, hecho por la IA; si el equipo prefiere el original, hay que cambiar también el consentimiento.** Una prueba comprueba que el plan y el consentimiento no se contradigan.
+- **Ajuste posterior, a pedido de Bastián, que además aceptó los tres puntos de arriba** (la fila de tramos por analogía de la tarea 2, el umbral en tres tramos y quién registra las grabaciones): la hipótesis dice ahora de forma explícita que solo 4 o 5 de 5 cuentan como «se cumple» y que con 3 de 5 no pasa (es «entorpece»). La misma aclaración está en la hoja de la regla de decisión, cuyo PDF se regeneró, y una prueba la fija en los dos documentos.
+- Se arreglaron dos defectos de las propias pruebas nuevas: un helper fallaba con la última sección de un documento, y una comprobación de la duración dejó de coincidir con el texto nuevo de la pauta.
+- No se aplicó: quitar los nombres del README, de la bitácora ni de `docs/etica.md` y `docs/entrevistas/`, que también los tienen. La decisión fue solo sobre `prueba-usuarios.md`; el kit y esos dos documentos no llevan nombres.
+
+**Cómo se verificó.**
+- `pytest tests`: 180 pruebas pasan.
+- **PDF de la pauta:** regenerado con el texto nuevo, 2 planas contadas con `pypdf`, las seis etapas suman 19 minutos, y una prueba comprueba que el PDF trae las preguntas reescritas. La hoja de la regla sigue en una plana.
+- Una prueba comprueba que `prueba-usuarios.md` y la pauta no nombran a ningún integrante, y otra que los números de la hoja de la regla coinciden con los de `prueba-usuarios.md`.
+- **Comprobación de que las preguntas nuevas no introducen sesgo:** se releyeron contra la regla del enunciado (ninguna sugiere la respuesta, pide una opinión sobre el futuro ni promueve una idea). **Es una lectura, no una prueba con una persona.** El ensayo interno es donde se confirma que se entienden y que no empujan una respuesta.
+- **No se verificó:** el ensayo con una persona, que la frase de la tarea 2 se pueda comprobar de oído en una grabación real, ni los tiempos por etapa, que siguen siendo los del documento.
+
+
+---
+
+## Encargo 24. Cerrar los pendientes del avance y preparar la fusión de las ramas
+
+**Objetivo.** Ordenar en el README lo hecho, lo pendiente del avance, lo congelado y la siguiente etapa, según la retroalimentación de la profesora, y dejar las ramas listas para abrir sus pull requests una por una.
+
+**Instrucción entregada.**
+- Contexto: la retroalimentación del Avance 5 («no le dediquen más horas a la aplicación Streamlit mientras la prueba con usuarios no confirme el flujo»), el PR #24 ya fusionado en `main` y el estado de las ramas.
+- Intención: pasar a «Hecho» lo que ya está hecho; marcar como «Congelado, no se hará por ahora», con su razón, lo de la aplicación Streamlit (límite de 60, cambios destacados en el validador, motivo obligatorio, borde del campo Cliente, cuentas y permisos); dejar como «Siguiente etapa» y no como pendiente del avance la línea base, el ensayo, la prueba en un celular real, la prueba con usuarios y las dos preguntas al jefe de bodega.
+- Restricciones: traer los cambios de `origin/main` a cada rama antes de su pull request, resolver los conflictos, correr las pruebas y avisar, en el orden `mejora-avance6`, `poc-supabase`, `kit-validacion`; no subir ni abrir ningún pull request sin confirmación; una rama a la vez.
+
+**Respuesta obtenida.** La sección «En qué estado está» del README en cuatro bloques (hecho, pendiente del avance, congelado, siguiente etapa) y la sincronización de `mejora-avance6` con `main`.
+
+**Qué se aceptó y qué se corrigió.**
+- **Se agregó un bloque que no se pidió, «Pendiente del avance»,** porque quedan tres cosas reales que no son de la siguiente etapa: que el equipo confirme los criterios de HU-02 a HU-05 (propuestos con ayuda de IA), confirmar con administración los 24 meses y configurar Vercel. Si el equipo prefiere otra clasificación, es un cambio de texto.
+- **El borde del campo Cliente** estaba en la lista de lo congelado, pero la aplicación Streamlit no tiene ese campo (se comprobó buscando «cliente» en `src/`). El que existía era el del prototipo y ya está corregido. El README lo dice así.
+- **Lo congelado no se perdió:** el trabajo de la aplicación está en dos ramas locales que no se suben ni se fusionan (`feature/avance5-pendientes-app` y `feature/login-etapa1`), y el README las nombra.
+- La fecha del README («Al 5 de noviembre») estaba desactualizada y pasó al 15 de noviembre de 2026.
+- **Sincronización de `mejora-avance6`:** se simularon las tres ramas contra `main` y ninguna tenía conflictos. Se hizo el merge de `origin/main` en `mejora-avance6`, sin conflictos (commit `4a4e2b5`), y sus 56 pruebas pasan. No se hizo todavía en `poc-supabase` ni en `kit-validacion`, porque cada una debe sincronizarse después de que la anterior se fusione. Se simuló `poc-supabase` contra `mejora-avance6` ya fusionada: habrá un conflicto en la bitácora, que se resuelve dejando los Encargos 19, 20 y 21 en orden.
+
+**Cómo se verificó.**
+- `pytest tests`: 181 pruebas pasan en `kit-validacion` y 56 en `mejora-avance6`.
+- Se comprobó que no hay emojis ni caracteres de control ocultos, que no hay `config.js` ni `.env` versionados y que ningún commit lleva líneas de Claude.
+- Se repitió, sin cambiar nada, el barrido de nombres de personas ajenas al equipo, teléfonos y correos: no hay teléfonos ni correos reales en los archivos. Los hallazgos están en la respuesta de la sesión.
+- **No se verificó:** el contenido de las 27 imágenes, la carpeta anidada que git excluye ni `bodega.db`.
+
+
+---
+
+## Encargo 25. Abrir el PR de `mejora-avance6` y reemplazar los RUT de ejemplo
+
+**Objetivo.** Subir `feature/mejora-avance6` y abrir su pull request como borrador, con un revisor, y reemplazar los RUT de las empresas de ejemplo por valores claramente falsos.
+
+**Instrucción entregada.**
+- Contexto: el barrido de datos personales del Encargo 24 (un RUT de ejemplo con dígito verificador válido) y la orden de fusión decidida: `mejora-avance6`, `poc-supabase` y `kit-validacion`.
+- Intención: subir solo `mejora-avance6`; abrir el PR hacia `main` como borrador, asignar a `sebastiancarmonap-web` como revisor y no fusionarlo; reemplazar el RUT de ejemplo con dígito verificador válido (el de Minera Cordillera) por `11.111.111-1` y `22.222.222-2` en las semillas, los documentos y las pruebas, en un commit aparte.
+- Restricciones: no subir nada más; detenerse después de abrir el PR hasta que Bastián avise que se fusionó; sin líneas de Claude; avisar antes de que se vuelva a ejecutar `seed_poc.sql` en Supabase.
+
+**Respuesta obtenida.**
+- Push de `feature/mejora-avance6` y PR #25 en borrador, con `sebastiancarmonap-web` como revisor solicitado. No se fusionó.
+- Commit `871d0c8` en `feature/kit-validacion` con el reemplazo de los RUT.
+
+**Qué se aceptó y qué se corrigió.**
+- **Interpretación del reemplazo:** la instrucción nombraba un RUT y dos valores nuevos. Se entendió que los dos RUT de ejemplo cambian, en orden: el de Constructora Andes pasa a `11.111.111-1` y el de Minera Cordillera a `22.222.222-2`.
+- **Los dos valores nuevos tienen dígito verificador válido** (el que corresponde a `11.111.111` es 1 y a `22.222.222` es 2) y están en el rango de las personas naturales, no en el de las empresas. Son placeholders muy usados, y se aplicaron porque así se decidió; lo que ya no existe es la coincidencia posible con una empresa real.
+- **Dónde quedó el cambio.** Primero se hizo en `feature/kit-validacion` (commit `871d0c8`), porque ahí existen a la vez las semillas, los documentos y la prueba que lista los RUT permitidos. Después Bastián pidió una rama aparte: `feature/rut-ficticios`, que sale de `main` y cambia lo que existe allí (`seed_ejemplo.sql`, `docs/datos/estructura_datos.md`) con dos pruebas nuevas en `tests/test_modelo_datos.py`. **`seed_poc.sql` no existe en `main`** (llega con la prueba de concepto), así que su cambio se hace como commit propio en `feature/poc-supabase` al sincronizarla. Los cambios de esas ramas y el del kit son idénticos, así que al fusionarlas no chocan. La rama aparte no lleva entrada propia en la bitácora para no agregar otro conflicto al final del archivo; este Encargo la cubre.
+- **No se cambió** el PDF `docs/unidad1/Avance_3_grupo_6.pdf` (plana 11 y 12), que es un documento entregado y todavía trae los RUT anteriores.
+- **La base real de Supabase sigue con los RUT anteriores** hasta que Bastián vuelva a ejecutar `seed_poc.sql`; no se ejecutó nada ni se tocó Supabase.
+- Una prueba nueva impide que los RUT anteriores vuelvan a las semillas y al modelo de datos. Al escribirla, mi primera versión contenía los RUT anteriores como texto y la revisión de datos personales del repositorio la marcó: se corrigió armándolos por partes.
+- El primer intento de `push` no se ejecutó porque mi comando encadenaba un `grep -c` que devuelve error cuando cuenta cero; se repitió el push solo.
+
+**Cómo se verificó.**
+- `pytest tests`: 182 pruebas pasan en `kit-validacion`.
+- Antes del push se comprobó que los tres commits de `mejora-avance6` no llevan trailers de Claude ni `config.js` ni `.env`.
+- El borrador y el revisor se verificaron en la página del PR #25. Las 3 verificaciones automáticas de GitHub estaban pendientes cuando se cerró la pestaña.
+- **No se verificó:** que la semilla con los RUT nuevos corra en Supabase; se ejecuta después de este aviso.
+
+
+---
+
+## Encargo 26. Cerrar el Avance 6 y la prueba de concepto: sincronizaciones, PR y fusiones
+
+**Objetivo.** Dejar el Avance 6 y la prueba de concepto fusionados en `main` por pasos, cada uno revisado por alguien distinto de Bastián, y preparar el PR del kit de validación.
+
+**Instrucción entregada.**
+- Contexto: la retroalimentación de la profesora, el PR #24 ya fusionado y las ramas `mejora-avance6`, `rut-ficticios`, `poc-supabase`, `kit-validacion`, `criterios-historias` y `mantener-supabase`.
+- Intención: sincronizar cada rama con `main` antes de su PR, corriendo las pruebas y revisando el diff; abrir cada PR con revisor y con descripción de cinco partes (qué cambia, cómo se probó, qué revisar, qué no se verificó, orden de fusión).
+- Restricciones: la IA no fusiona sin la aprobación de un tercero y sin el mensaje «fusiona #N»; los criterios de `historias.md` no se suben hasta «aprobado historias»; no se toca Supabase ni `feature/avance5-pendientes-app` ni `feature/login-etapa1`; `git add` solo con nombres de archivo.
+
+**Respuesta obtenida.**
+- **PR #25** (`mejora-avance6`): ya estaba fusionado por `diegoneves-design` cuando se retomó, con la versión anterior de los criterios. Los criterios reescritos van en la rama `feature/criterios-historias`, con un commit local pendiente de «aprobado historias».
+- **PR #26** (RUT de ejemplo) y **PR #27** (prueba de concepto): abiertos con revisores asignados por sus cargos del README. Ambos fueron fusionados por `diegoneves-design`. El #26 con dos aprobaciones (`oscarynchau-dev` y `diegoneves-design`) y el #27 con la de `oscarynchau-dev`; el revisor asignado al #27, `sebastiancarmonap-web`, no llegó a revisar. **Ninguna de las fusiones la hizo la IA.**
+- **Rama `feature/mantener-supabase`:** el flujo que evita que Supabase se pause, con su sección 6 en `docs/poc-supabase.md` y 7 pruebas. Es local y su PR se abre al final.
+- **PR del kit** (esta rama): sincronizada con `main` sin conflictos; los Encargos 1 a 25 quedaron en orden y sin repetir.
+
+**Qué se aceptó y qué se corrigió.**
+- Las pruebas del RUT se movieron a `tests/test_rut_ejemplo.py` antes de fusionar el #26, porque agregaban pruebas al final del mismo archivo que la prueba de concepto y habrían chocado.
+- No se publicaron comentarios pidiendo revisión en el #26 y el #27, porque cuando se iba a hacer ya estaban fusionados.
+- **Un incidente propio:** en la prueba de control del revisor del diff, git borró el `prototipo/js/config.js` local de Bastián al cambiar de rama (la prueba forzaba un archivo con ese nombre dentro de una rama desechable). Se regeneró desde `.env` con `generar-config.mjs`. No se versionó nada.
+- En el README se agregó a «Pendiente del avance» que Bastián debe ejecutar `seed_poc.sql` con los RUT nuevos y reiniciar la demo, y se amplió la fila de los criterios a HU-01 a HU-05.
+
+**Cómo se verificó.**
+- `pytest tests`: 184 pruebas pasan en esta rama.
+- Revisión de las líneas agregadas por cada rama antes de su PR, con un script que busca emojis, caracteres de control, claves, `config.js`, correos y teléfonos que no sean de ejemplo, RUT no permitidos y nombres ajenos al equipo. El script no se versiona. Se comprobó que detecta los siete tipos de defecto con una rama desechable.
+- Se comprobó que `docs/prueba-usuarios.md` y la pauta no nombran a ningún integrante, que el README enlaza la prueba de usuarios, la pauta, el kit, la línea base y el checklist del celular, y que ningún enlace está roto.
+- **No se verificó:** el contenido de las 27 imágenes; que el equipo haya verificado los criterios de `historias.md`; el flujo de Supabase, que no se ejecutó; ni nada que dependa de Vercel o del celular.
