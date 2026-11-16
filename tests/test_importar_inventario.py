@@ -88,7 +88,7 @@ def test_largo_de_extensiones(valor, esperado):
 
 def test_formato_estandar_de_sku_de_extension():
     assert imp.sku_extension_estandar("SD-63A20-00314")
-    assert not imp.sku_extension_estandar("SD-CC400V20-00241")
+    assert not imp.sku_extension_estandar("SD-ZZ400V20-99999")
     assert not imp.sku_extension_estandar("SD-125A20-00241")
 
 
