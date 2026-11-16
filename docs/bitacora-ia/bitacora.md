@@ -452,3 +452,54 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 
 **Cómo se verificó.** Se comparó con `curl` cada archivo del sitio publicado con el del repositorio: `index.html`, `js/app.js` y `js/datos.js` coinciden; `css/estilos.css` no. Se revisó con `grep` que no queden referencias a "borrador" de HU-02 a HU-05 ni al texto antiguo de HU-05. No se imprimió ni se contó las planas del PDF de la pauta.
 
+## Encargo 20. Corregir la modalidad y el motivo en el modelo de datos y dejarlo ejecutable
+
+**Objetivo.** Responder a la retroalimentación del Avance 3 sobre la modalidad y el motivo obligatorios en toda orden, y dejar el modelo como esquema SQL que se pueda probar.
+
+**Instrucción entregada.**
+- Contexto: `docs/datos/estructura_datos.md`, la retroalimentación de la profesora, `CLAUDE.md` (despacho convencional o alternativo, retiro preventivo o por falla) y la conversación con el subjefe de bodega (preguntas 3 y D1).
+- Intención: que `modalidad` aplique solo al despacho y el motivo solo al retiro, sin valores de relleno; que las claves externas del ejemplo existan; que el motivo del cambio sea obligatorio.
+- Restricciones: no tocar la aplicación Streamlit; los ejemplos se ajustan a la regla, no al revés.
+- Verificación: pruebas que fallen si una clave externa apunta a un registro que no existe o si una regla se rompe.
+
+**Respuesta obtenida.** `modalidad` solo en despacho y `motivo_retiro` (antes `motivo_alternativo`) solo en retiro; ejemplos ajustados (3002 retiro por falla, 3003 retiro por mantención preventiva); `supabase/schema.sql` con las reglas como restricciones y `supabase/seed_ejemplo.sql`; `tests/test_modelo_datos.py`; diagrama regenerado con Mermaid.
+
+**Qué se aceptó y qué se corrigió.**
+- Ya estaban corregidos desde el Encargo 15 las claves externas rotas, el equipo 501 y el motivo del cambio obligatorio; solo faltaba la modalidad. Se convirtieron en restricciones de la base.
+- La interpretación de que el retiro tiene solo los motivos falla y mantención preventiva es de la IA a partir de `CLAUDE.md` y de la pregunta 3. **Queda por validar con el jefe de bodega**, igual que si existe un retiro normal sin motivo.
+
+**Cómo se verificó.** `pytest tests`: pasan las pruebas, incluidas las de `test_modelo_datos.py` (en SQLite). El diagrama se revisó a ojo contra el Mermaid.
+
+---
+
+## Encargo 21. Prueba de concepto del prototipo con Supabase
+
+**Objetivo.** Conectar el prototipo a Supabase en lo mínimo (leer órdenes, validar SKU, registrar cambio y preparar guía) aplicando la validación en tres capas de la clase 7.
+
+**Instrucción entregada.**
+- Contexto: el prototipo (`prototipo/`), `supabase/schema.sql`, los apuntes de la clase 7 (CRUD, validación en tres capas, mensajes de error, estados de pantalla, pruebas de rotura) y las opciones del proyecto de Supabase (sin exponer tablas automáticamente, con RLS automático).
+- Intención: que la regla "la guía solo incluye productos validados" y "el motivo del cambio es obligatorio" las haga cumplir la base, no solo la pantalla.
+- Restricciones: no tocar la app Streamlit ni otras ramas; sin sesión, así que políticas abiertas solo de lectura y escritura únicamente por funciones; ninguna clave en el repositorio; no pedir la contraseña de la base ni la clave `service_role`; no marcar nada como probado en Supabase hasta confirmarlo.
+- Verificación: decir qué se probó y contra qué.
+
+**Respuesta obtenida.** `supabase/acceso.sql` (RLS, permisos y políticas), `supabase/funciones.sql` (cinco funciones), `supabase/seed_poc.sql`; `prototipo/js/api.js`, `reglas.js` y `app.js` reescritos; `prototipo/generar-config.mjs` para generar la configuración desde variables de entorno; `docs/poc-supabase.md`; pruebas estáticas en `tests/test_supabase_scripts.py`.
+
+**Qué se aceptó y qué se corrigió.**
+- Corregido por la IA en el esquema: un cambio de un SKU que no existe no se podía registrar, porque el equipo que sale era una clave externa obligatoria. Se agregó `sku_sale` y `id_equipo_sale` quedó opcional.
+- Corregido tras probar la pantalla: al reiniciar la demo, el aviso de confirmación se borraba por dibujar la pantalla dos veces.
+- Decisión: las tablas solo se leen desde el navegador y toda escritura pasa por funciones que validan; es más estricto que "políticas abiertas" y evita saltarse las reglas escribiendo directo en las tablas.
+- Pendiente de decisión del equipo: qué debe comprobar «Validar» en un retiro (hoy exige disponible, igual que el despacho).
+
+**Cómo se verificó.**
+- `pytest tests`: pasan, incluidas las pruebas estáticas de los scripts y de que no haya claves en el repositorio.
+- Sintaxis de los scripts de PostgreSQL con un analizador (`pglast`), incluido el código de las funciones. Eso no detectó ninguno de los dos defectos de abajo: solo revisa la forma, no cómo se comporta en Supabase.
+- La pantalla, en un navegador real, contra una réplica en memoria de Supabase escrita solo para probar (no es parte del proyecto): flujo completo de las tareas 1 y 2, campos vacíos, 61 productos, motivo vacío, tres envíos seguidos, corte de conexión y error del sistema. Es una prueba de la pantalla; no prueba las funciones SQL.
+- Antes de que existieran las tablas se hizo una sola lectura contra el proyecto real: devolvió el error esperado `PGRST205` y la pantalla mostró el mensaje con «Reintentar». Con eso se comprobó que la clave publicable es válida.
+- **Los cuatro scripts los ejecutó Bastián en el editor SQL de Supabase, sin error, con los conteos esperados.** Después se probó la base real con la clave publicable, llamando a cada función (`supabase/probar_en_supabase.py`): 73 de 80 comprobaciones pasaron en la primera ejecución.
+- **Dos defectos que solo aparecieron al probar en Supabase y que la IA no había previsto:** (1) `reiniciar_demo` fallaba desde la API con `DELETE requires a WHERE clause`, porque Supabase rechaza un `DELETE` sin `WHERE` para las llamadas de la API; (2) una línea con solo una tabulación se aceptaba como SKU, porque `btrim` solo quita espacios normales. Se corrigieron en `funciones.sql` (`where true` y una función `_limpiar`) y se agregó una restricción de PostgreSQL para el motivo del cambio.
+- La primera ejecución de la prueba ignoraba el error de `reiniciar_demo` y siguió con datos sucios; se corrigió el script para que verifique el reinicio. Esa ejecución dejó los datos de la demo modificados en Supabase.
+- **Correcciones confirmadas.** Bastián volvió a ejecutar `funciones.sql` y `select public.reiniciar_demo();` en Supabase, sin error. La prueba contra la base real se repitió con 3 comprobaciones nuevas para los espacios: **82 de 82 correctas**.
+- **La pantalla se probó contra la base real** en un navegador: el flujo completo de las tareas 1 y 2 (27 comprobaciones) y las pruebas de rotura (18), todas correctas. Incluye un caso en que se salta la validación del navegador y la base rechaza el dato, y que tres envíos seguidos dejan un solo cambio guardado. El corte de conexión y el fallo interno se simularon interceptando la red del navegador.
+- **Sin probar:** celular, poca señal real, otros navegadores y uso simultáneo de dos personas.
+- La demo quedó reiniciada: 2 órdenes con 4 líneas pendientes, sin guías ni cambios.
+

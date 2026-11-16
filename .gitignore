@@ -35,3 +35,6 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Configuracion del prototipo (se genera con prototipo/generar-config.mjs)
+prototipo/js/config.js

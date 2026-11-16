@@ -61,7 +61,7 @@ def test_el_motivo_del_cambio_es_obligatorio(con_datos):
     for motivo in (None, "", "   "):
         with pytest.raises(sqlite3.IntegrityError):
             con_datos.execute(
-                "insert into registro_cambios values (9, 3002, 504, 507, 1, '2026-10-05 12:00:00', ?)", (motivo,)
+                "insert into registro_cambios values (9, 3002, 'SD-32A10-0102', 504, 507, 1, '2026-10-05 12:00:00', ?)", (motivo,)
             )
 
 
@@ -97,3 +97,18 @@ def test_una_clave_externa_rota_se_rechaza(con_datos):
 def test_un_sku_que_no_existe_no_lleva_equipo(con_datos):
     with pytest.raises(sqlite3.IntegrityError):
         con_datos.execute("insert into detalle_orden values (9100, 3002, 504, 'SD-63A20-9999', 'no_existe', true)")
+
+
+def test_se_puede_registrar_el_cambio_de_un_sku_que_no_existe(con_datos):
+    # el equipo que sale no existe en el inventario: queda solo su SKU, sin clave externa
+    con_datos.execute(
+        "insert into registro_cambios values (9, 3002, 'SD-63A20-9999', null, 502, 1, '2026-10-05 12:00:00', 'Código mal digitado')"
+    )
+    assert con_datos.execute("PRAGMA foreign_key_check").fetchall() == []
+
+
+def test_el_equipo_que_entra_es_obligatorio_y_distinto_del_que_sale(con_datos):
+    with pytest.raises(sqlite3.IntegrityError):
+        con_datos.execute("insert into registro_cambios values (9, 3002, 'X', null, null, 1, '2026-10-05 12:00:00', 'm')")
+    with pytest.raises(sqlite3.IntegrityError):
+        con_datos.execute("insert into registro_cambios values (9, 3002, 'SD-32A10-0102', 504, 504, 1, '2026-10-05 12:00:00', 'm')")

@@ -1,5 +1,7 @@
 # Prototipo navegable · Avance 5, Parte A
 
+> **Nota (prueba de concepto).** Este documento describe el prototipo del Avance 5, que guardaba todo en memoria. En la prueba de concepto el mismo prototipo guarda en Supabase: ver [docs/poc-supabase.md](poc-supabase.md). Las pantallas, las historias y los datos de ejemplo siguen siendo los mismos; cambia que el motivo del cambio ahora es obligatorio y que el retiro pide su motivo en lugar de la modalidad.
+
 Grupo 6 · Automatizacion_bodega
 
 Prototipo de fidelidad media del flujo principal: cargar el pedido, validarlo contra el inventario, corregir un equipo a último minuto y dejar la guía lista para el ERP. Se puede recorrer sin iniciar sesión. Todo lo que se guarda, descarga o firma usa datos de ejemplo; lo que se quiere observar (navegación, validación de campos y estados) funciona de verdad.
