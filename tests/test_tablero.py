@@ -111,7 +111,7 @@ def test_el_importador_pide_openpyxl_aparte_de_la_app():
 
 
 def test_sin_emojis_en_los_archivos_nuevos():
-    patron = re.compile("[🌀-🫿" + chr(0x2600) + "-" + chr(0x27BF) + "]")
+    patron = re.compile("[" + chr(0x1F300) + "-" + chr(0x1FAFF) + chr(0x2600) + "-" + chr(0x27BF) + "]")
     for ruta in [PROTO / "tablero.html", PROTO / "css" / "tablero.css", PROTO / "js" / "tablero.js", PROTO / "js" / "graficos.js", PROTO / "js" / "filtros.js",
                  RAIZ / "supabase" / "dashboard.sql", RAIZ / "docs" / "analisis-inventario.md"]:
         assert not patron.search(leer(ruta)), ruta.name
