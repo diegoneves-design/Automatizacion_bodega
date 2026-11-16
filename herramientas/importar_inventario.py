@@ -11,7 +11,7 @@ suben al repositorio.
   carga_extensiones.sql              las extensiones electricas
   reporte_calidad.json               SOLO agregados: sin SKU, sin descripciones, sin textos de ubicacion
 
-Requiere openpyxl (pip install openpyxl). No esta en requirements.txt porque la app no lo usa.
+Requiere openpyxl: py -m pip install -r requirements-herramientas.txt (aparte de requirements.txt, porque la app no lo usa).
 Reglas y supuestos: docs/analisis-inventario.md
 """
 import argparse
@@ -248,7 +248,7 @@ def leer_excel(ruta):
     try:
         import openpyxl
     except ImportError:
-        sys.exit("Falta openpyxl. Instalalo con:  py -m pip install openpyxl")
+        sys.exit("Falta openpyxl. Instalalo con:  py -m pip install -r requirements-herramientas.txt")
     libro = openpyxl.load_workbook(ruta, data_only=True, read_only=True)
 
     def hoja(nombre_parcial):
