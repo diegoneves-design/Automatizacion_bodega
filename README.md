@@ -23,6 +23,8 @@ Documentación del proyecto:
 - Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app)
 - Análisis ético del prototipo (Avance 5): [docs/etica.md](docs/etica.md)
 - Prueba de concepto con Supabase (reglas, mensajes de error y pruebas de rotura): [docs/poc-supabase.md](docs/poc-supabase.md)
+- Inventario real de la bodega: método, supuestos y orden de carga a Supabase: [docs/analisis-inventario.md](docs/analisis-inventario.md)
+- Dashboard (en el menú del prototipo, junto a Pedidos; archivo `prototipo/dashboard.html`): gráficos con filtros que se combinan; sus reglas están en `docs/analisis-inventario.md`
 - Diseño de la prueba de usuarios (Avance 6): [docs/prueba-usuarios.md](docs/prueba-usuarios.md)
 - Guion para cada sesión de la prueba (Avance 6): [docs/pauta-validacion.md](docs/pauta-validacion.md)
 
@@ -211,6 +213,7 @@ Al 5 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance
 | | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
 | Diseño de la prueba con usuarios y guion de cada sesión (`docs/prueba-usuarios.md`, `docs/pauta-validacion.md`) | |
 | Prueba de concepto escrita: el prototipo lee órdenes, valida SKU, registra cambios (con motivo obligatorio) y prepara la guía en Supabase, con validación en tres capas (`prototipo/`, `supabase/`, `docs/poc-supabase.md`), probada en Supabase: las reglas de la base y la pantalla en un navegador contra la base real | Probarla en un celular, con poca señal y con personas ajenas al equipo (prueba de usuarios, `docs/prueba-usuarios.md`) |
+| Inventario real cargado en Supabase (1.617 equipos y 319 extensiones eléctricas) y Dashboard interactivo con 12 gráficos, filtros cruzados, tabla de casos y vistas por rol (`prototipo/dashboard.html`, `supabase/dashboard.sql`, `docs/analisis-inventario.md`) | Ejecutar `supabase/dashboard.sql` en Supabase, revisar el Dashboard en la página publicada y confirmar con Oscar o el jefe de bodega los supuestos del análisis (valores numéricos = arrendado, significado de POR HABILITAR y de BAJA, y si el inventario real puede mostrarse en una demo pública) |
 
 ### Prueba de concepto con Supabase: qué hay que configurar
 

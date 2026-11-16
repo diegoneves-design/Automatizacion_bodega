@@ -316,6 +316,18 @@ as $$
 begin
   perform pg_advisory_xact_lock(7001);
 
+  -- Solo lo de demo: los equipos 501-507 vuelven a su estado inicial. Los equipos reales (id_equipo >= 1000) no se tocan.
+  insert into equipos (id_equipo, sku, descripcion, estado, ubicacion) values
+    (501, 'SD-63A20-0314', 'Extensión 63 A x 20 m', 'disponible',    'bodega'),
+    (502, 'SD-63A20-0315', 'Extensión 63 A x 20 m', 'disponible',    'bodega'),
+    (503, 'SD-63A20-0316', 'Extensión 63 A x 20 m', 'en_mantencion', 'taller'),
+    (504, 'SD-32A10-0102', 'Extensión 32 A x 10 m', 'disponible',    'bodega'),
+    (505, 'SD-32A10-0108', 'Extensión 32 A x 10 m', 'disponible',    'bodega'),
+    (506, 'ST-0042',       'Tablero',               'disponible',    'bodega'),
+    (507, 'MP-0107',       'Manga perforada',       'disponible',    'bodega')
+  on conflict (id_equipo) do update
+    set sku = excluded.sku, descripcion = excluded.descripcion, estado = excluded.estado, ubicacion = excluded.ubicacion;
+
   -- "where true": desde la API Supabase rechaza un DELETE sin WHERE (pg_safeupdate)
   delete from guias            where true;
   delete from registro_cambios where true;

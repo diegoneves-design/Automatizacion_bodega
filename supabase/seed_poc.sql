@@ -6,6 +6,15 @@
 --   orden 3002: retiro por falla, con un SKU que no existe (SD-63A20-9999).
 -- Reemplaza cualquier dato anterior (por ejemplo, el de seed_ejemplo.sql). Se puede volver a ejecutar.
 
+-- Proteccion: este script BORRA todos los equipos. Si ya se cargo el inventario real (id_equipo >= 1000), se detiene.
+-- Para volver a dejar la demo sin tocar el inventario real, use:  select public.reiniciar_demo();
+do $$
+begin
+  if exists (select 1 from equipos where id_equipo >= 1000) then
+    raise exception 'seed_poc.sql borra todos los equipos y ya hay inventario real cargado (id_equipo >= 1000). No se hizo nada. Use select public.reiniciar_demo();';
+  end if;
+end $$;
+
 truncate table guias, registro_cambios, detalle_orden, ordenes, equipos, usuarios, clientes;
 
 insert into clientes (id_cliente, razon_social, rut, direccion) values

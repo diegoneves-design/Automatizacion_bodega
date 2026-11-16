@@ -503,3 +503,56 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - **Sin probar:** celular, poca señal real, otros navegadores y uso simultáneo de dos personas.
 - La demo quedó reiniciada: 2 órdenes con 4 líneas pendientes, sin guías ni cambios.
 
+---
+
+## Encargo 28. Cargar el inventario real a Supabase (primera parte: carga)
+
+**Objetivo.** Pasar el Excel de inventario de la bodega a la base de datos de la prueba de concepto, sin subir datos reales al repositorio, como base de un tablero que se hará en una segunda parte.
+
+**Instrucción entregada.**
+- Contexto: el Excel de la bodega (tres hojas: equipos, extensiones eléctricas y catálogo de familias), `supabase/` y la prueba de concepto ya fusionada.
+- Intención: cargar 1.617 equipos y 319 extensiones; que `reiniciar_demo` no borre el inventario real; que `seed_poc.sql` no pueda borrarlo por accidente.
+- Restricciones: el Excel y lo generado viven solo en `datos_locales/` (ignorado por Git); el reporte solo trae totales; la IA no ejecuta nada en Supabase, lo hace Bastián; detenerse antes de que Bastián corra la carga.
+- Numeración: se usa el Encargo 28 porque el 22 al 26 están en el PR del kit (#28) y el 27 está reservado para el flujo que mantiene activo a Supabase.
+
+**Respuesta obtenida.** `herramientas/importar_inventario.py`, `supabase/inventario.sql`, cambios en `reiniciar_demo` (`supabase/funciones.sql`) y en `supabase/seed_poc.sql`, `docs/analisis-inventario.md` y `tests/test_importar_inventario.py`. El importador generó en `datos_locales/` seis archivos de carga y el de extensiones.
+
+**Qué se aceptó y qué se corrigió.**
+- Supuesto de la columna Ubicación (valor numérico o nombre = arrendado): lo definió Bastián y queda escrito como supuesto a confirmar con Oscar en `docs/analisis-inventario.md`.
+- Dos cifras preliminares de Bastián diferían del cálculo: EC, AP y AC suman 1.324 equipos, el 81,9 % (no 83 %), y Bastián lo corrigió a 82 %; y el «modelo más repetido» dependía de cómo se defina modelo, que se resolvió en el Encargo 29.
+- Corregido por la IA durante la prueba: un patrón de capacidad (TR) fallaba por un grupo faltante; se vio en las pruebas.
+- El importador usa `openpyxl`, que no está en `requirements.txt` (la app no lo usa); queda indicado en el propio script.
+
+**Cómo se verificó.**
+- `pytest tests`: 132 pruebas pasan (60 nuevas, con filas ficticias): mapeo de ubicación, extracción de capacidad, largos, trozos de máximo 300 filas, escape de comillas, que el reporte no traiga SKU ni descripciones ni ubicaciones, y revisiones estáticas de los SQL.
+- Los archivos generados se ejecutaron en una base SQLite en memoria con el esquema real: 1.617 equipos con id desde 1000, 319 extensiones, y una segunda ejecución no duplica. Las restricciones de estado y lugar pasan.
+- **No se verificó:** nada contra PostgreSQL ni Supabase (`inventario.sql`, la nueva `reiniciar_demo` y el guard de `seed_poc.sql` solo tienen revisión estática); el contenido real de los datos más allá de los totales; ni el tablero, que no existe todavía.
+
+---
+
+## Encargo 29. Dashboard interactivo de inventario
+
+**Objetivo.** Agregar al prototipo un Dashboard para todos los roles, con 12 gráficos que se filtran entre sí, sobre el inventario real ya cargado en Supabase.
+
+**Instrucción entregada.**
+- Contexto: el inventario cargado y verificado (1.617 equipos, 319 extensiones, 7 de demo; `reiniciar_demo` lo deja intacto), el prototipo y sus reglas de estilo.
+- Intención: una función de datos de solo lectura; 12 gráficos con etiquetas, filtro cruzado, tabla de casos con CSV y panel de detalle, vistas por rol, filtros en la dirección y lectura de datos que se recalcula.
+- Ajustes pedidos por Bastián: 82 % en lugar de 83 %; el Pareto agrupa por modelo y lo documenta; capacidad sin mezclar BTU/H y TR; nota con el criterio de las 7 familias; `openpyxl` en un archivo aparte.
+- Restricciones: sin CDN (ECharts copiado), sin datos reales ni claves en el repositorio, no tocar Supabase, no abrir el PR hasta que Bastián lo confirme.
+
+**Respuesta obtenida.** `supabase/dashboard.sql` (`inventario_dashboard()`), `prototipo/dashboard.html`, `css/dashboard.css`, `js/filtros.js` (lógica sin navegador), `js/graficos.js`, `js/dashboard.js`, `js/vendor/` (ECharts 5.5.1 con un build propio de 640 KB), `prototipo/pruebas/filtros.test.js`, `tests/test_dashboard.py` y `requirements-herramientas.txt`; un enlace desde `index.html`; la sección 9 de `docs/analisis-inventario.md`.
+
+**Qué se aceptó y qué se corrigió.**
+- Modelo: primera palabra tras «MODELO» en la descripción; da 362 equipos (22,4 %) para el mayor, como indicó Bastián.
+- Capacidad: se pasó TR a BTU/H (1 TR = 12.000 BTU/H) y la nota del gráfico lo declara; cada vista usa una sola unidad.
+- Dejado fuera por decisión de la IA, anotado como mejora futura: indicar en el panel si el equipo aparece en una orden del prototipo.
+- Corregido tras verlo en el navegador: leyenda del gráfico 4 con colores equivocados; etiquetas del Pareto y de las medianas encima de las barras; texto blanco ilegible sobre celdas medias del mapa de calor; treemap con colores oscuros; etiquetas de la dona cortadas a 375 px; mensaje de extensiones que decía «con el filtro de corriente» sin que hubiera uno.
+- Bastián pidió llamar a la vista «Dashboard» en toda la interfaz (antes se llamaba de otra forma) y que fuera una vista más del programa: se renombraron `dashboard.html`, `dashboard.css` y `dashboard.js`, y se agregó un menú principal compartido (Pedidos y Dashboard, con estado activo) en `index.html` y `dashboard.html`. Las menciones anteriores a ese nombre en el Encargo 28 se dejaron como estaban.
+- Un intento de la IA de cerrar un servidor de prueba terminando todos los procesos `node` fue bloqueado y no se repitió: se usó otro puerto.
+
+**Cómo se verificó.**
+- `node --test`: 30 pruebas de la lógica de filtros con datos ficticios. `pytest tests`: 146 pasan, incluida la revisión de que la función devuelve solo las 9 columnas permitidas, que la página no tiene estilos ni scripts en línea y que ECharts pesa menos de 1 MB.
+- Las cifras del Dashboard se recalcularon con la misma lógica sobre los datos reales (solo totales): estados, tasas por familia, Pareto, capacidad y extensiones coinciden con `docs/analisis-inventario.md`. El JSON real pesa 236 KB.
+- El Dashboard se probó en Chrome contra una página local con datos ficticios, no contra Supabase: clic en la dona y filtro, enlace con filtros (`#estado=fuera_servicio&familia=AC`), panel de detalle con Escape y foco, y 375 px (sin desborde horizontal, tabla desplazable, panel a pantalla completa).
+- **No se verificó:** la función `inventario_dashboard()` en Supabase (solo revisión estática); la página publicada en Vercel; la descarga del CSV en el navegador (solo la función que lo arma, con pruebas); la navegación solo con teclado más allá de los botones y el panel; el celular real ni otros navegadores que no sean Chrome.
+
