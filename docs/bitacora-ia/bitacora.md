@@ -629,3 +629,33 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - Antes del push se comprobó que los tres commits de `mejora-avance6` no llevan trailers de Claude ni `config.js` ni `.env`.
 - El borrador y el revisor se verificaron en la página del PR #25. Las 3 verificaciones automáticas de GitHub estaban pendientes cuando se cerró la pestaña.
 - **No se verificó:** que la semilla con los RUT nuevos corra en Supabase; se ejecuta después de este aviso.
+
+
+---
+
+## Encargo 26. Cerrar el Avance 6 y la prueba de concepto: sincronizaciones, PR y fusiones
+
+**Objetivo.** Dejar el Avance 6 y la prueba de concepto fusionados en `main` por pasos, cada uno revisado por alguien distinto de Bastián, y preparar el PR del kit de validación.
+
+**Instrucción entregada.**
+- Contexto: la retroalimentación de la profesora, el PR #24 ya fusionado y las ramas `mejora-avance6`, `rut-ficticios`, `poc-supabase`, `kit-validacion`, `criterios-historias` y `mantener-supabase`.
+- Intención: sincronizar cada rama con `main` antes de su PR, corriendo las pruebas y revisando el diff; abrir cada PR con revisor y con descripción de cinco partes (qué cambia, cómo se probó, qué revisar, qué no se verificó, orden de fusión).
+- Restricciones: la IA no fusiona sin la aprobación de un tercero y sin el mensaje «fusiona #N»; los criterios de `historias.md` no se suben hasta «aprobado historias»; no se toca Supabase ni `feature/avance5-pendientes-app` ni `feature/login-etapa1`; `git add` solo con nombres de archivo.
+
+**Respuesta obtenida.**
+- **PR #25** (`mejora-avance6`): ya estaba fusionado por `diegoneves-design` cuando se retomó, con la versión anterior de los criterios. Los criterios reescritos van en la rama `feature/criterios-historias`, con un commit local pendiente de «aprobado historias».
+- **PR #26** (RUT de ejemplo) y **PR #27** (prueba de concepto): abiertos con revisores asignados por sus cargos del README. Ambos fueron fusionados por `diegoneves-design`. El #26 con dos aprobaciones (`oscarynchau-dev` y `diegoneves-design`) y el #27 con la de `oscarynchau-dev`; el revisor asignado al #27, `sebastiancarmonap-web`, no llegó a revisar. **Ninguna de las fusiones la hizo la IA.**
+- **Rama `feature/mantener-supabase`:** el flujo que evita que Supabase se pause, con su sección 6 en `docs/poc-supabase.md` y 7 pruebas. Es local y su PR se abre al final.
+- **PR del kit** (esta rama): sincronizada con `main` sin conflictos; los Encargos 1 a 25 quedaron en orden y sin repetir.
+
+**Qué se aceptó y qué se corrigió.**
+- Las pruebas del RUT se movieron a `tests/test_rut_ejemplo.py` antes de fusionar el #26, porque agregaban pruebas al final del mismo archivo que la prueba de concepto y habrían chocado.
+- No se publicaron comentarios pidiendo revisión en el #26 y el #27, porque cuando se iba a hacer ya estaban fusionados.
+- **Un incidente propio:** en la prueba de control del revisor del diff, git borró el `prototipo/js/config.js` local de Bastián al cambiar de rama (la prueba forzaba un archivo con ese nombre dentro de una rama desechable). Se regeneró desde `.env` con `generar-config.mjs`. No se versionó nada.
+- En el README se agregó a «Pendiente del avance» que Bastián debe ejecutar `seed_poc.sql` con los RUT nuevos y reiniciar la demo, y se amplió la fila de los criterios a HU-01 a HU-05.
+
+**Cómo se verificó.**
+- `pytest tests`: 184 pruebas pasan en esta rama.
+- Revisión de las líneas agregadas por cada rama antes de su PR, con un script que busca emojis, caracteres de control, claves, `config.js`, correos y teléfonos que no sean de ejemplo, RUT no permitidos y nombres ajenos al equipo. El script no se versiona. Se comprobó que detecta los siete tipos de defecto con una rama desechable.
+- Se comprobó que `docs/prueba-usuarios.md` y la pauta no nombran a ningún integrante, que el README enlaza la prueba de usuarios, la pauta, el kit, la línea base y el checklist del celular, y que ningún enlace está roto.
+- **No se verificó:** el contenido de las 27 imágenes; que el equipo haya verificado los criterios de `historias.md`; el flujo de Supabase, que no se ejecutó; ni nada que dependa de Vercel o del celular.

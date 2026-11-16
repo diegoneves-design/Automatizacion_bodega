@@ -225,8 +225,9 @@ La profesora indicó en la retroalimentación del Avance 5 que, mientras la prue
 
 | Qué | Por qué falta |
 |---|---|
-| Que el equipo confirme los criterios de HU-02 a HU-05 | Se propusieron con ayuda de IA y la profesora pidió que los revise el equipo |
+| Que el equipo verifique y apruebe los criterios de HU-01 a HU-05 de `docs/historias.md` | Se propusieron con ayuda de IA contra el código y la profesora pidió que los escriba el equipo |
 | Confirmar con administración el plazo de conservación de 24 meses | Es una propuesta del equipo (`docs/etica.md`, ficha B2) |
+| Ejecutar `supabase/seed_poc.sql` en Supabase con los RUT de ejemplo nuevos (`11.111.111-1` y `22.222.222-2`) y luego `select public.reiniciar_demo();` | La base real sigue con los RUT anteriores hasta que se vuelva a ejecutar la semilla |
 | Configurar Vercel (variables `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` y comando de construcción) y volver a publicar desde `main` | Hasta entonces el sitio publicado no es la versión conectada a Supabase |
 
 ### Congelado, no se hará por ahora
