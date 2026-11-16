@@ -3,25 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tablero de inventario · Automatizacion_bodega</title>
-  <meta name="description" content="Tablero interactivo del inventario de la bodega: estado, familias, modelos, extensiones eléctricas y actividad del prototipo.">
+  <title>Dashboard · Automatizacion_bodega</title>
+  <meta name="description" content="Dashboard interactivo del inventario de la bodega: estado, familias, modelos, extensiones eléctricas y actividad del prototipo.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
   <link rel="stylesheet" href="css/estilos.css">
-  <link rel="stylesheet" href="css/tablero.css">
+  <link rel="stylesheet" href="css/dashboard.css">
 </head>
-<body class="tablero">
+<body class="dashboard">
   <div class="app">
     <header class="cabecera">
       <span class="marca">Automatizacion_bodega</span>
-      <nav aria-label="Secciones">
-        <a class="enlace" href="index.html">Cargar pedido</a>
-        <a class="enlace" href="tablero.html" aria-current="page">Tablero de inventario</a>
-      </nav>
+      <span class="rol">Bodega</span>
     </header>
+    <nav class="menu" aria-label="Secciones del programa">
+      <a href="index.html">Pedidos</a>
+      <a href="dashboard.html" aria-current="page">Dashboard</a>
+    </nav>
 
     <main id="vista">
-      <noscript><p class="error">Este tablero necesita JavaScript activado para funcionar.</p></noscript>
-      <h1>Tablero de inventario</h1>
+      <noscript><p class="error">Este Dashboard necesita JavaScript activado para funcionar.</p></noscript>
+      <h1>Dashboard</h1>
       <p class="ayuda-pantalla">Complemento del programa para todos los roles. Haz clic en un gráfico para filtrar; todo lo demás se recalcula.</p>
 
       <section aria-labelledby="vistas-titulo" class="bloque-vistas">
@@ -100,6 +101,6 @@
   <script src="js/api.js"></script>
   <script src="js/filtros.js"></script>
   <script src="js/graficos.js"></script>
-  <script src="js/tablero.js"></script>
+  <script src="js/dashboard.js"></script>
 </body>
 </html>

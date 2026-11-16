@@ -143,8 +143,8 @@
       return ejecutar(function (c) { return c.rpc('reiniciar_demo'); });
     },
 
-    /* Todo lo que necesita el tablero de inventario, en una sola llamada (supabase/dashboard.sql) */
-    leerTablero: function () {
+    /* Todo lo que necesita el Dashboard, en una sola llamada (supabase/dashboard.sql) */
+    leerDashboard: function () {
       return ejecutar(function (c) { return c.rpc('inventario_dashboard'); });
     }
   };

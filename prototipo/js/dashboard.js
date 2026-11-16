@@ -1,4 +1,4 @@
-/* Tablero de inventario: carga los datos una vez, filtra en memoria y dibuja indicadores, graficos, lectura y tabla.
+/* Dashboard: carga los datos una vez, filtra en memoria y dibuja indicadores, graficos, lectura y tabla.
    La logica de filtros esta en filtros.js (se prueba aparte) y los graficos en graficos.js.
    Todo el HTML que arma este archivo escapa los textos y no usa atributos style (la pagina tiene CSP sin 'unsafe-inline'). */
 (function () {
@@ -36,7 +36,7 @@
 
   function cargar() {
     mostrarCarga();
-    window.API.leerTablero().then(function (r) {
+    window.API.leerDashboard().then(function (r) {
       if (r.error) { mostrarError(r.error); return; }
       var d = r.datos || {};
       datos.equipos = F.prepararEquipos(d.equipos);

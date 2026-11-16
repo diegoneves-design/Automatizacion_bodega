@@ -1,8 +1,8 @@
 # Biblioteca de gráficos (ECharts 5.5.1)
 
-`echarts.custom.min.js` es un build personalizado de [Apache ECharts](https://echarts.apache.org) 5.5.1 (licencia Apache 2.0, © The Apache Software Foundation). Se copió al repositorio para que el tablero no dependa de una CDN.
+`echarts.custom.min.js` es un build personalizado de [Apache ECharts](https://echarts.apache.org) 5.5.1 (licencia Apache 2.0, © The Apache Software Foundation). Se copió al repositorio para que el Dashboard no dependa de una CDN.
 
-El build completo pesa 1,03 MB; este, con solo lo que usa el tablero, pesa unos 640 KB: gráficos de barras, línea, dona, mapa de calor, treemap, caja y dispersión; ejes, leyenda, tooltip, mapa de color, línea de marca y accesibilidad; dibujo en canvas.
+El build completo pesa 1,03 MB; este, con solo lo que usa el Dashboard, pesa unos 640 KB: gráficos de barras, línea, dona, mapa de calor, treemap, caja y dispersión; ejes, leyenda, tooltip, mapa de color, línea de marca y accesibilidad; dibujo en canvas.
 
 ## Cómo se genera (solo si hay que cambiar los componentes)
 

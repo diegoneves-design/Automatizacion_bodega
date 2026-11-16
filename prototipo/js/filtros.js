@@ -1,4 +1,4 @@
-/* Logica del tablero de inventario: filtros, conteos, estadisticas y textos.
+/* Logica del Dashboard: filtros, conteos, estadisticas y textos.
    No usa el navegador (ni document ni window): se prueba con  node --test  (prototipo/pruebas/filtros.test.js).
    Funciona como modulo de Node y como variable global Filtros en la pagina. */
 (function (raiz, fabrica) {

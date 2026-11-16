@@ -72,6 +72,15 @@ body {
   color: var(--apoyo);
 }
 
+/* Navegacion principal entre las vistas del programa (Pedidos, Dashboard) */
+.menu { display: flex; flex-wrap: wrap; gap: 0 calc(var(--u) * 2); border-bottom: 1px solid var(--borde-suave); }
+.menu a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--u);
+  border-bottom: 4px solid transparent; color: var(--apoyo); font-weight: 600; text-decoration: none;
+}
+.menu a:hover { color: var(--texto); border-bottom-color: var(--borde-suave); }
+.menu a[aria-current="page"] { color: var(--texto); border-bottom-color: var(--accion); font-weight: 700; }
+
 main { flex: 1; padding-top: calc(var(--u) * 2); }
 
 .pie {

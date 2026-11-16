@@ -1,4 +1,4 @@
-/* Constructores de los 12 graficos del tablero (ECharts). Cada uno recibe el contexto y devuelve:
+/* Constructores de los 12 graficos del Dashboard (ECharts). Cada uno recibe el contexto y devuelve:
      titulo   la conclusion que muestra el grafico (se recalcula con los filtros)
      nota     como leerlo y que filtros lo afectan
      opcion   la configuracion de ECharts (null si no hay datos)

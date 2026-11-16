@@ -1,7 +1,7 @@
--- Datos del tablero de inventario (solo PostgreSQL / Supabase). Ejecutar despues de inventario.sql y funciones.sql.
+-- Datos del Dashboard (solo PostgreSQL / Supabase). Ejecutar despues de inventario.sql y funciones.sql.
 -- Se puede volver a ejecutar sin error y no cambia ningun dato.
 --
--- inventario_dashboard() devuelve UN jsonb con todo lo que el tablero necesita; el navegador lo carga una vez y filtra en memoria.
+-- inventario_dashboard() devuelve UN jsonb con todo lo que el Dashboard necesita; el navegador lo carga una vez y filtra en memoria.
 --   equipos      columnas + filas, SOLO estas 9 columnas: id_equipo, sku, descripcion, familia, categoria, estado,
 --                situacion_origen, capacidad_valor, capacidad_unidad (equipos reales: id_equipo >= 1000, sin los de demo)
 --   extensiones  columnas + filas: sku, corriente, largo_m

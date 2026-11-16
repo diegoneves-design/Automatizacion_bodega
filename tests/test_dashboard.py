@@ -1,4 +1,4 @@
-"""Revisiones del tablero de inventario: funcion de datos, pagina, scripts y biblioteca de graficos. Sin datos reales."""
+"""Revisiones del Dashboard: funcion de datos, pagina, scripts y biblioteca de graficos. Sin datos reales."""
 import re
 import shutil
 import subprocess
@@ -54,7 +54,7 @@ def test_los_motivos_de_cambio_del_sql_son_los_del_prototipo():
 
 # ---------- pagina y scripts ----------
 def test_pagina_sin_estilos_ni_scripts_en_linea_y_con_csp():
-    html = leer(PROTO / "tablero.html")
+    html = leer(PROTO / "dashboard.html")
     assert "Content-Security-Policy" in html and "'unsafe-inline'" not in html and "'unsafe-eval'" not in html
     assert not re.search(r"\sstyle=", html) and not re.search(r"<style", html)
     for tag in re.findall(r"<script\b[^>]*>", html):
@@ -65,7 +65,7 @@ def test_pagina_sin_estilos_ni_scripts_en_linea_y_con_csp():
     assert 'src="js/vendor/echarts.custom.min.js"' in html
 
 
-@pytest.mark.parametrize("archivo", ["tablero.js", "graficos.js"])
+@pytest.mark.parametrize("archivo", ["dashboard.js", "graficos.js"])
 def test_el_codigo_no_genera_atributos_style(archivo):
     assert not re.search(r"style=[\"']", leer(PROTO / "js" / archivo)), "la CSP bloquea los atributos style en HTML"
 
@@ -92,14 +92,14 @@ def test_los_doce_graficos_estan_definidos():
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="node no esta instalado")
-def test_sintaxis_de_los_scripts_del_tablero():
-    for nombre in ("filtros.js", "graficos.js", "tablero.js", "api.js"):
+def test_sintaxis_de_los_scripts_del_dashboard():
+    for nombre in ("filtros.js", "graficos.js", "dashboard.js", "api.js"):
         r = subprocess.run(["node", "--check", str(PROTO / "js" / nombre)], capture_output=True, text=True)
         assert r.returncode == 0, r.stderr
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="node no esta instalado")
-def test_pruebas_de_node_del_tablero():
+def test_pruebas_de_node_del_dashboard():
     r = subprocess.run(["node", "--test", str(PROTO / "pruebas" / "filtros.test.js")], capture_output=True, text=True, encoding="utf-8")
     assert r.returncode == 0, r.stdout[-2000:]
 
@@ -112,6 +112,22 @@ def test_el_importador_pide_openpyxl_aparte_de_la_app():
 
 def test_sin_emojis_en_los_archivos_nuevos():
     patron = re.compile("[" + chr(0x1F300) + "-" + chr(0x1FAFF) + chr(0x2600) + "-" + chr(0x27BF) + "]")
-    for ruta in [PROTO / "tablero.html", PROTO / "css" / "tablero.css", PROTO / "js" / "tablero.js", PROTO / "js" / "graficos.js", PROTO / "js" / "filtros.js",
+    for ruta in [PROTO / "dashboard.html", PROTO / "css" / "dashboard.css", PROTO / "js" / "dashboard.js", PROTO / "js" / "graficos.js", PROTO / "js" / "filtros.js",
                  RAIZ / "supabase" / "dashboard.sql", RAIZ / "docs" / "analisis-inventario.md"]:
         assert not patron.search(leer(ruta)), ruta.name
+
+
+def test_el_dashboard_es_una_vista_mas_del_menu_y_se_puede_volver():
+    """El menu es igual en las dos paginas y cada una marca la suya como activa."""
+    index, dash = leer(PROTO / "index.html"), leer(PROTO / "dashboard.html")
+    for html, activa in ((index, "index.html"), (dash, "dashboard.html")):
+        menu = re.search(r'<nav class="menu"[^>]*>(.*?)</nav>', html, re.S).group(1)
+        enlaces = re.findall(r'<a href="([^"]+)"([^>]*)>([^<]+)</a>', menu)
+        assert [(h, t) for h, _, t in enlaces] == [("index.html", "Pedidos"), ("dashboard.html", "Dashboard")]
+        assert [h for h, extra, _ in enlaces if 'aria-current="page"' in extra] == [activa]
+
+
+def test_la_interfaz_no_usa_la_palabra_tablero():
+    for ruta in [PROTO / "index.html", PROTO / "dashboard.html", PROTO / "js" / "dashboard.js", PROTO / "js" / "graficos.js", PROTO / "css" / "dashboard.css"]:
+        assert not re.search(r"tablero", leer(ruta), re.I), ruta.name
+    assert (PROTO / "dashboard.html").exists() and not (PROTO / "tablero.html").exists()

@@ -1,6 +1,6 @@
 # Análisis del inventario real de la bodega
 
-Estado: **borrador (2026-11-15).** La carga del inventario ya se ejecutó en Supabase y el tablero está construido; falta verlo en la página publicada y confirmar los supuestos con la bodega.
+Estado: **borrador (2026-11-15).** La carga del inventario ya se ejecutó en Supabase y el Dashboard está construido; falta verlo en la página publicada y confirmar los supuestos con la bodega.
 
 Este documento explica cómo se pasó el Excel de la bodega a la base de datos, qué supuestos se hicieron y qué falta confirmar. **No contiene SKU, descripciones de equipos ni textos de ubicación**: el Excel y todo lo generado con datos reales viven solo en `datos_locales/`, que Git ignora.
 
@@ -57,7 +57,7 @@ Entre las familias con capacidad extraída en al menos 15 equipos, solo AC mezcl
 - `supabase/inventario.sql`: columnas `familia`, `categoria`, `situacion_origen`, `capacidad_valor` y `capacidad_unidad` (todas opcionales, con restricciones de valores) y la tabla `extensiones_electricas`, con lectura abierta igual que el resto (sin escritura directa).
 - `reiniciar_demo()` ahora también restaura los equipos de demo 501 a 507 y **no toca los equipos con id desde 1000**.
 - `seed_poc.sql` se detiene si ya existen equipos con id desde 1000, porque borra todos los equipos.
-- `supabase/dashboard.sql`: la función `inventario_dashboard()` que alimenta el tablero (solo lectura; ver la sección 9).
+- `supabase/dashboard.sql`: la función `inventario_dashboard()` que alimenta el Dashboard (solo lectura; ver la sección 9).
 
 ## 5. Primeras lecturas (con los totales del importador)
 
@@ -105,9 +105,9 @@ Se muestran solo las familias con 30 o más equipos (siete con los datos de hoy)
 
 La política de lectura de la prueba de concepto es abierta y la clave pública está en el sitio publicado. Quien tenga esa clave puede leer los equipos reales (SKU y descripciones; no hay nombres de personas porque el importador no los guarda). Está aceptado para la prueba de concepto y queda pendiente confirmarlo con Oscar. Antes de un uso real hay que agregar inicio de sesión y cerrar las políticas por rol.
 
-## 9. Tablero de inventario
+## 9. Dashboard
 
-`prototipo/tablero.html` carga una sola vez `inventario_dashboard()` (`supabase/dashboard.sql`) y filtra en memoria. El JSON con los datos reales pesa unos 236 KB.
+El Dashboard es una vista más del programa: aparece en el menú junto a Pedidos y desde él se vuelve a Pedidos. `prototipo/dashboard.html` carga una sola vez `inventario_dashboard()` (`supabase/dashboard.sql`) y filtra en memoria. El JSON con los datos reales pesa unos 236 KB.
 
 - **Qué devuelve la función:** los equipos reales (id desde 1000) con solo nueve columnas (`id_equipo`, `sku`, `descripcion`, `familia`, `categoria`, `estado`, `situacion_origen`, `capacidad_valor`, `capacidad_unidad`), las extensiones (`sku`, `corriente`, `largo_m`) y la actividad del MVP (órdenes por estado y cambios por motivo). Nunca devuelve nombres de personas, correos, clientes ni textos libres: un motivo de cambio que no sea uno de los tres del prototipo se cuenta como «Otro».
 - **Filtros:** clic en una barra, trozo, celda o área aplica el filtro; otro clic lo quita. Entre dimensiones los filtros se suman con «y» (familia AC y fuera de servicio); dentro de una dimensión, con «o» (familia AC o AP). Cada gráfico muestra todos los valores de su propio eje para poder cambiar la selección; los demás filtros sí lo afectan.
@@ -138,9 +138,9 @@ select
 
 Después de verificar, `select public.reiniciar_demo();` y una nueva consulta de equipos con id desde 1000 (debe seguir dando 1617).
 
-**Para el tablero** (después de la carga, no cambia ningún dato): ejecutar `supabase/dashboard.sql` y probar la función:
+**Para el Dashboard** (después de la carga, no cambia ningún dato): ejecutar `supabase/dashboard.sql` y probar la función:
 
 ```sql
-select jsonb_array_length(public.inventario_dashboard() -> 'equipos' -> 'filas') as equipos_en_el_tablero;   -- debe dar 1617
+select jsonb_array_length(public.inventario_dashboard() -> 'equipos' -> 'filas') as equipos_en_el_dashboard;   -- debe dar 1617
 select length(public.inventario_dashboard()::text) as caracteres_del_json;                                   -- unos 240.000 (menos de 600.000)
 ```

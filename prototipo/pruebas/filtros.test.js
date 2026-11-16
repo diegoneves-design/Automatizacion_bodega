@@ -1,4 +1,4 @@
-// Pruebas de la logica del tablero. Se corren con:  node --test prototipo/pruebas
+// Pruebas de la logica del Dashboard. Se corren con:  node --test prototipo/pruebas/filtros.test.js
 // Todos los datos son ficticios.
 'use strict';
 const test = require('node:test');

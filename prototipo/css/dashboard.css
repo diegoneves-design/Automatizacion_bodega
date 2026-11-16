@@ -1,14 +1,12 @@
-/* Tablero de inventario. Se carga despues de estilos.css y reutiliza sus variables (espaciado de 8 px, colores y contrastes). */
+/* Dashboard. Se carga despues de estilos.css y reutiliza sus variables (espaciado de 8 px, colores y contrastes). */
 
-body.tablero .app { max-width: 1280px; }
+body.dashboard .app { max-width: 1280px; }
 
 .solo-lectores {
   position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
   clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
 
-.cabecera nav { display: flex; flex-wrap: wrap; gap: 0 var(--u); }
-.cabecera .enlace[aria-current="page"] { text-decoration: none; color: var(--texto); }
 
 h2 { margin: 0 0 var(--u); font-size: 18px; line-height: 1.3; }
 h3 { margin: calc(var(--u) * 2) 0 var(--u); font-size: var(--t-base); }
@@ -124,4 +122,4 @@ h3 { margin: calc(var(--u) * 2) 0 var(--u); font-size: var(--t-base); }
   .kpi-boton, .vista, .modo { transition: background-color 0.15s, border-color 0.15s; }
 }
 
-.tablero :focus-visible { outline: 3px solid var(--accion); outline-offset: 2px; }
+.dashboard :focus-visible { outline: 3px solid var(--accion); outline-offset: 2px; }
