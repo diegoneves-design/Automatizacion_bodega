@@ -23,6 +23,7 @@ Documentación del proyecto:
 - Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app)
 - Análisis ético del prototipo (Avance 5): [docs/etica.md](docs/etica.md)
 - Prueba de concepto con Supabase (reglas, mensajes de error y pruebas de rotura): [docs/poc-supabase.md](docs/poc-supabase.md)
+- Inventario real de la bodega: método, supuestos y orden de carga a Supabase: [docs/analisis-inventario.md](docs/analisis-inventario.md)
 - Diseño de la prueba de usuarios (Avance 6): [docs/prueba-usuarios.md](docs/prueba-usuarios.md)
 - Guion para cada sesión de la prueba (Avance 6): [docs/pauta-validacion.md](docs/pauta-validacion.md)
 

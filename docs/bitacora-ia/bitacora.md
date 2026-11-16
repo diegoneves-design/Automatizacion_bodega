@@ -503,3 +503,28 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - **Sin probar:** celular, poca señal real, otros navegadores y uso simultáneo de dos personas.
 - La demo quedó reiniciada: 2 órdenes con 4 líneas pendientes, sin guías ni cambios.
 
+---
+
+## Encargo 28. Cargar el inventario real a Supabase (primera parte: carga)
+
+**Objetivo.** Pasar el Excel de inventario de la bodega a la base de datos de la prueba de concepto, sin subir datos reales al repositorio, como base de un tablero que se hará en una segunda parte.
+
+**Instrucción entregada.**
+- Contexto: el Excel de la bodega (tres hojas: equipos, extensiones eléctricas y catálogo de familias), `supabase/` y la prueba de concepto ya fusionada.
+- Intención: cargar 1.617 equipos y 319 extensiones; que `reiniciar_demo` no borre el inventario real; que `seed_poc.sql` no pueda borrarlo por accidente.
+- Restricciones: el Excel y lo generado viven solo en `datos_locales/` (ignorado por Git); el reporte solo trae totales; la IA no ejecuta nada en Supabase, lo hace Bastián; detenerse antes de que Bastián corra la carga.
+- Numeración: se usa el Encargo 28 porque el 22 al 26 están en el PR del kit (#28) y el 27 está reservado para el flujo que mantiene activo a Supabase.
+
+**Respuesta obtenida.** `herramientas/importar_inventario.py`, `supabase/inventario.sql`, cambios en `reiniciar_demo` (`supabase/funciones.sql`) y en `supabase/seed_poc.sql`, `docs/analisis-inventario.md` y `tests/test_importar_inventario.py`. El importador generó en `datos_locales/` seis archivos de carga y el de extensiones.
+
+**Qué se aceptó y qué se corrigió.**
+- Supuesto de la columna Ubicación (valor numérico o nombre = arrendado): lo definió Bastián y queda escrito como supuesto a confirmar con Oscar en `docs/analisis-inventario.md`.
+- Dos cifras preliminares de Bastián difieren del cálculo: EC, AP y AC suman 1.324 equipos, el 81,9 % (no 83 %); y el «modelo más repetido» depende de cómo se defina modelo, por lo que no se confirmó.
+- Corregido por la IA durante la prueba: un patrón de capacidad (TR) fallaba por un grupo faltante; se vio en las pruebas.
+- El importador usa `openpyxl`, que no está en `requirements.txt` (la app no lo usa); queda indicado en el propio script.
+
+**Cómo se verificó.**
+- `pytest tests`: 132 pruebas pasan (60 nuevas, con filas ficticias): mapeo de ubicación, extracción de capacidad, largos, trozos de máximo 300 filas, escape de comillas, que el reporte no traiga SKU ni descripciones ni ubicaciones, y revisiones estáticas de los SQL.
+- Los archivos generados se ejecutaron en una base SQLite en memoria con el esquema real: 1.617 equipos con id desde 1000, 319 extensiones, y una segunda ejecución no duplica. Las restricciones de estado y lugar pasan.
+- **No se verificó:** nada contra PostgreSQL ni Supabase (`inventario.sql`, la nueva `reiniciar_demo` y el guard de `seed_poc.sql` solo tienen revisión estática); el contenido real de los datos más allá de los totales; ni el tablero, que no existe todavía.
+
