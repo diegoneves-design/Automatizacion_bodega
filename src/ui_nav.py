@@ -3,8 +3,8 @@ Estado de navegacion de la interfaz (st.session_state). Lo usan el enrutador y l
 
   vista      pantalla actual (ordenes, detalle, validacion, ajuste, guia, historial, carga)
   folio      orden seleccionada
-  validadas  folios cuya validacion se pidio en esta sesion
-  guias      guias emitidas en esta sesion: folio -> {"numero", "fecha"}
+  id_usuario quien opera (se elige en el menu lateral; la app no tiene inicio de sesion)
+  validadas, guias  solo los usa la interfaz clasica; el MVP con base real lee ese estado de la base
   aviso      mensaje de una sola vez: (tipo, texto), tipo = ok / info / aviso / error
 """
 
@@ -17,6 +17,7 @@ def iniciar_estado():
     ss = st.session_state
     ss.setdefault("vista", "ordenes")
     ss.setdefault("folio", None)
+    ss.setdefault("id_usuario", None)
     ss.setdefault("validadas", set())
     ss.setdefault("guias", {})
     ss.setdefault("sku_corregir", None)

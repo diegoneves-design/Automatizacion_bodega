@@ -13,29 +13,28 @@ PROPORCION = [8.2, 1.5]
 ENCABEZADOS = ["N° orden", "Tipo", "Modalidad", "Equipos", "Estado"]
 
 
-def _fila_html(fila, estado):
+def _fila_html(fila):
     """Datos de una orden como cuadricula HTML (5 columnas en escritorio, 2 en celular)."""
+    etiqueta, tono = ui_datos.estado_visible(fila.estado)
+    detalle = ui_datos.fecha_corta(fila.fecha_carga) + (f" · {fila.cliente}" if fila.cliente else "")
     return (
         '<div class="bp-orden-grid">'
         f'<div class="bp-orden-folio"><div class="bp-folio">{esc(fila.folio)}</div>'
-        f'<div class="bp-sub">{esc(ui_datos.fecha_corta(fila.fecha_carga))}</div></div>'
+        f'<div class="bp-sub">{esc(detalle)}</div></div>'
         f'<div class="bp-celda" data-et="Tipo">{esc(fila.tipo_movimiento)}</div>'
         f'<div class="bp-celda" data-et="Modalidad">{esc(fila.modalidad)}</div>'
         f'<div class="bp-celda" data-et="Equipos">{esc(int(fila.skus_vigentes))}</div>'
-        f'<div class="bp-celda" data-et="Estado">{pill(estado, ui_datos.TONO_ESTADO[estado])}</div>'
+        f'<div class="bp-celda" data-et="Estado">{pill(etiqueta, tono)}</div>'
         "</div>"
     )
 
 
-def render(app):
-    ss = st.session_state
+def render(repo):
     mostrar(titulo("Órdenes del día", "Selecciona la orden que deseas gestionar."))
 
     mostrar_aviso()
 
-    resumen = app.obtener_resumen_ordenes()
-    con_cambios = set(app.obtener_log_cambios()["folio"])
-    emitidas = set(ss.guias)
+    resumen = repo.ordenes()
 
     col_buscar, col_fecha = st.columns([3, 1.3])
     texto = col_buscar.text_input(
@@ -82,9 +81,8 @@ def render(app):
         der.markdown('<div class="bp-cabecera">Acciones</div>', unsafe_allow_html=True)
 
         for fila in visibles.itertuples():
-            estado = ui_datos.estado_orden(fila.folio, con_cambios, emitidas)
             izq, der = st.columns(PROPORCION)
-            izq.markdown(_fila_html(fila, estado), unsafe_allow_html=True)
+            izq.markdown(_fila_html(fila), unsafe_allow_html=True)
             der.button(
                 "Ver detalle",
                 key=f"ver_{fila.folio}",

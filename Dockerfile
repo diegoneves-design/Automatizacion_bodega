@@ -6,6 +6,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
+# Esquema para la base SQLite local de pruebas (sin DATABASE_URL). En produccion se usa PostgreSQL con DATABASE_URL.
+COPY supabase/schema.sql ./supabase/schema.sql
 
 EXPOSE 8501
 
