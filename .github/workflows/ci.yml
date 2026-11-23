@@ -9,6 +9,24 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    # PostgreSQL efimero para las pruebas de contrato de la capa de datos (tests/test_contrato_repo.py) y los
+    # recorridos de pantalla contra Postgres. Sin contrasena: "trust" solo acepta conexiones de este mismo contenedor
+    # de pruebas y desaparece al terminar el trabajo. La base se llama bodega_test porque la prueba borra su esquema
+    # public, y solo se atreve con bases cuyo nombre termina en _test.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_DB: bodega_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d bodega_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
@@ -25,8 +43,10 @@ jobs:
       - name: Instalar dependencias
         run: pip install -r requirements-dev.txt
 
-      - name: Verificar sintaxis de src/app.py
-        run: python -m py_compile src/app.py
+      - name: Verificar sintaxis de src/app.py y src/db.py
+        run: python -m py_compile src/app.py src/db.py
 
-      - name: Ejecutar tests
+      - name: Ejecutar tests (con PostgreSQL de prueba)
+        env:
+          DATABASE_URL_TEST: postgresql://postgres@localhost:5432/bodega_test
         run: pytest -v
