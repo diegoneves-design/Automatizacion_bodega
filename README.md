@@ -22,6 +22,7 @@ Documentación del proyecto:
 - Conversación con el usuario (Avance 4): [docs/entrevistas/entrevista_subjefe_bodega.md](docs/entrevistas/entrevista_subjefe_bodega.md)
 - Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app)
 - Análisis ético del prototipo (Avance 5): [docs/etica.md](docs/etica.md)
+- **Arquitectura y camino delgado de la prueba de concepto (Avance 7): [docs/arquitectura.md](docs/arquitectura.md)**
 - Prueba de concepto con Supabase (reglas, mensajes de error y pruebas de rotura): [docs/poc-supabase.md](docs/poc-supabase.md)
 - Diseño de la prueba de usuarios (Avance 6): [docs/prueba-usuarios.md](docs/prueba-usuarios.md)
 - Guion para cada sesión de la prueba (Avance 6): [docs/pauta-validacion.md](docs/pauta-validacion.md) · [versión para imprimir](docs/pauta-validacion.pdf)
@@ -56,7 +57,83 @@ README.md             portada del proyecto
 - **Usuario principal:** el jefe de bodega, que hoy digita cada guía a mano y la rehace cuando mantenimiento cambia un equipo a último minuto.
 - **Usuarios secundarios:** comercial, que envía el pedido de venta (PV), y mantenimiento, comercial y operaciones, que piden los cambios de último minuto.
 
-## Cómo se instala y se ejecuta
+## Prueba de concepto (Avance 7)
+
+**Qué hace.** Demuestra una sola acción de punta a punta con piezas reales, **preparar la guía de una orden**. La persona presiona *Preparar guía*, la base de datos vuelve a revisar cada producto contra el inventario, guarda la guía y la pantalla muestra su número interno. Si hay un código que no existe, la guía no se guarda y aparece el mensaje para corregirlo. El diagrama, las piezas y lo que queda fuera están en [docs/arquitectura.md](docs/arquitectura.md).
+
+**Dirección pública.** [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app). Se abre sin iniciar sesión.
+
+**Video (1 a 2 minutos).** Se agrega el enlace cuando esté grabado.
+
+**Qué flujo demuestra.**
+
+| Caso | Cómo se prueba | Qué se ve |
+|---|---|---|
+| Exitoso | Orden 3001 → *Cargar pedido* → *Validar* → *Preparar guía* | La pantalla de guía lista con el **N.º interno** de la guía |
+| Error | Orden 3002 → *Cargar pedido* → *Validar* | La guía queda bloqueada con el mensaje *"Corrige 1 producto para continuar"* por el código `SD-63A20-9999`, que no existe |
+| Volver a empezar | Botón *Reiniciar demo* | Las órdenes 3001 y 3002 vuelven a estar como al inicio |
+
+**Qué tecnología requiere.**
+- Para usarla, solo un navegador.
+- Para levantarla en tu computador, [Node.js](https://nodejs.org) 18 o superior, Python 3 (solo para abrir un servidor local) y Git o la descarga en ZIP del repositorio.
+- Una base en [Supabase](https://supabase.com). Puede ser la del grupo, ya preparada, o una propia creada con los scripts de `supabase/`.
+
+**Qué variables necesita.** Están en `.env.example`, sin valores. Se copian a un archivo `.env`, que no se sube al repositorio.
+
+| Variable | Qué es | Dónde se obtiene |
+|---|---|---|
+| `SUPABASE_URL` | La dirección del proyecto, con la forma `https://xxxx.supabase.co` | Supabase → *Project Settings* → *Data API* |
+| `SUPABASE_PUBLISHABLE_KEY` | La clave **publicable**, que empieza con `sb_publishable_` | Supabase → *Project Settings* → *API Keys*. Si usas la base del grupo, pídela al equipo por un canal privado. Nunca uses la clave secreta |
+
+### Cómo levantarla desde cero
+
+Los comandos son para PowerShell en Windows. En Mac o Linux, usa `cp` en vez de `copy` y `python3` en vez de `py`.
+
+**Paso 1. Descargar el proyecto.**
+
+```
+git clone https://github.com/diegoneves-design/Automatizacion_bodega.git
+cd Automatizacion_bodega
+```
+
+**Paso 2. Preparar la base.** Si usas la base del grupo, ya está lista y puedes pasar al paso 3. Si creas una propia, en Supabase entra a *SQL Editor* y ejecuta estos archivos de `supabase/` en este orden, cada uno en una consulta nueva: `schema.sql`, `acceso.sql`, `funciones.sql` y `seed_poc.sql`.
+
+**Paso 3. Completar las variables.**
+
+```
+copy .env.example .env
+```
+
+Abre `.env` con el Bloc de notas y completa `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`. Deja el resto como está.
+
+**Paso 4. Generar la configuración del prototipo.**
+
+```
+node prototipo/generar-config.mjs
+```
+
+Tiene que decir `prototipo/js/config.js creado.` Si dice que falta una variable, revisa el paso 3.
+
+**Paso 5. Abrir el prototipo.**
+
+```
+cd prototipo
+py -m http.server 8000
+```
+
+Entra a `http://127.0.0.1:8000` en el navegador y prueba los casos de la tabla de arriba. Para cerrarlo, vuelve a PowerShell y presiona `Ctrl + C`.
+
+**Si algo falla.**
+- *"Falta la configuración de la base de datos"* en la pantalla. No se hizo el paso 4, o se abrió el archivo `index.html` con doble clic en vez de usar el servidor del paso 5.
+- *"No hay conexión con la base de datos"*. Revisa tu internet y que `SUPABASE_URL` esté bien escrita.
+- La orden 3001 ya tiene guía. Presiona *Reiniciar demo*.
+
+**En Vercel** el sitio se publica solo desde `main`, con las variables `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` configuradas en el proyecto y el comando de construcción que genera la configuración (detalle en «Prueba de concepto con Supabase: qué hay que configurar», más abajo).
+
+## Aplicación Streamlit (congelada): cómo se instala y se ejecuta
+
+Esta es la aplicación de los avances anteriores. La profesora pidió no seguir invirtiéndole horas, así que no es parte de la prueba de concepto.
+
 
 Guía paso a paso para Windows, pensada para quien nunca ha usado una terminal. Se hace una sola vez; las veces siguientes basta con los pasos 3 y 5. Toma entre 10 y 15 minutos.
 
