@@ -659,3 +659,32 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - Revisión de las líneas agregadas por cada rama antes de su PR, con un script que busca emojis, caracteres de control, claves, `config.js`, correos y teléfonos que no sean de ejemplo, RUT no permitidos y nombres ajenos al equipo. El script no se versiona. Se comprobó que detecta los siete tipos de defecto con una rama desechable.
 - Se comprobó que `docs/prueba-usuarios.md` y la pauta no nombran a ningún integrante, que el README enlaza la prueba de usuarios, la pauta, el kit, la línea base y el checklist del celular, y que ningún enlace está roto.
 - **No se verificó:** el contenido de las 27 imágenes; que el equipo haya verificado los criterios de `historias.md`; el flujo de Supabase, que no se ejecutó; ni nada que dependa de Vercel o del celular.
+
+---
+
+## Encargo 27. Diagrama de arquitectura y camino delgado (Avance 7)
+
+Lo hizo Oscar Ynchaustegui el 2026-11-22, con Claude. Lo revisa Sebastián Carmona en el pull request.
+
+**Objetivo.** Escribir `docs/arquitectura.md` con la plantilla del Avance 7. El diagrama de componentes con su tabla de piezas y el plan de falla, el camino delgado con una sola acción y la evidencia.
+
+**Instrucción entregada.**
+- Contexto. El enunciado del Avance 7, la prueba de concepto que ya estaba en `main` (`prototipo/`, `supabase/` y `docs/poc-supabase.md`) y el encargo con que se construyó, que es el Encargo 21 de esta bitácora, con sus cuatro partes (contexto, intención, restricciones y verificación).
+- Intención. Que cada pieza diga qué hace en nuestra solución y no una definición de manual, y que el camino delgado sea una sola acción justificada como lo más frágil.
+- Restricciones. No tocar el código, una sola acción aunque la PoC haga cuatro, declarar lo que queda fuera como decisión y no poner nada como probado si no se comprobó en el repositorio.
+- Verificación. Que cada mensaje de error citado exista tal cual en el código y que los datos de la orden 3002 calcen con la semilla.
+
+**Respuesta obtenida.** El archivo `docs/arquitectura.md` con un diagrama Mermaid de seis piezas y siete comunicaciones numeradas, la tabla de piezas, el plan de falla de Supabase, el camino delgado "Preparar la guía de una orden" con su recorrido en cuatro pasos, el caso de error de la orden 3002 y la lista de lo que queda fuera.
+
+**Qué se aceptó y qué se corrigió.**
+- Aceptado. "Preparar la guía" como camino delgado, porque es la acción que entrega una respuesta visible (el N.º interno de la guía) y la que bloquea un código que no existe, que es el problema que originó el proyecto.
+- Corregido. El diagrama de `docs/poc-supabase.md` no mostraba la publicación ni el servicio externo, y su tabla decía qué hace cada pieza en general. Se agregaron GitHub, Vercel y Supabase como servicio externo con su plan de falla, y el ERP como pieza fuera de la PoC.
+- Corregido. La PoC hace cuatro acciones (cargar, validar, registrar cambio y preparar guía) y el enunciado pide una sola. Las otras tres quedan declaradas como fuera del camino delgado, no como parte de él.
+- Decisión. El enunciado pide el código en `src/`, pero la PoC está en `prototipo/` y `supabase/`, y `src/` tiene la aplicación Streamlit congelada. Se explica en el documento en vez de mover el código el día antes de la entrega, porque moverlo podía romper la publicación en Vercel.
+- Decisión. El inventario real de la bodega no forma parte de la PoC. El enunciado pide que los datos guardados sean de ejemplo e inventados, y la base no tiene inicio de sesión.
+
+**Cómo se verificó.**
+- Cada mensaje citado se buscó en `supabase/funciones.sql` y `prototipo/js/app.js` ("Corrige 1 producto para continuar.", "Solo el jefe de bodega puede preparar la guía.", el de sin conexión y el de fallo del sistema) y está escrito igual.
+- En `supabase/seed_poc.sql`, la orden 3002 trae `SD-63A20-9999`, que no está en el inventario, y sus otros tres productos están disponibles, así que el error es por un solo producto.
+- Que `preparar_guia` rechaza sin pasar por la pantalla está en la tabla de pruebas de rotura de `docs/poc-supabase.md` (sección 3), contra el Supabase real.
+- **Pendiente.** Abrir la dirección pública en una ventana de incógnito, grabar el video y agregar su enlace en la sección de evidencia.
