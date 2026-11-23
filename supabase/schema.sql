@@ -42,6 +42,9 @@ create table ordenes (
   modalidad        text      check (modalidad in ('convencional', 'alternativo')),
   motivo_retiro    text      check (motivo_retiro in ('mantencion_preventiva', 'falla')),
   estado           text      not null check (estado in ('pendiente', 'bloqueada', 'validada', 'emitida')),
+  -- folio con el que la gente nombra la orden (GUIA-2026-001). Opcional para no romper las ordenes anteriores;
+  -- supabase/mvp_folio.sql agrega ademas la regla del formato (solo PostgreSQL).
+  folio            text      unique,
   -- modalidad solo existe en el despacho y motivo_retiro solo en el retiro; cada uno es obligatorio en el suyo
   check (
     (tipo_movimiento = 'despacho' and modalidad is not null and motivo_retiro is null) or

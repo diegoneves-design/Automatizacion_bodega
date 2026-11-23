@@ -33,6 +33,23 @@ as $$
   select btrim(coalesce(p_texto, ''), E' \t\r\n\f\v' || chr(160));
 $$;
 
+-- Limpia la lista de SKU de un pedido: mayusculas, sin espacios, sin lineas vacias ni repetidos, en el orden en que
+-- aparecen. La usan cargar_pedido y crear_pedido (mvp_funciones.sql), para que las dos limpien igual.
+create or replace function public._skus_limpios(p_skus text[])
+returns text[]
+language sql
+immutable
+set search_path = public
+as $$
+  select coalesce(array_agg(s.sku order by s.primero), '{}'::text[])
+    from (
+      select upper(_limpiar(t.x)) as sku, min(t.ord) as primero
+        from unnest(coalesce(p_skus, '{}'::text[])) with ordinality as t(x, ord)
+       where _limpiar(t.x) <> ''
+       group by upper(_limpiar(t.x))
+    ) s;
+$$;
+
 -- ---------------------------------------------------------------------------------------------------------
 -- cargar_pedido: crea las lineas del pedido (HU-02). Reemplaza lo que hubiera cargado antes para esa orden.
 -- ---------------------------------------------------------------------------------------------------------
@@ -56,14 +73,7 @@ declare
   v_id   integer;
 begin
   -- Limpieza: mayusculas, sin espacios, sin lineas vacias ni repetidos (se conserva el orden)
-  select coalesce(array_agg(s.sku order by s.primero), '{}')
-    into v_skus
-    from (
-      select upper(_limpiar(t.x)) as sku, min(t.ord) as primero
-        from unnest(coalesce(p_skus, '{}'::text[])) with ordinality as t(x, ord)
-       where _limpiar(t.x) <> ''
-       group by upper(_limpiar(t.x))
-    ) s;
+  v_skus := _skus_limpios(p_skus);
   v_n := coalesce(array_length(v_skus, 1), 0);
 
   if not exists (select 1 from ordenes where id_orden = p_id_orden) then
@@ -304,8 +314,9 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------------------------------------
--- reiniciar_demo: vuelve las ordenes, sus lineas, los cambios y las guias al estado inicial de la demo.
--- No toca clientes, usuarios ni equipos. Abierta a cualquiera, porque la demo no tiene sesion.
+-- reiniciar_demo: deja las ordenes 3001 y 3002 de la demo (con folio) en su estado inicial, con sus lineas, sin cambios
+-- y sin guia. NO borra ninguna otra orden: lo que se cree desde el MVP no se pierde cuando alguien reinicia la demo del
+-- prototipo. Abierta a cualquiera, porque la demo no tiene sesion; el rol del MVP (mvp_rol.sql) no puede llamarla.
 -- ---------------------------------------------------------------------------------------------------------
 create or replace function public.reiniciar_demo()
 returns void
@@ -313,8 +324,15 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  v_base integer;
 begin
   perform pg_advisory_xact_lock(7001);
+
+  -- Los dos folios de la demo estan reservados: si otra orden los usara, no se pisa nada.
+  if exists (select 1 from ordenes where folio in ('GUIA-2026-001', 'GUIA-2026-002') and id_orden not in (3001, 3002)) then
+    perform _fallo('Los folios GUIA-2026-001 y GUIA-2026-002 son de la demo y ya los usa otra orden.', 'folio');
+  end if;
 
   -- Solo lo de demo: los equipos 501-507 vuelven a su estado inicial. Los equipos reales (id_equipo >= 1000) no se tocan.
   insert into equipos (id_equipo, sku, descripcion, estado, ubicacion) values
@@ -328,26 +346,34 @@ begin
   on conflict (id_equipo) do update
     set sku = excluded.sku, descripcion = excluded.descripcion, estado = excluded.estado, ubicacion = excluded.ubicacion;
 
-  -- "where true": desde la API Supabase rechaza un DELETE sin WHERE (pg_safeupdate)
-  delete from guias            where true;
-  delete from registro_cambios where true;
-  delete from detalle_orden    where true;
-  delete from ordenes          where true;
+  -- "where": desde la API Supabase rechaza un DELETE sin WHERE (pg_safeupdate). Solo las dos ordenes de la demo.
+  delete from guias            where id_orden in (3001, 3002);
+  delete from registro_cambios where id_orden in (3001, 3002);
+  delete from detalle_orden    where id_orden in (3001, 3002);
 
-  insert into ordenes (id_orden, id_cliente, id_usuario_carga, fecha_orden, tipo_movimiento, modalidad, motivo_retiro, estado) values
-    (3001, 10, 1, now(), 'despacho', 'convencional', null,    'pendiente'),
-    (3002, 11, 1, now(), 'retiro',   null,           'falla', 'pendiente');
+  insert into ordenes (id_orden, id_cliente, id_usuario_carga, fecha_orden, tipo_movimiento, modalidad, motivo_retiro, estado, folio) values
+    (3001, 10, 1, now(), 'despacho', 'convencional', null,    'pendiente', 'GUIA-2026-001'),
+    (3002, 11, 1, now(), 'retiro',   null,           'falla', 'pendiente', 'GUIA-2026-002')
+  on conflict (id_orden) do update
+    set id_cliente = excluded.id_cliente, id_usuario_carga = excluded.id_usuario_carga, fecha_orden = excluded.fecha_orden,
+        tipo_movimiento = excluded.tipo_movimiento, modalidad = excluded.modalidad,
+        motivo_retiro = excluded.motivo_retiro, estado = excluded.estado, folio = excluded.folio;
 
-  -- 3001 se puede despachar completa; 3002 trae un SKU que no existe (SD-63A20-9999)
-  insert into detalle_orden (id_detalle, id_orden, id_equipo, sku_informado, resultado_validacion, vigente) values
-    (9001, 3001, null, 'SD-63A20-0314', 'pendiente', true),
-    (9002, 3001, null, 'SD-63A20-0315', 'pendiente', true),
-    (9003, 3001, null, 'ST-0042',       'pendiente', true),
-    (9004, 3001, null, 'MP-0107',       'pendiente', true),
-    (9005, 3002, null, 'SD-32A10-0102', 'pendiente', true),
-    (9006, 3002, null, 'SD-63A20-9999', 'pendiente', true),
-    (9007, 3002, null, 'ST-0042',       'pendiente', true),
-    (9008, 3002, null, 'MP-0107',       'pendiente', true);
+  -- 3001 se puede despachar completa; 3002 trae un SKU que no existe (SD-63A20-9999).
+  -- Los id de las lineas siguen al mayor que exista, para no chocar con las de otras ordenes.
+  select coalesce(max(id_detalle), 9000) into v_base from detalle_orden;
+  insert into detalle_orden (id_detalle, id_orden, id_equipo, sku_informado, resultado_validacion, vigente)
+  select v_base + row_number() over (order by v.n), v.id_orden, null, v.sku, 'pendiente', true
+    from (values
+      (1, 3001, 'SD-63A20-0314'),
+      (2, 3001, 'SD-63A20-0315'),
+      (3, 3001, 'ST-0042'),
+      (4, 3001, 'MP-0107'),
+      (5, 3002, 'SD-32A10-0102'),
+      (6, 3002, 'SD-63A20-9999'),
+      (7, 3002, 'ST-0042'),
+      (8, 3002, 'MP-0107')
+    ) as v(n, id_orden, sku);
 end;
 $$;
 
@@ -356,6 +382,7 @@ $$;
 -- ---------------------------------------------------------------------------------------------------------
 revoke all on function public._fallo(text, text) from public, anon, authenticated;
 revoke all on function public._limpiar(text)     from public, anon, authenticated;
+revoke all on function public._skus_limpios(text[]) from public, anon, authenticated;
 
 revoke all on function public.cargar_pedido(integer, text, text, text, text[]) from public;
 revoke all on function public.validar_pedido(integer)                          from public;
