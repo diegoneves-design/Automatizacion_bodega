@@ -556,3 +556,40 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - El Dashboard se probó en Chrome contra una página local con datos ficticios, no contra Supabase: clic en la dona y filtro, enlace con filtros (`#estado=fuera_servicio&familia=AC`), panel de detalle con Escape y foco, y 375 px (sin desborde horizontal, tabla desplazable, panel a pantalla completa).
 - **No se verificó:** la función `inventario_dashboard()` en Supabase (solo revisión estática); la página publicada en Vercel; la descarga del CSV en el navegador (solo la función que lo arma, con pruebas); la navegación solo con teclado más allá de los botones y el panel; el celular real ni otros navegadores que no sean Chrome.
 
+
+---
+
+## Encargo 30. Migrar el MVP (Streamlit) a Supabase
+
+**Objetivo.** Pasar el MVP de `src/` de una base SQLite con datos de ejemplo a la base real de Supabase, sin exponer ninguna clave y sin tocar el prototipo. El orden fue: auditoría y plan primero (sin cambiar nada), y recién después de que Bastián aprobó el plan, la implementación.
+
+**Instrucción entregada.**
+- Contexto: el MVP son las pantallas de `src/` y sus datos en SQLite; el prototipo de `prototipo/` ya está probado y no se rehace; Supabase ya tiene la base real (1.617 equipos desde el id 1000, 319 extensiones, demo 501 a 507) y las funciones del flujo. Streamlit no corre en Vercel.
+- Intención: que el MVP lea y escriba en Supabase llamando a las funciones SQL (fuente única de verdad), con una capa `db.py` de dos implementaciones (SQLite para pruebas y PostgreSQL con psycopg, sin ORM, para producción, elegida por `DATABASE_URL`).
+- Restricciones (no negociables): ninguna contraseña, cadena de conexión ni clave en el repositorio, en registros ni en el chat; la aplicación no se conecta como `postgres` sino con un rol limitado sin contraseña escrita en el SQL; pooler de Supabase en modo sesión; la IA no ejecuta nada en Supabase; rama `feature/mvp-supabase` desde `feature/dashboard-inventario`; no fusionar nada sin aprobación de otra persona y la orden «fusiona #N».
+- Verificación pedida: pruebas verdes sin conexión a internet, y detenerse antes de levantar el MVP contra Supabase hasta el «listo» de Bastián.
+- Decisiones de Bastián tras la auditoría: columna `ordenes.folio` (único, opcional, formato `GUIA-2026-001`, exigido por `crear_pedido`); `psycopg[binary]` con versión fija, importado solo si hay `DATABASE_URL`; el responsable del cambio sale de la tabla `usuarios` y la falta de inicio de sesión se documenta; `reiniciar_demo` solo restaura las órdenes 3001 y 3002 y no se le da al rol del MVP; evaluar un servicio de PostgreSQL en el CI.
+
+**Respuesta obtenida.**
+- Auditoría y plan: tabla de equivalencias entre el MVP y la base (folio contra `id_orden`, «stock» contra estado del equipo, 50 contra 60 SKU, modalidad y motivo de retiro separados, estados derivados contra guardados) y la lista de lo que Supabase no tenía (crear órdenes, listado, detalle, historial). Decisión recomendada y aprobada: llamar a las funciones SQL.
+- SQL nuevo: `supabase/mvp_folio.sql`, `mvp_funciones.sql` (`crear_pedido`), `mvp_vistas.sql` (tres vistas de lectura), `mvp_rol.sql` (rol `app_mvp`), `verificar_mvp.sql`; cambios en `schema.sql`, `funciones.sql` (ayuda `_skus_limpios` y `reiniciar_demo` acotado a la demo) y `probar_en_supabase.py`.
+- Python: `src/db.py` (interfaz, `RepoPostgres`, `RepoSqlite`, lector de `.env`), las siete pantallas de `src/views/` y `ui_router`, `ui_datos` y `app.py` adaptados; `requirements.txt` con `psycopg[binary]==3.3.9`.
+- Pruebas: `tests/test_contrato_repo.py` (las mismas pruebas contra las dos implementaciones, y las exclusivas de PostgreSQL), `tests/test_mvp_ui.py` (recorridos de pantalla), `tests/conftest.py`, y revisiones estáticas nuevas en `tests/test_supabase_scripts.py`. CI con un servicio de PostgreSQL 16.
+- Documentación: `docs/mvp-supabase.md` (orden de ejecución, contraseña, de dónde copiar la cadena del pooler, permisos, límites) y el README.
+
+**Qué se aceptó y qué se corrigió.**
+- La IA cambió `cargar_pedido` (una función ya probada con 82 comprobaciones) para que use la ayuda `_skus_limpios` compartida con `crear_pedido`, en lugar de duplicar la limpieza. No era pedido textual; se hizo para que las dos limpien igual, y se compensó con las pruebas de contrato. Bastián debe volver a correr las comprobaciones por la API pública tras ejecutar el SQL.
+- `crear_pedido` y las vistas no se dan a la API pública (decisión de la IA, no pedida): el sitio publicado no necesita crear órdenes y Supabase da permisos por omisión a lo que se crea después.
+- La IA mantuvo `main_clasico` y las funciones de SQLite de `app.py`, que ya no usa `main()`, porque el repositorio pide no eliminar código funcional sin confirmación. Queda la pregunta de si se borran.
+- Corregido durante el trabajo: (1) un error de la IA en su propia prueba (usaba una columna que no existía en `clientes`), visto en el primer intento contra PostgreSQL; (2) la IA notó que Streamlit no lee `.env`, así que agregó un lector que no pisa variables ya definidas, y blindó las pruebas para que nunca lo lean ni usen `DATABASE_URL`; (3) la revisión estática de credenciales encontró una contraseña falsa escrita literal en una prueba de la propia IA, y se pasó a armarla al ejecutar; (4) `probar_en_supabase.py` asumía exactamente 7 equipos y 2 órdenes, lo que ya no es cierto con el inventario real y las órdenes del MVP, así que se acotó a la demo; (5) los números de línea de `reiniciar_demo` eran fijos (9001 a 9008) y podían chocar con los de otras órdenes, así que ahora siguen al mayor existente.
+- Agregado después, al aprobar el plan de la vista Dashboard del MVP: `mvp_rol.sql` también le da al rol `app_mvp` el permiso de ejecutar `inventario_dashboard()` (solo lectura), con su fila en `verificar_mvp.sql` y sus pruebas.
+- Limitación documentada, por decisión de Bastián: el MVP no tiene inicio de sesión; cualquiera con acceso opera como el usuario que elija (README y `docs/mvp-supabase.md`).
+- Contexto que consta: la profesora pidió en el Avance 5 no dedicar más horas a la app Streamlit hasta que la prueba con usuarios confirme el flujo; esta migración la decidió Bastián (2026-11-20).
+- Nombres de personas en el repositorio: solo los de los usuarios ficticios de siempre (Pedro Soto y Camila Rojas).
+
+**Cómo se verificó.**
+- `py -m pytest tests`: 220 pasan y 66 se omiten (las que necesitan PostgreSQL o `psycopg`). Con un PostgreSQL 16 local y desechable (`DATABASE_URL_TEST`): 282 pasan y 4 se omiten.
+- Las reglas de las cuatro funciones y sus mensajes exactos dan lo mismo en SQLite y en PostgreSQL; el rol `app_mvp` rechaza escribir directo en las ocho tablas, leer correo, teléfono, RUT y dirección, y ejecutar `reiniciar_demo`; `anon` no puede usar `crear_pedido` ni las vistas; `reiniciar_demo` como `anon` no borra las órdenes del MVP ni los equipos reales.
+- Los archivos SQL se aplicaron en el orden documentado sobre una base nueva y sobre una que simula la actual (estado anterior más inventario ficticio y una orden sin folio), dos veces cada una; `verificar_mvp.sql` solo falló en los conteos del inventario real, porque la base local no los tiene.
+- `node --test prototipo/pruebas/filtros.test.js`: 30 pruebas pasan; el prototipo no se modificó.
+- **No se verificó:** nada en Supabase (no se ejecutó ningún SQL ahí); las comprobaciones por la API pública de `probar_en_supabase.py`, que necesitan la API de Supabase; el pooler con el usuario `app_mvp.<referencia>`; el MVP en un navegador contra Supabase; el flujo del CI en GitHub (solo se validó su sintaxis). Tampoco se probó la aplicación a mano en un navegador: los recorridos usan Streamlit AppTest.
