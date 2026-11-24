@@ -20,7 +20,7 @@ Documentación del proyecto:
 - Historias de usuario y criterios de aceptación (Avance 4): [docs/historias.md](docs/historias.md)
 - Wireframes del flujo principal (Avance 4): [docs/wireframes/](docs/wireframes/)
 - Conversación con el usuario (Avance 4): [docs/entrevistas/entrevista_subjefe_bodega.md](docs/entrevistas/entrevista_subjefe_bodega.md)
-- Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app). **Archivo histórico:** cuando se publique el portal (`portal/`), esa dirección mostrará el portal y no el prototipo; el prototipo se abre en el computador (ver más abajo)
+- Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app). Sigue publicado en su propio proyecto de Vercel (`bodega-prototipo`) para el video de este README y para la prueba con usuarios; no se rehace y el portal no lo enlaza
 - Portal público para Vercel (una página con un botón hacia el MVP): [portal/LEEME.md](portal/LEEME.md); la dirección del MVP vive en `portal/config.js`
 - Análisis ético del prototipo (Avance 5): [docs/etica.md](docs/etica.md)
 - Prueba de concepto con Supabase (reglas, mensajes de error y pruebas de rotura): [docs/poc-supabase.md](docs/poc-supabase.md)
@@ -43,7 +43,7 @@ docs/historias.md     historias de usuario y criterios de aceptación (Avance 4)
 docs/wireframes/      wireframes del flujo principal, con sus notas (Avance 4)
 docs/entrevistas/     conversación con el usuario y su guion (Avance 4)
 docs/recorrido-usuario/ borrador del mapa de recorrido (ensayo, sin validar)
-prototipo/            prototipo del flujo principal (Avance 5), en HTML, CSS y JS sin build; conectado a Supabase en la prueba de concepto. Archivo histórico
+prototipo/            prototipo del flujo principal (Avance 5), en HTML, CSS y JS sin build; conectado a Supabase en la prueba de concepto. Sigue publicado en su propio proyecto de Vercel
 portal/               entrada pública que publica Vercel: una página estática con un botón hacia el MVP (la dirección, en portal/config.js)
 README.md             portada del proyecto
 .gitignore            archivos locales que no se suben (base de datos, .env)
@@ -152,25 +152,30 @@ Es el análisis del inventario real de la bodega (1.617 equipos y 319 extensione
 Streamlit necesita un servidor siempre encendido y no corre en Vercel. Por eso Vercel publica solo una **entrada**: `portal/`, una página estática con el nombre del proyecto, una frase de qué hace y **un único botón**.
 
 - **La dirección del MVP vive en un solo lugar:** `portal/config.js` (`URL_APLICACION`). Mientras esté vacía, el botón aparece desactivado con el texto «Aplicación en despliegue»; con una dirección `https`, pasa a «Abrir la aplicación». Cambiarla es editar esa línea y volver a publicar.
-- **No enlaza al prototipo ni a su dashboard.** El prototipo (`prototipo/`) queda como archivo histórico del repositorio: se abre en el computador (`prototipo/`, `node prototipo/generar-config.mjs` y un servidor local, como en «Prueba de concepto con Supabase»). Efecto colateral: **`bodega-prototipo.vercel.app` dejará de mostrar el prototipo**. Los documentos de los avances ya evaluados (`docs/prototipo.md`, `docs/pauta-validacion.md`, `docs/prueba-usuarios.md`, `docs/etica.md`) siguen describiendo el prototipo como se evaluó y no se modificaron; si la prueba con usuarios se hace con el prototipo, hay que abrirlo en el computador o publicarlo en otro proyecto.
+- **El prototipo no cambia ni se desconecta.** Sigue publicado en `bodega-prototipo.vercel.app`, en su propio proyecto de Vercel (`bodega-prototipo`, con Root Directory = `prototipo` y Build Command = `node generar-config.mjs`), para el video de este README y para la prueba con usuarios. **Ese proyecto no se modifica.** El portal no lo enlaza ni enlaza a su dashboard.
 - **Sin dependencias, sin claves y sin Supabase.** La página lleva su propia política de seguridad (no puede conectarse a ninguna red) y `vercel.json` agrega encabezados de seguridad.
+- **Pendiente aparte, que el portal no resuelve:** el proyecto `bodega-prototipo` hoy no está conectado al repositorio correcto. Lo publicado es la versión del 25 de octubre (la de Avance 5: sin conexión a Supabase y sin dashboard). La pauta de la prueba con usuarios supone la versión actual (órdenes 3001 y 3002 y «Reiniciar demo»), que se publica cuando ese proyecto se vuelva a conectar a `main` y tenga sus dos variables (`SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`).
 
-**Qué hay que cambiar en Vercel** (lo hace una persona del equipo en el panel; el repositorio no puede hacerlo por sí solo). Hoy Vercel **no está conectado al repositorio correcto**: no se da por resuelto.
+**Crear el proyecto nuevo en Vercel** (lo hace una persona del equipo en el panel; el repositorio no puede hacerlo por sí solo). Es un proyecto **nuevo** de Vercel: **no se modifica `bodega-prototipo`**.
 
-1. **Conectar el repositorio.** Proyecto `bodega-prototipo` → *Settings* → *Git* → *Connect Git Repository* → GitHub → `diegoneves-design/Automatizacion_bodega`. Vercel necesita permiso sobre esa cuenta de GitHub (lo da quien la administra, instalando la aplicación de Vercel en ese repositorio). Según el plan de Vercel puede no permitir repositorios de otra cuenta u organización: si lo rechaza, hay que resolverlo antes de seguir.
-2. **Rama de producción** = `main` (*Settings* → *Git* → *Production Branch*). El portal llega a `main` con el pull request revisado.
-3. **Root Directory = `portal`** (*Settings* → *General* → *Root Directory*), con *Framework Preset* «Other».
-4. **Quitar el Build Command** `node generar-config.mjs` (*Settings* → *Build and Deployment*): apaga el interruptor *Override* del *Build Command* y deja sin override también *Install Command* y *Output Directory*. Con ese comando el portal **falla al publicarse**: `generar-config.mjs` no existe dentro de `portal/`.
-5. **Las variables `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` ya no hacen falta** para el portal (*Settings* → *Environment Variables*). Pueden quedar sin efecto; bórralas cuando compruebes que el portal funciona.
-6. **Publicar:** *Deployments* → *Redeploy*, o un commit en `main`. Para probar antes de fusionar, Vercel crea una vista previa por cada rama o pull request cuando el repositorio está conectado.
+1. **Esperar a que el portal esté en `main`.** El proyecto nuevo publica la rama de producción (`main`) y, si `portal/` todavía no existe ahí, su primera publicación falla (la carpeta no está). Por eso se crea después de fusionar el pull request del portal.
+2. En Vercel, en el equipo `automatizacion-de-bodega`: *Add New…* → *Project* → importar el repositorio de GitHub `diegoneves-design/Automatizacion_bodega`. Vercel necesita permiso sobre esa cuenta de GitHub (lo da quien la administra, instalando la aplicación de Vercel en ese repositorio). Según el plan de Vercel puede no permitir repositorios de otra cuenta u organización: si lo rechaza, hay que resolverlo antes de seguir.
+3. En la pantalla de configuración, **antes de publicar**:
+   - *Project Name*: `bodega-portal`.
+   - *Framework Preset*: **Other**.
+   - *Root Directory*: **`portal`** (*Edit* y elegir la carpeta).
+   - *Build and Output Settings*: no cambiar nada: **sin Build Command**, sin Install Command y sin Output Directory (los interruptores *Override* apagados).
+   - *Environment Variables*: **ninguna**.
+4. *Deploy*. La rama de producción es `main` (*Settings* → *Git*).
 
 **Cómo comprobar que quedó bien:**
 
-- Abrir la dirección de producción: se ve «Del pedido a la guía, sin errores.» y **un botón gris desactivado** que dice «Aplicación en despliegue».
-- `/dashboard.html` y `/prototipo/index.html` deben dar **404** (el prototipo ya no se publica), y `/config.js` debe mostrar `URL_APLICACION: ''` sin ninguna clave.
+- Abrir la dirección del proyecto nuevo: se ve «Del pedido a la guía, sin errores.» y **un botón gris desactivado** que dice «Aplicación en despliegue».
+- `/config.js` debe mostrar `URL_APLICACION: ''` sin ninguna clave, y `/dashboard.html` y `/prototipo/index.html` deben dar **404** (este proyecto solo sirve el portal).
 - En las herramientas de desarrollo (F12) → *Network*: solo cinco archivos (`index`, `config.js`, `portal.js`, `estilos.css`, `icono.svg`) y ninguna llamada a `supabase`. En los encabezados de la página: `Content-Security-Policy` y `X-Frame-Options: DENY`.
-- En *Deployments*, el registro de construcción (*Build Logs*) no debe mencionar `generar-config.mjs` y debe terminar sin errores.
+- En *Deployments*, el registro de construcción (*Build Logs*) no debe ejecutar ningún comando `node` ni mencionar `generar-config.mjs`, y debe terminar sin errores.
 - Abrirlo en el celular: sin desplazamiento horizontal y con el botón visible.
+- **Comprobar que `bodega-prototipo` no cambió:** su dirección sigue abriendo el prototipo y su configuración (Root Directory, Build Command y variables) sigue como estaba.
 - Cuando el MVP esté publicado: poner su dirección `https` en `portal/config.js`, pull request, fusión, y comprobar que el botón pasa a azul con «Abrir la aplicación» y lleva al MVP.
 
 ### Prueba guiada (5 minutos)
@@ -245,7 +250,7 @@ Al 5 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance
 | Diseño de la prueba con usuarios y guion de cada sesión (`docs/prueba-usuarios.md`, `docs/pauta-validacion.md`) | |
 | Prueba de concepto escrita: el prototipo lee órdenes, valida SKU, registra cambios (con motivo obligatorio) y prepara la guía en Supabase, con validación en tres capas (`prototipo/`, `supabase/`, `docs/poc-supabase.md`), probada en Supabase: las reglas de la base y la pantalla en un navegador contra la base real | Probarla en un celular, con poca señal y con personas ajenas al equipo (prueba de usuarios, `docs/prueba-usuarios.md`) |
 | MVP (Streamlit) sobre Supabase, en la rama `feature/mvp-supabase`: capa de datos `src/db.py` (Supabase o SQLite) que llama a las funciones SQL, folio de la orden, `crear_pedido`, vistas de lectura y un rol de base limitado `app_mvp` (`docs/mvp-supabase.md`). Probado contra un PostgreSQL local y en SQLite | Ejecutar en Supabase los archivos `mvp_*.sql` y `funciones.sql`, definir la contraseña del rol `app_mvp`, correr `supabase/verificar_mvp.sql` y `probar_en_supabase.py`, y decidir dónde se publica el MVP (Streamlit no corre en Vercel) |
-| Portal público para Vercel (`portal/`): una página con un botón hacia el MVP, desactivado mientras no haya dirección en `portal/config.js`. El prototipo queda como archivo histórico | Conectar Vercel al repositorio correcto, poner Root Directory = `portal` y quitar el Build Command (pasos en «Portal público en Vercel»); publicar el MVP en un hosting y poner su dirección en `portal/config.js` |
+| Portal público para Vercel (`portal/`): una página con un botón hacia el MVP, desactivado mientras no haya dirección en `portal/config.js`. El prototipo sigue publicado aparte, sin cambios | Crear el proyecto nuevo `bodega-portal` en Vercel una vez que el portal esté en `main` (pasos en «Portal público en Vercel»); publicar el MVP en un hosting y poner su dirección en `portal/config.js`; volver a conectar `bodega-prototipo` al repositorio correcto (hoy publica la versión del 25 de octubre) |
 | Inventario real cargado en Supabase (1.617 equipos y 319 extensiones eléctricas) y Dashboard interactivo con 12 gráficos, filtros cruzados, tabla de casos y vistas por rol (`prototipo/dashboard.html`, `supabase/dashboard.sql`, `docs/analisis-inventario.md`) | Ejecutar `supabase/dashboard.sql` en Supabase, revisar el Dashboard en la página publicada y confirmar con Oscar o el jefe de bodega los supuestos del análisis (valores numéricos = arrendado, significado de POR HABILITAR y de BAJA, y si el inventario real puede mostrarse en una demo pública) |
 
 ### Prueba de concepto con Supabase: qué hay que configurar
@@ -268,7 +273,7 @@ Para comprobar que quedó bien, desde la raíz del repositorio y con `.env` comp
 **2. El prototipo.** Necesita la dirección del proyecto y la clave **publicable** (empieza con `sb_publishable_`). Nunca uses la clave secreta ni `service_role`: no se necesitan.
 
 - **En el computador:** copia `.env.example` a `.env`, completa `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`, y ejecuta `node prototipo/generar-config.mjs`. Eso crea `prototipo/js/config.js`. Luego, desde la carpeta `prototipo`, abre el sitio con un servidor local, por ejemplo `py -m http.server 8000`, y entra a `http://127.0.0.1:8000`.
-- **En Vercel (solo si algún día se publica el prototipo por separado; el proyecto de Vercel pasa a publicar el portal, ver «Portal público en Vercel»):** en el proyecto, agrega las variables de entorno `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`, y como **Build Command** `node generar-config.mjs` (si la carpeta raíz del proyecto es `prototipo`) o `node prototipo/generar-config.mjs` (si es la raíz del repositorio). Sin eso el sitio muestra «Falta la configuración de la base de datos».
+- **En Vercel (proyecto `bodega-prototipo`, que no se modifica para el portal):** en el proyecto, agrega las variables de entorno `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`, y como **Build Command** `node generar-config.mjs` (si la carpeta raíz del proyecto es `prototipo`) o `node prototipo/generar-config.mjs` (si es la raíz del repositorio). Sin eso el sitio muestra «Falta la configuración de la base de datos».
 
 `.env` y `prototipo/js/config.js` no se suben a git (están en `.gitignore`).
 

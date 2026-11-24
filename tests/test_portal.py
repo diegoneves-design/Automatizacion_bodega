@@ -104,8 +104,18 @@ def test_vercel_json_es_valido_y_agrega_encabezados_de_seguridad():
     assert "buildCommand" not in config and "installCommand" not in config  # un sitio estatico no se construye
 
 
-def test_vercel_no_ejecuta_el_script_de_configuracion_del_prototipo_en_el_portal():
-    """El Build Command antiguo (node generar-config.mjs) no existe dentro de portal/: se avisa en el LEEME."""
-    assert not (PORTAL / "generar-config.mjs").exists()
+def test_el_portal_va_en_un_segundo_proyecto_de_vercel_y_no_toca_el_del_prototipo():
+    """Decision de Bastian: bodega-prototipo no cambia (sigue publicado); el portal es un proyecto nuevo, sin build ni variables."""
+    assert not (PORTAL / "generar-config.mjs").exists()  # el portal no se construye: ese script es del prototipo
     leeme = leer("LEEME.md")
-    assert "Root Directory" in leeme and "Build Command" in leeme and "generar-config" in leeme
+    for frase in ("bodega-portal", "proyecto nuevo", "No se modifica `bodega-prototipo`", "Root Directory = `portal`", "sin Build Command",
+                  "sin variables de entorno"):
+        assert frase in leeme, frase
+    readme = (RAIZ / "README.md").read_text(encoding="utf-8")
+    seccion = readme[readme.index("### Portal público en Vercel"):readme.index("### Prueba guiada (5 minutos)")]
+    for frase in ("bodega-portal", "Root Directory", "Other", "sin Build Command", "Add New", "no se modifica `bodega-prototipo`"):
+        assert frase in seccion, frase
+    # el prototipo sigue publicado: ningun documento dice lo contrario
+    for texto in (readme, leeme, (RAIZ / "docs" / "bitacora-ia" / "bitacora.md").read_text(encoding="utf-8")):
+        assert "dejará de mostrar el prototipo" not in texto and "deja de mostrar el prototipo" not in texto
+    assert "archivo histórico" not in seccion and "Quita el Build Command" not in seccion
