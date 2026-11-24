@@ -235,7 +235,7 @@ Para comprobar que quedó bien, desde la raíz del repositorio y con `.env` comp
 
 ### Seguridad de la base en esta etapa
 
-El prototipo **no tiene inicio de sesión**: cualquier persona con el enlace lo usa. Por eso, en esta etapa de prueba de concepto las políticas de acceso (RLS) son **abiertas**: quien abra el prototipo puede **leer** todas las tablas (de la tabla de usuarios solo el nombre, el cargo y si está activo; el correo y el teléfono no salen por la API) y puede llamar a las funciones. Es aceptable solo porque **los datos son de ejemplo y ficticios**: no cargues datos reales.
+El prototipo **no tiene inicio de sesión**: cualquier persona con el enlace lo usa. Por eso, en esta etapa de prueba de concepto las políticas de acceso (RLS) son **abiertas**: quien abra el prototipo puede **leer** todas las tablas (de la tabla de usuarios solo el nombre, el cargo y si está activo, y de la de clientes solo el identificador y la razón social; el correo, el teléfono, el RUT y la dirección no salen por la API) y puede llamar a las funciones. Es aceptable solo porque **los datos son de ejemplo y ficticios**: no cargues datos reales.
 
 Lo que sí se protege desde ya: las tablas **no aceptan escribir directo** desde el navegador; todo cambio pasa por funciones de la base que vuelven a validar antes de guardar, y las restricciones de las tablas son la última barrera. Como no hay sesión, quién prepara la guía o registra un cambio lo elige la persona en la pantalla: sirve para la demo, no es seguridad. Cualquiera puede además presionar «Reiniciar demo» y borrar lo hecho por otra persona.
 

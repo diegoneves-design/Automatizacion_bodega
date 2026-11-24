@@ -67,6 +67,13 @@ comprobaciones as (
   union all select 'app_mvp NO lee clientes.direccion', 'false', has_column_privilege('app_mvp', 'public.clientes', 'direccion', 'select')::text
   union all select 'app_mvp SI lee usuarios.nombre', 'true', has_column_privilege('app_mvp', 'public.usuarios', 'nombre', 'select')::text
 
+  -- La clave publicable (anon) tampoco ve datos personales de clientes ni de usuarios
+  union all select 'anon NO lee clientes.rut', 'false', has_column_privilege('anon', 'public.clientes', 'rut', 'select')::text
+  union all select 'anon NO lee clientes.direccion', 'false', has_column_privilege('anon', 'public.clientes', 'direccion', 'select')::text
+  union all select 'anon NO lee usuarios.correo', 'false', has_column_privilege('anon', 'public.usuarios', 'correo', 'select')::text
+  union all select 'anon NO lee usuarios.telefono', 'false', has_column_privilege('anon', 'public.usuarios', 'telefono', 'select')::text
+  union all select 'anon SI lee clientes.razon_social (lo usa el prototipo)', 'true', has_column_privilege('anon', 'public.clientes', 'razon_social', 'select')::text
+
   -- Funciones: solo las del flujo
   union all select 'app_mvp ejecuta ' || firma, esperado::text, has_function_privilege('app_mvp', firma, 'execute')::text from funciones
 

@@ -342,6 +342,18 @@ def test_el_rol_del_mvp_puede_leer_el_dashboard_y_solo_eso_de_datos_agregados(re
     assert "correo" not in str(datos) and "telefono" not in str(datos)
 
 
+def test_la_clave_publicable_no_lee_datos_personales_de_clientes_ni_usuarios(repo):
+    _solo_postgres(repo)
+    import psycopg
+
+    with psycopg.connect(url_de_prueba(), autocommit=True, options="-c role=anon") as c:
+        assert len(c.execute("select id_cliente, razon_social from public.clientes").fetchall()) == 2  # lo que usa el prototipo
+        for sql in ("select rut from public.clientes", "select direccion from public.clientes", "select * from public.clientes",
+                    "select correo from public.usuarios", "select telefono from public.usuarios"):
+            with pytest.raises(psycopg.errors.InsufficientPrivilege):
+                c.execute(sql)
+
+
 def test_las_funciones_nuevas_no_estan_abiertas_a_la_api_publica(repo):
     _solo_postgres(repo)
     import psycopg

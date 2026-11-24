@@ -44,6 +44,15 @@ def test_usuarios_no_expone_correo_ni_telefono():
     assert "correo" not in columnas and "telefono" not in columnas
 
 
+def test_clientes_no_expone_rut_ni_direccion():
+    acceso = leer("acceso.sql")
+    columnas = re.search(r"grant select \(([^)]*)\) on public\.clientes", acceso).group(1)
+    assert "rut" not in columnas and "direccion" not in columnas and "razon_social" in columnas
+    # y no hay un permiso de tabla completa que los vuelva a abrir
+    for g in re.findall(r"grant select on ([^;]*?) to", acceso, re.S):
+        assert "clientes" not in g, g
+
+
 def test_cada_funcion_de_la_pagina_tiene_su_permiso():
     funciones = leer("funciones.sql")
     nombres = [n for n in re.findall(r"create or replace function public\.(\w+)", funciones) if not n.startswith("_")]

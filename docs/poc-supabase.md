@@ -9,6 +9,7 @@ La prueba de concepto lleva el prototipo navegable a una base de datos real, sol
 > - **Los scripts corrieron en el proyecto.** `schema.sql`, `acceso.sql`, `funciones.sql` y `seed_poc.sql` se ejecutaron en Supabase sin error y los conteos coincidieron: 2 clientes, 2 usuarios, 7 equipos, 2 órdenes y 8 líneas.
 > - **Las reglas de la base, probadas con la clave publicable:** `supabase/probar_en_supabase.py` llama a cada función y pasan **82 de 82 comprobaciones**. La primera ejecución (73 de 80) encontró dos defectos de `funciones.sql`: `reiniciar_demo` fallaba desde la API porque Supabase rechaza un `DELETE` sin `WHERE`, y una línea con solo una tabulación se aceptaba como SKU. Se corrigieron, se volvió a ejecutar `funciones.sql` en Supabase y la prueba se repitió.
 > - **La pantalla, probada contra la base real:** en un navegador, el flujo completo de las tareas 1 y 2 y las pruebas de rotura (45 comprobaciones, todas correctas). El corte de conexión y el fallo interno se simularon interceptando la red del navegador, no con una caída real de Supabase.
+> - **Corrección posterior (2026-11-23).** Al ampliar `probar_en_supabase.py` para el MVP, una comprobación nueva encontró que la clave publicable podía leer el **RUT y la dirección de los clientes** (`acceso.sql` daba lectura de la tabla completa). El prototipo solo usa `id_cliente` y `razon_social`, así que se cerró: en Supabase, Bastián ejecutó `revoke select on public.clientes from anon, authenticated;` y `grant select (id_cliente, razon_social) on public.clientes to anon, authenticated;`, y `acceso.sql` quedó igual para que una base nueva nazca así. Con las comprobaciones nuevas el script da 89 OK y 0 FALLAS (resultado informado por Bastián, 2026-11-23).
 > - **Lo que no se probó:** en un celular ni con poca señal real, otros navegadores, dos personas a la vez, ni con personas ajenas al equipo (eso es la prueba de usuarios).
 > - La demo quedó reiniciada al terminar: 2 órdenes con 4 líneas pendientes cada una, sin guías ni cambios.
 
@@ -101,7 +102,7 @@ Contra el Supabase real, de dos maneras: llamando a las funciones con la clave p
 | Preparar la guía con productos sin validar, con un SKU que no existe o con un usuario que no es jefe de bodega | Se rechaza y no se crea la guía | Pasó | Pasó (con un SKU que no existe: guía bloqueada) |
 | Preparar la guía dos veces, o cambiar una orden que ya tiene guía | Se rechaza | Pasó | No probado en pantalla |
 | Escribir directo en las tablas (insertar, actualizar o borrar) | Rechazado sin cambiar nada | Pasó | No aplica |
-| Leer el correo o el teléfono de los usuarios | Rechazado | Pasó | No aplica |
+| Leer el correo o el teléfono de los usuarios, o el RUT o la dirección de los clientes | Rechazado | Pasó (los de clientes, desde 2026-11-23) | No aplica |
 | Reiniciar la demo | Las dos órdenes vuelven a su estado inicial | Pasó | Pasó |
 | Apretar «Guardar cambio» tres veces seguidas | Un solo cambio en la base; el botón queda desactivado | No aplica | Pasó: un solo cambio en la base |
 | Cortar la conexión (al validar y al guardar) | Aviso claro; lo escrito se conserva; el botón vuelve a estar activo | No aplica | Pasó (red simulada) |
@@ -128,9 +129,9 @@ Estas dos preguntas quedan abiertas hasta esa entrevista. Mientras tanto, el pro
 
 **El prototipo no tiene inicio de sesión, así que todo lo siguiente lo puede hacer cualquier persona que tenga la clave publicable.** La clave va dentro de la página y se ve en el navegador: esto es así por diseño y no es una filtración.
 
-- **Leer** todas las tablas del flujo. De los usuarios solo se leen el nombre, el cargo y si está activo; el correo y el teléfono no salen por la API.
+- **Leer** todas las tablas del flujo. De los usuarios solo se leen el nombre, el cargo y si está activo (el correo y el teléfono no salen por la API); de los clientes, solo el identificador y la razón social (el RUT y la dirección tampoco).
 - **Llamar a cualquiera de las cinco funciones:** cargar un pedido, validar, registrar un cambio, preparar una guía y **Reiniciar demo**.
-- **Reiniciar demo borra** las guías, los cambios y las líneas de todas las órdenes y las deja como al inicio. Cualquiera puede hacerlo en cualquier momento, también mientras otra persona está en plena sesión.
+- **Reiniciar demo deja las dos órdenes de la demo (3001 y 3002) como al inicio**: borra sus guías, cambios y líneas y las vuelve a crear. Desde el MVP con Supabase (`docs/mvp-supabase.md`) ya no borra ninguna otra orden. Cualquiera puede hacerlo en cualquier momento, también mientras otra persona está en plena sesión.
 - **Quién registra** un cambio o prepara una guía lo elige la persona en la pantalla, y las funciones no pueden comprobar que sea cierto. Que solo el jefe de bodega prepare la guía es coherencia de la demo, no seguridad.
 
 Lo que sí limita a cualquiera: no puede escribir directo en las tablas ni saltarse las reglas, porque toda escritura pasa por las funciones y estas, junto con las restricciones de las tablas, rechazan lo que no cumpla.

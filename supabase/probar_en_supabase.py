@@ -136,7 +136,11 @@ prueba("Lectura de guías de la demo (0)", st == 200 and c == [], f"HTTP {st}")
 st, c = llamar("GET", "/ordenes?select=id_orden,folio&id_orden=in.(3001,3002)&order=id_orden")
 prueba("Las órdenes de la demo tienen su folio", st == 200 and c == [{"id_orden": 3001, "folio": "GUIA-2026-001"}, {"id_orden": 3002, "folio": "GUIA-2026-002"}], f"HTTP {st} {str(c)[:120]}")
 st, c = llamar("GET", "/clientes?select=rut")
-prueba("Lo nuevo no abre datos: el RUT de clientes NO se puede leer con la clave pública", st in (401, 403) or (isinstance(c, dict) and c.get("code") == "42501"), f"HTTP {st}")
+prueba("El RUT de clientes NO se puede leer con la clave pública", st in (401, 403) or (isinstance(c, dict) and c.get("code") == "42501"), f"HTTP {st}")
+st, c = llamar("GET", "/clientes?select=direccion")
+prueba("La dirección de clientes NO se puede leer con la clave pública", st in (401, 403) or (isinstance(c, dict) and c.get("code") == "42501"), f"HTTP {st}")
+st, c = llamar("GET", "/clientes?select=id_cliente,razon_social")
+prueba("La razón social de clientes SÍ se puede leer (la usa el prototipo)", st == 200 and len(c) >= 2, f"HTTP {st}")
 
 # ------------------------------------------------------------------ escritura directa: debe estar cerrada
 for tabla, cuerpo in [("clientes", {"id_cliente": 99, "razon_social": "x", "rut": "x", "direccion": "x"}),
