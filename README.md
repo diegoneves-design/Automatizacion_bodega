@@ -57,6 +57,8 @@ README.md             portada del proyecto
 .env.example          nombres de variables de entorno, sin valores
 ```
 
+Sin emojis en el código; lo vigila `tests/test_sin_emojis.py`.
+
 ## Para quién es
 
 - **Usuario principal:** el jefe de bodega, que hoy digita cada guía a mano y la rehace cuando mantenimiento cambia un equipo a último minuto.

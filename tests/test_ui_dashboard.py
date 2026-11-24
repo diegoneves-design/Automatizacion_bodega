@@ -74,12 +74,12 @@ def test_la_politica_de_seguridad_coincide_con_el_contenido_y_no_deja_salir_nada
 
 
 def test_los_datos_viajan_escapados_y_se_leen_igual():
-    peligrosa = 'Equipo </script><script>alert(1)</script><!-- & "comillas"  '
+    peligrosa = 'Equipo </script><script>alert(1)</script><!-- & "comillas" ' + chr(0x2028)
     datos = datos_ficticios(peligrosa)
     html = ui_dashboard.pagina(datos)
     assert "</script><script>alert(1)" not in html
     bloque = re.search(r'<script type="application/json" id="datos-dashboard">(.*?)</script>', html, re.S).group(1)
-    assert "<" not in bloque and ">" not in bloque and "&" not in bloque and " " not in bloque
+    assert "<" not in bloque and ">" not in bloque and "&" not in bloque and chr(0x2028) not in bloque
     assert json.loads(bloque) == datos  # el navegador lee exactamente lo que mando el servidor
 
 
