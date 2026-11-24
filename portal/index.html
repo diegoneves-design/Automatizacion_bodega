@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>BodegaPlus · Guías de despacho y retiro</title>
+  <meta name="description" content="BodegaPlus emite automáticamente la guía de despacho o retiro de equipos de arriendo: valida cada equipo contra el inventario y deja registro de los cambios de última hora.">
+  <link rel="icon" href="icono.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <main class="portal">
+    <p class="marca">
+      <svg class="marca-icono" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12L3 7M12 12v10"/></svg>
+      <span>BodegaPlus</span>
+    </p>
+
+    <h1>Del pedido a la guía, <span class="enfasis">sin errores.</span></h1>
+    <p class="frase">Carga el listado de equipos de una orden, valida cada uno contra el inventario y emite la guía de despacho o retiro sin volver a digitarla, con registro de cada cambio de última hora.</p>
+
+    <noscript><p class="nota nota-error">Esta página necesita JavaScript activado para mostrar el acceso a la aplicación.</p></noscript>
+
+    <!-- Un solo botón. Mientras no haya dirección en config.js se ve este, desactivado; con dirección, portal.js lo cambia por el enlace. -->
+    <button type="button" id="abrir-pendiente" class="boton" disabled>Aplicación en despliegue</button>
+    <a id="abrir" class="boton" hidden rel="noopener noreferrer">Abrir la aplicación</a>
+    <p id="nota" class="nota">La aplicación todavía no está publicada. Cuando esté lista, el acceso aparecerá aquí.</p>
+
+    <footer class="pie">
+      <p>Proyecto del electivo «Ingeniería Digital en Acción: Datos, IA, MVP». Departamento de Ingeniería Industrial, Universidad de Santiago de Chile.</p>
+    </footer>
+  </main>
+
+  <!-- La dirección de la aplicación vive solo en config.js -->
+  <script src="config.js"></script>
+  <script src="portal.js"></script>
+</body>
+</html>

@@ -628,3 +628,28 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - Las capturas están en la carpeta temporal de la sesión, no en el repositorio (muestran el inventario real).
 - **No se verificó:** otros navegadores distintos de Chrome ni un celular real; el MVP publicado en un hosting; una persona usándolo con el teclado o un lector de pantalla; la lectura de las etiquetas más pequeñas de los gráficos en todos los tamaños más allá de las capturas revisadas; la carga con muchas sesiones a la vez.
 
+---
+
+## Encargo 32. Portal para Vercel (entrada pública del proyecto)
+
+**Objetivo.** Dejar Vercel como entrada pública del proyecto: Streamlit no corre en Vercel, así que Vercel publica una página estática mínima con un único botón hacia el MVP, y el prototipo queda como archivo histórico del repositorio.
+
+**Instrucción entregada.**
+- Contexto: el MVP (Streamlit) se publicará en un hosting aparte, todavía por elegir; el prototipo ya fue evaluado; Vercel sigue sin estar conectado al repositorio correcto y no se da por resuelto.
+- Intención: una carpeta `portal/` con título del proyecto, una frase de qué hace y un único botón «Abrir la aplicación» cuya dirección vive en una sola constante en un solo lugar; mientras esté vacía, el botón aparece desactivado con el texto «Aplicación en despliegue», para poder publicar el portal antes de que el MVP exista; mismo estilo del proyecto, responsive y en español; documentar en README y bitácora qué es el portal, que el prototipo es archivo histórico y dónde está la dirección del MVP; dar los pasos de Vercel.
+- Restricciones: no enlazar al prototipo ni a su dashboard; sin dependencias externas, sin claves y sin Supabase; no tocar nada en Vercel; commit aparte y sin abrir ningún pull request todavía.
+
+**Respuesta obtenida.** `portal/` con `index.html`, `estilos.css`, `portal.js`, `config.js` (la constante `URL_APLICACION`), `icono.svg`, `vercel.json` (encabezados de seguridad, sin comandos de construcción) y `LEEME.md`; las pruebas `tests/test_portal.py` y `tests/js/portal.test.js`; las secciones del README («Portal público en Vercel», la estructura, el estado y el aviso sobre el prototipo); los pasos de Vercel con su forma de comprobarlos.
+
+**Qué se aceptó y qué se corrigió.**
+- Solo se aceptan direcciones `https` sin usuario ni contraseña en `config.js`; `javascript:`, `data:`, `http:`, direcciones relativas y direcciones con credenciales se ignoran y el botón queda desactivado. Es una decisión de la IA, no pedida, para que una dirección mal escrita no deje un botón que lleve a un lugar inesperado.
+- Un solo botón visible en cada estado: el desactivado y el enlace son dos elementos del HTML, y `portal.js` deja visible solo uno. Sin JavaScript queda el desactivado y un aviso.
+- La IA no editó los documentos de los avances ya evaluados que mencionan `bodega-prototipo.vercel.app` (`docs/prototipo.md`, `docs/pauta-validacion.md`, `docs/prueba-usuarios.md`, `docs/etica.md`): cambiarlos alteraría entregas evaluadas. Se dejó el aviso en el README. **Consecuencia que Bastián debe decidir:** al cambiar el proyecto de Vercel, esa dirección deja de mostrar el prototipo, y la pauta de la prueba con usuarios lo menciona.
+- Dos pruebas de la IA estaban mal planteadas (una exigía que `portal.js` nombrara la constante una sola vez, aunque la nombra también en un comentario) y se corrigieron para exigir lo que importa: que solo `config.js` la defina.
+- El `vercel.json` no define `buildCommand`: no se pudo comprobar en Vercel qué hace un valor vacío frente al de la configuración del proyecto, así que quitar el Build Command antiguo queda como paso manual.
+
+**Cómo se verificó.**
+- `tests/test_portal.py` (9 pruebas: una sola constante, sin enlace al prototipo, sin claves ni dependencias externas, sin código en línea, política de seguridad, un solo botón, `vercel.json`) y `tests/js/portal.test.js` (4 pruebas: dirección vacía o inválida desactiva el botón, una `https` válida lo convierte en enlace).
+- En Chrome sin ventana, con el portal servido en el computador, en 375 px y 1366 px y con la dirección vacía y con una dirección de prueba (en una copia fuera del repositorio): siempre un único botón visible con el texto pedido, sin desplazamiento horizontal, sin errores de consola y sin más recursos que los cinco archivos del portal; el único enlace de la página es el de la constante. Los servidores y el navegador se cerraron por su número de proceso.
+- **No se verificó:** nada en Vercel (ni la conexión al repositorio, ni Root Directory, ni la publicación, ni que los encabezados de `vercel.json` se apliquen); otros navegadores ni un celular real; la dirección real del MVP, que no existe todavía.
+
