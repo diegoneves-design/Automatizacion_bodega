@@ -100,10 +100,11 @@ Se muestran solo las familias con 30 o más equipos (siete con los datos de hoy)
 2. ¿Qué significa exactamente POR HABILITAR? ¿Son equipos que se pueden recuperar?
 3. ¿BAJA es definitiva, o un equipo dado de baja puede volver?
 4. ¿Puede mostrarse el inventario real en una demo pública, o solo con datos de ejemplo?
+   **Respondida el 24 de noviembre de 2026 por Oscar: sí, el inventario real puede mostrarse en el Dashboard público.** Sigue fuera de lo público todo dato personal de clientes (RUT, dirección, correo y teléfono): `inventario_dashboard()` no los devuelve y los permisos de `clientes` no los exponen.
 
 ## 8. Nota de riesgo
 
-La política de lectura de la prueba de concepto es abierta y la clave pública está en el sitio publicado. Quien tenga esa clave puede leer los equipos reales (SKU y descripciones; no hay nombres de personas porque el importador no los guarda). Está aceptado para la prueba de concepto y queda pendiente confirmarlo con Oscar. Antes de un uso real hay que agregar inicio de sesión y cerrar las políticas por rol.
+La política de lectura de la prueba de concepto es abierta y la clave pública está en el sitio publicado. Quien tenga esa clave puede leer los equipos reales (SKU y descripciones; no hay nombres de personas porque el importador no los guarda). Oscar confirmó el 24 de noviembre de 2026 que el inventario real puede mostrarse en el Dashboard público (pregunta 4 de la sección 7), así que este riesgo queda aceptado. Lo que nunca se publica son los datos personales de clientes (RUT, dirección, correo y teléfono). Antes de un uso real hay que agregar inicio de sesión y cerrar las políticas por rol.
 
 ## 9. Dashboard
 
@@ -149,7 +150,7 @@ select length(public.inventario_dashboard()::text) as caracteres_del_json;      
 
 El mismo Dashboard de la sección 9 está también como vista del MVP, con el nombre «Dashboard». Se arma con los mismos archivos del prototipo (`prototipo/dashboard.html` entre sus marcadores, `filtros.js`, `graficos.js`, `dashboard.js`, ECharts y los estilos) más lo propio del MVP (`src/dashboard_incrustado/`: el entorno del iframe, el reemplazo de los datos y la distribución ancha). Lo que se corrija en los gráficos se corrige en las dos. El prototipo queda como está.
 
-**Por qué viene apagado.** Muestra el inventario real (SKU, descripciones, estados), y el MVP no tiene inicio de sesión: quien tenga la dirección de la aplicación lo vería. **La pregunta 4 de la sección 7 («¿puede mostrarse el inventario real en una demo pública?») sigue abierta** con Oscar o el jefe de bodega. Hasta tener su respuesta, el hosting público debe dejar la vista apagada.
+**Por qué viene apagado.** Muestra el inventario real (SKU, descripciones, estados), y el MVP no tiene inicio de sesión: quien tenga la dirección de la aplicación lo vería. **La pregunta 4 de la sección 7 («¿puede mostrarse el inventario real en una demo pública?») quedó respondida: Oscar confirmó el 24 de noviembre de 2026 que sí.** Por eso `DASHBOARD_INVENTARIO=1` puede activarse al publicar el MVP; sigue apagada por omisión para que sea una decisión explícita. Los datos personales de clientes (RUT, dirección, correo y teléfono) siguen fuera de lo público.
 
 **Cómo se enciende y se apaga.** Con la variable de entorno `DASHBOARD_INVENTARIO`: solo el valor exacto `1` enciende la vista (vacía, ausente o cualquier otro valor la apaga: no aparece en el menú y `?vista=dashboard` no la abre).
 
@@ -158,9 +159,9 @@ El mismo Dashboard de la sección 9 está también como vista del MVP, con el no
 | Computador (tu `.env`) | `DASHBOARD_INVENTARIO=1` | borra la línea o déjala vacía |
 | Hosting público | En el panel del servicio, agrega la variable de entorno `DASHBOARD_INVENTARIO` con valor `1` y reinicia el servicio | Quita la variable (o déjala vacía) y reinicia |
 
-No es un secreto (no contiene claves), pero es una decisión sobre qué datos se muestran: cámbiala solo cuando la bodega lo haya autorizado, y anótalo aquí. `DATABASE_URL` sí es secreto y va solo en los secretos del hosting.
+No es un secreto (no contiene claves), pero es una decisión sobre qué datos se muestran. La bodega ya lo autorizó (Oscar, 24 de noviembre de 2026), así que puede encenderse al publicar. `DATABASE_URL` sí es secreto y va solo en los secretos del hosting.
 
 **De dónde salen los datos.** El servidor llama a `inventario_dashboard()` con el rol limitado `app_mvp` (el permiso lo da `supabase/mvp_rol.sql`) y los guarda en memoria 5 minutos; el botón «Actualizar datos» los vuelve a pedir. La función devuelve solo las nueve columnas de la sección 9 (sin personas, clientes ni textos libres). Los datos viajan dentro de la página y el navegador no usa la clave publicable.
 
-**Lo que no cambia de la nota de riesgo (sección 8).** Con la vista encendida, quien llegue a la aplicación puede leer los equipos reales. Está aceptado solo mientras no se difunda la dirección más allá de quienes participan en la prueba.
+**Lo que no cambia de la nota de riesgo (sección 8).** Con la vista encendida, quien llegue a la aplicación puede leer los equipos reales. Oscar aceptó que se muestre el inventario real (24 de noviembre de 2026); lo que no debe cargarse en esta etapa son datos personales reales de clientes.
 

@@ -906,3 +906,19 @@ Lo hizo Oscar Ynchaustegui el 2026-11-22, con Claude. Lo revisa Sebastián Carmo
 
 **Cómo se verificó.** Suites tras el cambio en la rama 2: `pytest` 358 pasan y 70 se omiten; `pytest` con PostgreSQL 418 pasan y 10 se omiten; `node --test` 30 pasan. Sin marcadores de conflicto, claves ni SKU reales.
 
+
+---
+
+## Encargo 36. Pregunta 4 respondida: el inventario real puede mostrarse en público
+
+**Objetivo.** Dejar constancia de que Oscar confirmó que el inventario real puede mostrarse en el Dashboard público (pregunta 4 de `docs/analisis-inventario.md`) y quitar la advertencia de «no fusionar hasta tener su respuesta».
+
+**Instrucción entregada.** Actualizar `docs/analisis-inventario.md` (respuesta, quién y fecha); quitar la advertencia del README y de la descripción del PR 1 (#29), dejando constancia de que los datos personales de clientes (RUT, dirección, correo y teléfono) siguen fuera de lo público; indicar en `docs/mvp-supabase.md` y en los borradores que `DASHBOARD_INVENTARIO` puede activarse al publicar el MVP; registrar el cambio; propagar por fusión a las ramas 2, 3 y 4 sin force.
+
+**Respuesta obtenida.** Solo documentación y un comentario de `.env.example`; no cambió código ni SQL. La respuesta de Oscar quedó en las secciones 7 y 8 y en la 11 de `docs/analisis-inventario.md`, en `docs/mvp-supabase.md`, en el README y en `.env.example`. La vista sigue apagada por omisión (`DASHBOARD_INVENTARIO=1` la enciende): activarla es una decisión explícita al publicar. La respuesta fue informada por Bastián; esta rama no guarda otra evidencia de ella.
+
+**Qué se aceptó y qué se corrigió.**
+- Esta entrada se registra aquí, en la última rama, para no dejar un hueco entre los Encargos 29 y 30 en el PR 1.
+- Las fusiones entre ramas tuvieron un conflicto cada una en la tabla «Pendiente del avance» del README (las ramas 2 y 4); se resolvió conservando las filas de cada rama más la fila actualizada del Dashboard.
+
+**Cómo se verificó.** Suites tras cada paso: rama 1, `pytest` 282 y `node --test` 30; rama 3, `pytest` 384 con 72 omitidas y `node --test` 38; rama 4, `pytest` 393 con 72 omitidas y `node --test` 42. No se corrió PostgreSQL local; el CI en GitHub se revisa aparte. Sin marcadores de conflicto, claves ni SKU reales.

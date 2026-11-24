@@ -156,7 +156,7 @@ El MVP no tiene login. Quien opera se elige en el menú («Operar como») y la b
 
 ## 9. El Dashboard dentro del MVP
 
-Es una vista más del menú, apagada por omisión (`DASHBOARD_INVENTARIO=1` la enciende; ver `docs/analisis-inventario.md`, sección 11). Los gráficos son los del prototipo, mostrados en un `st.iframe` de Streamlit (`st.components.v1.html` está obsoleto en la 1.65).
+Es una vista más del menú, apagada por omisión (`DASHBOARD_INVENTARIO=1` la enciende y puede activarse al publicar el MVP: Oscar confirmó el 24 de noviembre de 2026 que el inventario real puede mostrarse; ver `docs/analisis-inventario.md`, sección 11). Los gráficos son los del prototipo, mostrados en un `st.iframe` de Streamlit (`st.components.v1.html` está obsoleto en la 1.65).
 
 - **Una sola fuente.** `src/ui_dashboard.py` arma la página leyendo los mismos archivos del prototipo (entre los marcadores de `prototipo/dashboard.html`) y les suma lo propio del MVP (`src/dashboard_incrustado/`). Si alguien borra un marcador, la vista lo dice y una prueba falla.
 - **Sin clave en el navegador.** El servidor lee `inventario_dashboard()` con el rol `app_mvp` y la incrusta en la página. La página lleva una política de seguridad con `connect-src 'none'` (no puede hablar con ninguna red) y solo ejecuta su propio código (por hash). No se copia `config.js` ni `api.js`.
