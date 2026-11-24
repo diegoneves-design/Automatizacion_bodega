@@ -55,6 +55,11 @@ COLUMNAS_ORDENES = ["folio", "tipo_movimiento", "modalidad", "fecha_carga", "sku
 COLUMNAS_LINEAS = ["id", "sku", "descripcion", "estado_equipo", "resultado", "ultima_modificacion"]
 COLUMNAS_CAMBIOS = ["id", "folio", "sku_original", "sku_nuevo", "responsable", "fecha_hora", "motivo"]
 COLUMNAS_EQUIPOS = ["sku", "descripcion", "estado"]
+# Lo que entrega inventario_dashboard(): solo estas nueve columnas de los equipos reales (id desde 1000)
+COLUMNAS_DASHBOARD = ["id_equipo", "sku", "descripcion", "familia", "categoria", "estado", "situacion_origen",
+                      "capacidad_valor", "capacidad_unidad"]
+# Motivos de cambio que el Dashboard cuenta por nombre; cualquier otro texto se cuenta como "Otro" (igual que en el SQL)
+MOTIVOS_DASHBOARD = ("Código mal digitado", "No pasó la prueba eléctrica", "Equipo en mantención")
 
 _FOLIO = re.compile(r"GUIA-[0-9]{4}-[0-9]{3,6}")
 _ESPACIOS = " \t\r\n\f\v\xa0"  # los mismos que quita _limpiar en SQL
@@ -158,6 +163,10 @@ class Repositorio(ABC):
     @abstractmethod
     def preparar_guia(self, folio, id_usuario):
         """Prepara la guia (solo si todo esta validado) y devuelve {numero_guia, fecha_emision}."""
+
+    @abstractmethod
+    def dashboard(self):
+        """Los datos del Dashboard (lo mismo que inventario_dashboard()): {equipos, extensiones, actividad}. Solo lectura."""
 
     def orden(self, folio):
         """Fila de la orden como dict, o None si no existe."""
@@ -311,6 +320,13 @@ class RepoPostgres(Repositorio):
         self._escribir("select public.preparar_guia(%s::integer, %s::integer)", (self._id_orden(folio), id_usuario))
         return self.guia(folio)
 
+    def dashboard(self):
+        filas = self._ejecutar("select public.inventario_dashboard() as d")
+        datos = filas[0]["d"] if filas else None
+        if not isinstance(datos, dict) or not {"equipos", "extensiones", "actividad"} <= set(datos):
+            raise ErrorDeBase("La base de datos devolvió el Dashboard con una forma inesperada. Avisa al equipo.")
+        return datos
+
     def _fecha_guia(self, folio):
         filas = self._ejecutar(
             f"select (fecha_emision at time zone '{ZONA_HORARIA}') as f from public.v_ordenes_resumen where folio = %s", (folio,)
@@ -458,6 +474,24 @@ class RepoSqlite(Repositorio):
             (patron, patron, int(limite)),
         )
         return pd.DataFrame(filas, columns=COLUMNAS_EQUIPOS)
+
+    def dashboard(self):
+        """Misma forma que inventario_dashboard(). En SQLite no hay inventario real (los equipos de demo no cuentan), asi que
+        el Dashboard sale vacio salvo por la actividad; sirve para probar la vista sin red."""
+        equipos = self._consultar("select id_equipo, sku, descripcion, estado from equipos where id_equipo >= 1000 order by id_equipo")
+        ordenes = self._consultar("select estado, count(*) as n from ordenes group by estado")
+        cambios = {}
+        for f in self._consultar("select motivo_cambio from registro_cambios"):
+            motivo = f["motivo_cambio"] if f["motivo_cambio"] in MOTIVOS_DASHBOARD else "Otro"
+            cambios[motivo] = cambios.get(motivo, 0) + 1
+        return {
+            "equipos": {
+                "columnas": list(COLUMNAS_DASHBOARD),
+                "filas": [[e["id_equipo"], e["sku"], e["descripcion"], None, None, e["estado"], None, None, None] for e in equipos],
+            },
+            "extensiones": {"columnas": ["sku", "corriente", "largo_m"], "filas": []},
+            "actividad": {"ordenes_por_estado": {o["estado"]: o["n"] for o in ordenes}, "cambios_por_motivo": cambios},
+        }
 
     def _fecha_guia(self, folio):
         filas = self._consultar(

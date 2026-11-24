@@ -401,6 +401,29 @@ def test_reiniciar_la_demo_no_pisa_los_ids_de_las_lineas_de_otras_ordenes(repo):
 
 
 # ---------------------------------------------------------------------------
+# Dashboard: los datos que lee el MVP (lo mismo que inventario_dashboard())
+# ---------------------------------------------------------------------------
+
+def test_el_dashboard_tiene_la_misma_forma_con_las_dos_bases(repo):
+    d = repo.dashboard()
+    assert set(d) == {"equipos", "extensiones", "actividad"}
+    assert d["equipos"]["columnas"] == db.COLUMNAS_DASHBOARD
+    assert d["equipos"]["filas"] == []  # los equipos de demo (501 a 507) no son inventario real
+    assert d["extensiones"] == {"columnas": ["sku", "corriente", "largo_m"], "filas": []}
+    assert d["actividad"] == {"ordenes_por_estado": {"pendiente": 2}, "cambios_por_motivo": {}}
+
+
+def test_el_dashboard_cuenta_ordenes_por_estado_y_cambios_por_motivo_igual_en_las_dos_bases(repo):
+    repo.validar("GUIA-2026-001")
+    repo.registrar_cambio("GUIA-2026-002", "SD-63A20-9999", "SD-63A20-0315", MANTENIMIENTO, "Código mal digitado")
+    repo.registrar_cambio("GUIA-2026-002", "SD-63A20-0315", "SD-63A20-0314", MANTENIMIENTO, "Cualquier otro texto libre")
+    d = repo.dashboard()
+    assert d["actividad"]["ordenes_por_estado"] == {"pendiente": 1, "validada": 1}
+    assert d["actividad"]["cambios_por_motivo"] == {"Código mal digitado": 1, "Otro": 1}  # un texto libre nunca sale tal cual
+    assert "Cualquier otro texto libre" not in str(d)
+
+
+# ---------------------------------------------------------------------------
 # .env local y eleccion de la base
 # ---------------------------------------------------------------------------
 

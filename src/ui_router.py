@@ -9,11 +9,12 @@ DATABASE_URL, o SQLite local si no.
 import streamlit as st
 
 import db
+import ui_dashboard
 import ui_datos
 import ui_nav
 import ui_theme
 from ui_components import Html, banner, esc, icono, mostrar
-from views import ajuste, carga, detalle, guia, historial, ordenes, validacion
+from views import ajuste, carga, dashboard, detalle, guia, historial, ordenes, validacion
 
 # (clave del boton, etiqueta, pantalla de destino)
 MENU = [
@@ -24,6 +25,9 @@ MENU = [
     ("menu_historial", "Historial", "historial"),
 ]
 
+# Solo aparece con DASHBOARD_INVENTARIO=1: el inventario real no se muestra en publico sin permiso (docs/analisis-inventario.md)
+MENU_DASHBOARD = ("menu_dashboard", "Dashboard", "dashboard")
+
 # Que opcion del menu queda resaltada en cada pantalla
 MENU_ACTIVO = {
     "ordenes": "menu_ordenes",
@@ -33,6 +37,7 @@ MENU_ACTIVO = {
     "validacion": "menu_validador",
     "ajuste": "menu_ajuste",
     "historial": "menu_historial",
+    "dashboard": "menu_dashboard",
 }
 
 # Paso del flujo (1 a 5) que corresponde a cada pantalla; las demas no resaltan ninguno
@@ -69,7 +74,7 @@ def _menu_lateral(repo):
     with st.sidebar:
         mostrar(Html(f'<div class="bp-marca">{icono("logo", 28)}<span>{esc(ui_theme.NOMBRE_APP)}</span></div>'))
         activo = MENU_ACTIVO.get(st.session_state.vista)
-        for clave, etiqueta, destino in MENU:
+        for clave, etiqueta, destino in MENU + ([MENU_DASHBOARD] if ui_dashboard.activo() else []):
             st.button(
                 etiqueta,
                 key=clave,
@@ -98,6 +103,7 @@ PANTALLAS = {
     "guia": guia.render,
     "historial": historial.render,
     "carga": carga.render,
+    "dashboard": dashboard.render,
 }
 
 
@@ -131,6 +137,8 @@ def _flujo(vista):
 def run(repo):
     """Punto de entrada de la interfaz: estado, tema, menu y pantalla actual."""
     ui_nav.iniciar_estado()
+    if st.session_state.vista == "dashboard" and not ui_dashboard.activo():
+        st.session_state.vista = "ordenes"  # apagado: ni por el menu ni por la direccion
     ui_theme.inyectar()
     try:
         _menu_lateral(repo)
@@ -141,4 +149,5 @@ def run(repo):
         mostrar(banner("error", "No se pudo leer la base de datos", str(e)))
         st.button("Reintentar", key="reintentar")
         return
-    _flujo(st.session_state.vista)
+    if st.session_state.vista != "dashboard":  # el Dashboard no es un paso del flujo de la guia
+        _flujo(st.session_state.vista)

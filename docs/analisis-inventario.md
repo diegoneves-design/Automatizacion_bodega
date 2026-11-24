@@ -144,3 +144,23 @@ Después de verificar, `select public.reiniciar_demo();` y una nueva consulta de
 select jsonb_array_length(public.inventario_dashboard() -> 'equipos' -> 'filas') as equipos_en_el_dashboard;   -- debe dar 1617
 select length(public.inventario_dashboard()::text) as caracteres_del_json;                                   -- unos 240.000 (menos de 600.000)
 ```
+
+## 11. El Dashboard dentro del MVP (Streamlit): cómo activarlo
+
+El mismo Dashboard de la sección 9 está también como vista del MVP, con el nombre «Dashboard». Se arma con los mismos archivos del prototipo (`prototipo/dashboard.html` entre sus marcadores, `filtros.js`, `graficos.js`, `dashboard.js`, ECharts y los estilos) más lo propio del MVP (`src/dashboard_incrustado/`: el entorno del iframe, el reemplazo de los datos y la distribución ancha). Lo que se corrija en los gráficos se corrige en las dos. El prototipo queda como está.
+
+**Por qué viene apagado.** Muestra el inventario real (SKU, descripciones, estados), y el MVP no tiene inicio de sesión: quien tenga la dirección de la aplicación lo vería. **La pregunta 4 de la sección 7 («¿puede mostrarse el inventario real en una demo pública?») sigue abierta** con Oscar o el jefe de bodega. Hasta tener su respuesta, el hosting público debe dejar la vista apagada.
+
+**Cómo se enciende y se apaga.** Con la variable de entorno `DASHBOARD_INVENTARIO`: solo el valor exacto `1` enciende la vista (vacía, ausente o cualquier otro valor la apaga: no aparece en el menú y `?vista=dashboard` no la abre).
+
+| Dónde | Para encenderla | Para apagarla |
+|---|---|---|
+| Computador (tu `.env`) | `DASHBOARD_INVENTARIO=1` | borra la línea o déjala vacía |
+| Hosting público | En el panel del servicio, agrega la variable de entorno `DASHBOARD_INVENTARIO` con valor `1` y reinicia el servicio | Quita la variable (o déjala vacía) y reinicia |
+
+No es un secreto (no contiene claves), pero es una decisión sobre qué datos se muestran: cámbiala solo cuando la bodega lo haya autorizado, y anótalo aquí. `DATABASE_URL` sí es secreto y va solo en los secretos del hosting.
+
+**De dónde salen los datos.** El servidor llama a `inventario_dashboard()` con el rol limitado `app_mvp` (el permiso lo da `supabase/mvp_rol.sql`) y los guarda en memoria 5 minutos; el botón «Actualizar datos» los vuelve a pedir. La función devuelve solo las nueve columnas de la sección 9 (sin personas, clientes ni textos libres). Los datos viajan dentro de la página y el navegador no usa la clave publicable.
+
+**Lo que no cambia de la nota de riesgo (sección 8).** Con la vista encendida, quien llegue a la aplicación puede leer los equipos reales. Está aceptado solo mientras no se difunda la dirección más allá de quienes participan en la prueba.
+

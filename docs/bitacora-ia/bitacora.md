@@ -594,3 +594,37 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - Los archivos SQL se aplicaron en el orden documentado sobre una base nueva y sobre una que simula la actual (estado anterior más inventario ficticio y una orden sin folio), dos veces cada una; `verificar_mvp.sql` solo falló en los conteos del inventario real, porque la base local no los tiene.
 - `node --test prototipo/pruebas/filtros.test.js`: 30 pruebas pasan; el prototipo no se modificó.
 - **No se verificó:** nada en Supabase (no se ejecutó ningún SQL ahí); las comprobaciones por la API pública de `probar_en_supabase.py`, que necesitan la API de Supabase; el pooler con el usuario `app_mvp.<referencia>`; el MVP en un navegador contra Supabase; el flujo del CI en GitHub (solo se validó su sintaxis). Tampoco se probó la aplicación a mano en un navegador: los recorridos usan Streamlit AppTest.
+
+---
+
+## Encargo 31. Dashboard del inventario dentro del MVP
+
+**Objetivo.** Llevar el análisis del inventario real (12 gráficos, filtro cruzado, indicadores, tabla de casos, CSV, vistas por rol y «Lectura de los datos») a una vista «Dashboard» del MVP, reutilizando el código del prototipo sin duplicarlo, con los datos entregados por el servidor y con una distribución pensada para pantallas anchas.
+
+**Instrucción entregada.**
+- Contexto: el MVP (Streamlit) ya usa `db.py` y el rol `app_mvp`; el prototipo ya fue evaluado y queda como archivo histórico (no se rehace, no se rompe). Rama `feature/mvp-dashboard`, desde `feature/mvp-supabase`.
+- Intención: enfoque a evaluar y confirmar antes de implementar (componente HTML incrustado con datos del servidor, un «modo incrustado» y una sola fuente de scripts); rediseño ancho (indicadores en una fila, 3 columnas en pantallas grandes y 2 en medianas, gráficos densos con más ancho, tabla a todo el ancho, panel lateral que no tape los gráficos); revisar CSV, panel y filtros en la dirección dentro de Streamlit.
+- Restricciones: ninguna clave, contraseña ni cadena de conexión en el repositorio; el navegador no usa la clave pública en esta vista; la vista solo aparece con `DASHBOARD_INVENTARIO=1`; no cambiar el flujo de pedidos del prototipo ni nada de su dashboard salvo lo necesario para compartir el código; fijar `streamlit==1.65.0`; probar los tamaños 1366×768, 1920×1080, 2560×1440 y 375 px de uno en uno y cerrar cada proceso por su número.
+- Decisiones de Bastián tras el plan: `st.iframe`, código compartido con marcadores, CSS ancho solo para el MVP, solución del panel y de los filtros en la URL, la bandera, y fijar la versión de Streamlit.
+
+**Respuesta obtenida.**
+- Plan evaluado: `st.components.v1.html` está obsoleto en la 1.65, y `st.iframe` mide el contenido. Alternativas descartadas con razones: reescribir en Plotly (cada clic sería un viaje al servidor, habría que reescribir `filtros.js` y sumar una dependencia) y `st.html` o componentes v2 (el código correría dentro de la página de Streamlit y chocaría con sus estilos).
+- Código compartido: dos pares de marcadores en `prototipo/dashboard.html` (solo comentarios) y un «entorno» opcional en `prototipo/js/dashboard.js` (por omisión se comporta como antes).
+- MVP: `src/ui_dashboard.py` (arma la página, escapa los datos y fija la política de seguridad por hash), `src/dashboard_incrustado/` (entorno, datos y CSS ancho), `src/views/dashboard.py`, el método `dashboard()` de `db.py` en SQLite y PostgreSQL, el menú y `?vista=dashboard`, el permiso del rol (en `mvp_rol.sql`, del Encargo 30), `requirements.txt` y `Dockerfile` (copia los archivos uno a uno, nunca `config.js`).
+- Pruebas: `tests/test_ui_dashboard.py`, `tests/js/incrustado.test.js` y el contrato de `dashboard()` en `tests/test_contrato_repo.py`.
+
+**Qué se aceptó y qué se corrigió.**
+- El panel lateral del prototipo es fijo: en un iframe del alto total del contenido habría quedado anclado al final de la página. Se resolvió como se había propuesto: el iframe ocupa el alto de la ventana, con el contenido desplazándose dentro, y en pantallas anchas el panel se acopla a un lado.
+- Corregido durante el trabajo: (1) mi primera captura «completa» salió del tamaño de la ventana, no del contenido, porque Streamlit desplaza su propio contenedor; se rehízo ampliando la ventana; (2) el iframe quedaba a 286 px del borde de la ventana: se compactó la fila del título con el botón «Actualizar datos» (224 px); (3) el selector «Operar como» del menú, de la etapa anterior, tenía texto blanco sobre fondo claro (ilegible); el primer arreglo de CSS no funcionó porque Streamlit 1.65 ya no usa `data-baseweb`, y se corrigió mirando el HTML real en el navegador; (4) una prueba mía comparaba objetos de un contexto aislado de Node con `deepEqual` estricto y fallaba por el prototipo; se comparan por contenido.
+- Dejado fuera: nada de lo pedido. Queda como decisión de Bastián si, en pantallas medianas, el treemap debe seguir a ancho completo.
+- Quedó apagado en público por decisión de Bastián, a la espera de la respuesta de Oscar (pregunta 4 de `docs/analisis-inventario.md`).
+
+**Cómo se verificó.**
+- `py -m pytest tests`: 248 pasan y 71 se omiten (las que necesitan un PostgreSQL de prueba). Con un PostgreSQL 16 local y desechable: 313 pasan y 6 se omiten. `node --test`: 38 pasan (30 del prototipo y 8 nuevas).
+- Contra Supabase real (rol `app_mvp`, solo lectura): `inventario_dashboard()` devuelve 1.617 equipos y 319 extensiones con las 9 columnas permitidas.
+- En Chrome sin ventana, con la aplicación local conectada a Supabase, un tamaño a la vez: 1366×768 (2 columnas), 1920×1080 y 2560×1440 (3 columnas) y 375 px (1 columna). En los cuatro: sin desplazamiento horizontal de la página ni del iframe, los 12 gráficos dibujados, ninguno aplastado (mínimo 300 px de alto), indicadores en una fila desde 720 px de ancho, y ningún error de consola (la política de seguridad no bloquea nada).
+- En el navegador, a 1920 y a 375: el filtro de un indicador queda en la dirección de la página de Streamlit; abrir con `#estado=arrendado` restaura el filtro (243 equipos); el CSV descargado trae 244 líneas (243 más el encabezado), también con la política estricta; el panel se acopla sin tapar los gráficos a 1920 y es modal a 375; Escape lo cierra.
+- Las otras vistas conservan su ancho (1120 px en Órdenes y Carga masiva) y el Dashboard usa el ancho completo. El prototipo, probado en el mismo navegador, da las mismas cifras (1.617, 899, 243, 195 y 280), 12 gráficos, su ancho de 1280 px y sus filtros en su propia dirección.
+- Las capturas están en la carpeta temporal de la sesión, no en el repositorio (muestran el inventario real).
+- **No se verificó:** otros navegadores distintos de Chrome ni un celular real; el MVP publicado en un hosting; una persona usándolo con el teclado o un lector de pantalla; la lectura de las etiquetas más pequeñas de los gráficos en todos los tamaños más allá de las capturas revisadas; la carga con muchas sesiones a la vez.
+

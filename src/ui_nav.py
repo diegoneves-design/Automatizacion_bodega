@@ -10,12 +10,22 @@ Estado de navegacion de la interfaz (st.session_state). Lo usan el enrutador y l
 
 import streamlit as st
 
+import ui_dashboard
 from ui_components import banner, mostrar
+
+
+def _vista_inicial():
+    """La pantalla con la que abre la sesion. ?vista=dashboard abre el Dashboard, pero solo si esta encendido."""
+    try:
+        pedida = st.query_params.get("vista")
+    except Exception:  # noqa: BLE001 - sin parametros de direccion, se abre en Ordenes
+        pedida = None
+    return "dashboard" if pedida == "dashboard" and ui_dashboard.activo() else "ordenes"
 
 
 def iniciar_estado():
     ss = st.session_state
-    ss.setdefault("vista", "ordenes")
+    ss.setdefault("vista", _vista_inicial())
     ss.setdefault("folio", None)
     ss.setdefault("id_usuario", None)
     ss.setdefault("validadas", set())

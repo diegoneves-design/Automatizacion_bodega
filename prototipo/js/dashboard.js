@@ -7,6 +7,18 @@
   var G = window.Graficos;
   var esc = G.esc;
 
+  /* Entorno: donde viven la direccion (#filtros) y la forma del panel. En el prototipo es la propia pagina. El MVP
+     (src/dashboard_incrustado/entorno.js) lo reemplaza porque corre dentro de un iframe de Streamlit. */
+  var ENT = window.DASHBOARD_ENTORNO || {
+    leerHash: function () { return window.location.hash; },
+    guardarHash: function (h) {
+      var destino = window.location.pathname + window.location.search + (h ? '#' + h : '');
+      if (window.location.hash.replace(/^#/, '') !== h) window.history.replaceState(null, '', destino);
+    },
+    alCambiarHash: function (cb) { window.addEventListener('hashchange', cb); },
+    panelAcoplado: function () { return false; }
+  };
+
   var datos = { equipos: [], extensiones: [], actividad: null };
   var st = {
     filtros: F.filtrosVacios(), modo3: 'porcentaje', modo4: 'porcentaje', unidad: null, tablas: {},
@@ -18,6 +30,7 @@
   var listaTabla = [];
   var reducido = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var abridor = null;
+  var acoplado = false;
 
   function $(id) { return document.getElementById(id); }
   function html(el, texto) { el.innerHTML = texto; }
@@ -49,7 +62,7 @@
       html($('estado-carga'), '');
       $('contenido').hidden = false;
       armarGraficos();
-      st.filtros = F.desdeHash(window.location.hash);
+      st.filtros = F.desdeHash(ENT.leerHash());
       render();
     });
   }
@@ -103,11 +116,7 @@
 
   function cambiarFiltros(f) { st.filtros = f; st.pagina = 1; render(); }
 
-  function guardarHash() {
-    var h = F.aHash(st.filtros);
-    var destino = window.location.pathname + window.location.search + (h ? '#' + h : '');
-    if (window.location.hash.replace(/^#/, '') !== h) window.history.replaceState(null, '', destino);
-  }
+  function guardarHash() { ENT.guardarHash(F.aHash(st.filtros)); }
 
   /* ---------- Dibujo ---------- */
   function render() {
@@ -301,9 +310,13 @@
       fila('Modelo (leído de la descripción)', e.modelo === F.SIN_MODELO ? 'No se indica en la descripción' : e.modelo) + '</dl>' +
       '<p class="nota">Pendiente como mejora futura: indicar aquí si el equipo aparece en alguna orden del prototipo.</p>');
     $('panel-titulo').textContent = 'Detalle del equipo';
-    $('panel').hidden = false; $('velo').hidden = false;
-    document.querySelector('.app').inert = true;
+    /* En pantallas anchas del MVP el panel se acopla a un lado y no tapa los graficos: no es modal. */
+    acoplado = !!(ENT.panelAcoplado && ENT.panelAcoplado());
+    $('panel').setAttribute('aria-modal', acoplado ? 'false' : 'true');
+    $('panel').hidden = false;
+    if (!acoplado) { $('velo').hidden = false; document.querySelector('.app').inert = true; }
     document.body.classList.add('con-panel');
+    if (acoplado) { document.body.classList.add('panel-acoplado'); window.setTimeout(reajustar, 0); }
     $('panel-cerrar').focus();
   }
 
@@ -312,9 +325,13 @@
     $('panel').hidden = true; $('velo').hidden = true;
     document.querySelector('.app').inert = false;
     document.body.classList.remove('con-panel');
+    if (acoplado) { document.body.classList.remove('panel-acoplado'); acoplado = false; window.setTimeout(reajustar, 0); }
     if (abridor && document.contains(abridor)) abridor.focus();
     abridor = null;
   }
+
+  /* Los graficos se redibujan cuando cambia el ancho (el panel acoplado lo cambia sin cambiar la ventana). */
+  function reajustar() { window.dispatchEvent(new Event('resize')); }
 
   /* ---------- Eventos ---------- */
   document.addEventListener('click', function (ev) {
@@ -343,9 +360,9 @@
   function arrancar() {
     $('velo').addEventListener('click', cerrarPanel);
     $('buscar').addEventListener('input', function (ev) { st.busqueda = ev.target.value; st.pagina = 1; renderTabla(F.aplicar(datos.equipos, st.filtros)); });
-    window.addEventListener('hashchange', function () {
+    ENT.alCambiarHash(function () {
       if (!datos.equipos.length) return;
-      var f = F.desdeHash(window.location.hash);
+      var f = F.desdeHash(ENT.leerHash());
       if (!F.mismosFiltros(f, st.filtros)) { st.filtros = f; st.pagina = 1; render(); }
     });
     var pendiente = null;

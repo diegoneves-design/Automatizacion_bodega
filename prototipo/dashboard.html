@@ -25,6 +25,7 @@
       <h1>Dashboard</h1>
       <p class="ayuda-pantalla">Complemento del programa para todos los roles. Haz clic en un gráfico para filtrar; todo lo demás se recalcula.</p>
 
+      <!-- dashboard:contenido:inicio  (src/ui_dashboard.py reutiliza lo que hay entre este marcador y el de cierre en el MVP; no los borres) -->
       <section aria-labelledby="vistas-titulo" class="bloque-vistas">
         <h2 class="solo-lectores" id="vistas-titulo">Vistas rápidas por rol</h2>
         <div class="vistas" id="vistas" role="group" aria-label="Vistas rápidas por rol"></div>
@@ -76,6 +77,7 @@
           <p class="ayuda" id="pagina-info" aria-live="polite"></p>
         </section>
       </div>
+      <!-- dashboard:contenido:fin -->
     </main>
 
     <footer class="pie">
@@ -83,6 +85,7 @@
     </footer>
   </div>
 
+  <!-- dashboard:panel:inicio -->
   <div id="velo" class="velo" hidden></div>
   <aside id="panel" class="panel" role="dialog" aria-modal="true" aria-labelledby="panel-titulo" hidden>
     <div class="panel-cabecera">
@@ -91,6 +94,7 @@
     </div>
     <div id="panel-cuerpo"></div>
   </aside>
+  <!-- dashboard:panel:fin -->
 
   <!-- config.js lo genera generar-config.mjs y no se sube a git -->
   <script src="js/config.js"></script>

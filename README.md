@@ -134,6 +134,16 @@ La aplicación abre en **Órdenes**. A la izquierda hay un menú con cinco opcio
 | **Validador** | Revisar cada SKU de la orden contra el inventario. El resultado queda guardado en la base. Cada fila queda como `OK`, `No disponible` o `No existe`, y se puede descargar en CSV. Si algún SKU tiene problemas, *Emitir guía* queda bloqueado y *Corregir SKU* lleva al ajuste. Con todo `OK`, emite la guía (solo el jefe de bodega puede) con su número y la deja para descargar en `.txt`. Una orden con guía ya no admite cambios |
 | **Ajuste de última hora** | Reemplazar un SKU por otro del inventario (se busca por parte del SKU o de la descripción), con motivo y responsable (se elige de la lista de usuarios). El original no se borra y el cambio queda en el historial de la orden; después hay que volver a validar |
 | **Historial** | Ver todos los cambios de última hora (fecha y hora, orden, SKU original y nuevo, responsable y motivo) y descargarlos en CSV |
+| **Dashboard** (opcional, apagado por omisión) | Análisis del inventario real: 5 indicadores, 12 gráficos que se filtran entre sí, tabla de equipos con descarga en CSV, vistas rápidas por rol y «Lectura de los datos». Solo aparece con `DASHBOARD_INVENTARIO=1` |
+
+### Dashboard del inventario (opcional)
+
+Es el análisis del inventario real de la bodega (1.617 equipos y 319 extensiones), dentro del mismo menú del MVP. **Viene apagado**: el inventario real no se muestra en público sin permiso de la bodega (pregunta 4 de `docs/analisis-inventario.md`, todavía abierta).
+
+- **En tu computador:** en `.env`, `DASHBOARD_INVENTARIO=1`, y que `DATABASE_URL` apunte a Supabase (con la base local de pruebas la vista sale vacía). Aparece «Dashboard» en el menú, y también se abre directo con `http://localhost:8501/?vista=dashboard`.
+- **En un hosting público:** déjalo **sin definir**. Para encenderlo, agrega la variable de entorno `DASHBOARD_INVENTARIO` con el valor `1` en el servicio y reinícialo; para apagarlo, quítala. Cómo y por qué: `docs/analisis-inventario.md` (sección 11).
+- **Cómo funciona:** los gráficos son los mismos del prototipo (se arma la página con los mismos archivos, sin copiarlos). Los datos los lee el servidor con el rol limitado `app_mvp` y viajan dentro de la página: el navegador no usa la clave publicable ni llama a Supabase. Los filtros quedan en la dirección (`?vista=dashboard#estado=arrendado`) y se pueden compartir.
+- **Streamlit está fijo en la versión 1.65.0** (`requirements.txt`): el Dashboard usa `st.iframe`, que no existe en versiones antiguas.
 
 ### Prueba guiada (5 minutos)
 

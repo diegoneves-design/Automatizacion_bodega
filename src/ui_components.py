@@ -39,6 +39,7 @@ TRAZOS = {
     "validador": '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
     "ajuste": '<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
     "historial": '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    "dashboard": '<path d="M4 20V11M10 20V4M16 20v-6M3 20h18"/>',
     "ok": '<circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-7"/>',
     "alerta": '<path d="M12 3l10 18H2L12 3z"/><path d="M12 10v5M12 18v.5"/>',
     "error": '<circle cx="12" cy="12" r="10"/><path d="M9 9l6 6M15 9l-6 6"/>',

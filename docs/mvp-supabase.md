@@ -1,6 +1,6 @@
 # MVP (Streamlit) conectado a Supabase
 
-Estado: **escrito y probado contra un PostgreSQL local y en SQLite (2026-11-20); falta ejecutarlo en Supabase.** Ver la sección 9.
+Estado: **escrito y probado contra un PostgreSQL local y en SQLite (2026-11-20); falta ejecutarlo en Supabase.** Ver la sección 10.
 
 Este documento explica cómo el MVP (la aplicación Streamlit de `src/`) pasó de una base SQLite con datos de ejemplo a la base real de Supabase: qué se cambió, en qué orden se ejecuta el SQL, cómo conectarla sin exponer ninguna clave, qué permisos tiene la aplicación y qué falta. No contiene contraseñas, cadenas de conexión ni datos reales.
 
@@ -154,7 +154,17 @@ El MVP no tiene login. Quien opera se elige en el menú («Operar como») y la b
 - Una orden **sin folio** (por ejemplo, una creada a mano) no aparece en la lista del MVP; las dos de la demo reciben su folio con `mvp_folio.sql`.
 - Los folios `GUIA-2026-001` y `GUIA-2026-002` son de la demo: el MVP no los puede reutilizar.
 
-## 9. Pendiente
+## 9. El Dashboard dentro del MVP
+
+Es una vista más del menú, apagada por omisión (`DASHBOARD_INVENTARIO=1` la enciende; ver `docs/analisis-inventario.md`, sección 11). Los gráficos son los del prototipo, mostrados en un `st.iframe` de Streamlit (`st.components.v1.html` está obsoleto en la 1.65).
+
+- **Una sola fuente.** `src/ui_dashboard.py` arma la página leyendo los mismos archivos del prototipo (entre los marcadores de `prototipo/dashboard.html`) y les suma lo propio del MVP (`src/dashboard_incrustado/`). Si alguien borra un marcador, la vista lo dice y una prueba falla.
+- **Sin clave en el navegador.** El servidor lee `inventario_dashboard()` con el rol `app_mvp` y la incrusta en la página. La página lleva una política de seguridad con `connect-src 'none'` (no puede hablar con ninguna red) y solo ejecuta su propio código (por hash). No se copia `config.js` ni `api.js`.
+- **Qué cambia respecto del prototipo.** Los filtros viajan en la dirección de la página de Streamlit (no del iframe); el iframe ocupa el alto de la ventana y el contenido se desplaza dentro; en pantallas anchas el panel de detalle se acopla a un lado y no tapa los gráficos; la distribución usa todo el ancho (1 columna en celular, 2 en pantallas medianas y 3 en grandes). Las demás vistas conservan su ancho de lectura.
+- **Fijar Streamlit.** `requirements.txt` pide `streamlit==1.65.0`: el comportamiento del iframe (sandbox y medición) depende de la versión.
+- **Con la base local de pruebas** (SQLite) la vista avisa que no hay inventario real: ahí solo existen los equipos de demo.
+
+## 10. Pendiente
 
 1. Ejecutar la sección 3 en Supabase, definir la contraseña de `app_mvp` y correr `verificar_mvp.sql` y `probar_en_supabase.py`.
 2. Levantar el MVP en el computador contra Supabase y probarlo a mano (Bastián).
