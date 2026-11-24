@@ -223,10 +223,10 @@ La aplicación abre en **Órdenes**. A la izquierda hay un menú con cinco opcio
 
 ### Dashboard del inventario (opcional)
 
-Es el análisis del inventario real de la bodega (1.617 equipos y 319 extensiones), dentro del mismo menú del MVP. **Viene apagado**: el inventario real no se muestra en público sin permiso de la bodega (pregunta 4 de `docs/analisis-inventario.md`, todavía abierta).
+Es el análisis del inventario real de la bodega (1.617 equipos y 319 extensiones), dentro del mismo menú del MVP. **Viene apagado por omisión**, pero la bodega ya autorizó mostrar el inventario real en público (Oscar, 24 de noviembre de 2026, pregunta 4 de `docs/analisis-inventario.md`), así que puede activarse al publicar el MVP. Los datos personales de clientes siguen fuera de lo público.
 
 - **En tu computador:** en `.env`, `DASHBOARD_INVENTARIO=1`, y que `DATABASE_URL` apunte a Supabase (con la base local de pruebas la vista sale vacía). Aparece «Dashboard» en el menú, y también se abre directo con `http://localhost:8501/?vista=dashboard`.
-- **En un hosting público:** déjalo **sin definir**. Para encenderlo, agrega la variable de entorno `DASHBOARD_INVENTARIO` con el valor `1` en el servicio y reinícialo; para apagarlo, quítala. Cómo y por qué: `docs/analisis-inventario.md` (sección 11).
+- **En un hosting público:** al publicar el MVP puedes activarlo. Para encenderlo, agrega la variable de entorno `DASHBOARD_INVENTARIO` con el valor `1` en el servicio y reinícialo; para apagarlo, quítala. Cómo y por qué: `docs/analisis-inventario.md` (sección 11).
 - **Cómo funciona:** los gráficos son los mismos del prototipo (se arma la página con los mismos archivos, sin copiarlos). Los datos los lee el servidor con el rol limitado `app_mvp` y viajan dentro de la página: el navegador no usa la clave publicable ni llama a Supabase. Los filtros quedan en la dirección (`?vista=dashboard#estado=arrendado`) y se pueden compartir.
 - **Streamlit está fijo en la versión 1.65.0** (`requirements.txt`): el Dashboard usa `st.iframe`, que no existe en versiones antiguas.
 
