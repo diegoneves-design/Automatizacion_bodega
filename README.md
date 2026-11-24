@@ -23,12 +23,16 @@ Documentación del proyecto:
 - Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app). Sigue publicado en su propio proyecto de Vercel (`bodega-prototipo`) para el video de este README y para la prueba con usuarios; no se rehace y el portal no lo enlaza
 - Portal público para Vercel (una página con un botón hacia el MVP): [portal/LEEME.md](portal/LEEME.md); la dirección del MVP vive en `portal/config.js`
 - Análisis ético del prototipo (Avance 5): [docs/etica.md](docs/etica.md)
+- **Arquitectura y camino delgado de la prueba de concepto (Avance 7): [docs/arquitectura.md](docs/arquitectura.md)**
 - Prueba de concepto con Supabase (reglas, mensajes de error y pruebas de rotura): [docs/poc-supabase.md](docs/poc-supabase.md)
 - Inventario real de la bodega: método, supuestos y orden de carga a Supabase: [docs/analisis-inventario.md](docs/analisis-inventario.md)
 - Dashboard (en el menú del prototipo, junto a Pedidos; archivo `prototipo/dashboard.html`): gráficos con filtros que se combinan; sus reglas están en `docs/analisis-inventario.md`
 - MVP (Streamlit) conectado a Supabase: orden de ejecución del SQL, rol limitado, cómo conectarlo y límites: [docs/mvp-supabase.md](docs/mvp-supabase.md)
 - Diseño de la prueba de usuarios (Avance 6): [docs/prueba-usuarios.md](docs/prueba-usuarios.md)
-- Guion para cada sesión de la prueba (Avance 6): [docs/pauta-validacion.md](docs/pauta-validacion.md)
+- Guion para cada sesión de la prueba (Avance 6): [docs/pauta-validacion.md](docs/pauta-validacion.md) · [versión para imprimir](docs/pauta-validacion.pdf)
+- Kit para ejecutar la prueba (consentimiento, planilla, ensayo, plan de sesiones y regla de decisión): [docs/kit-prueba/](docs/kit-prueba/)
+- Línea base: cómo medir hoy una guía a mano y el indicador de éxito: [docs/linea-base.md](docs/linea-base.md)
+- Chequeo del prototipo en un celular real: [docs/checklist-celular.md](docs/checklist-celular.md)
 
 ### Estructura del repositorio
 
@@ -40,6 +44,9 @@ docs/bitacora-ia/     registro de encargos a un agente de IA
 docs/datos/           diseño de la base de datos y su diagrama
 supabase/             esquema SQL y datos de ejemplo de la base (se prueba en SQLite y en Supabase)
 docs/historias.md     historias de usuario y criterios de aceptación (Avance 4)
+docs/kit-prueba/      kit para ejecutar la prueba con usuarios (Avance 6)
+docs/plantillas/      plantillas vacías en CSV (línea base)
+herramientas/         scripts de apoyo: cálculo de la línea base y PDF imprimible, con pruebas
 docs/wireframes/      wireframes del flujo principal, con sus notas (Avance 4)
 docs/entrevistas/     conversación con el usuario y su guion (Avance 4)
 docs/recorrido-usuario/ borrador del mapa de recorrido (ensayo, sin validar)
@@ -55,7 +62,83 @@ README.md             portada del proyecto
 - **Usuario principal:** el jefe de bodega, que hoy digita cada guía a mano y la rehace cuando mantenimiento cambia un equipo a último minuto.
 - **Usuarios secundarios:** comercial, que envía el pedido de venta (PV), y mantenimiento, comercial y operaciones, que piden los cambios de último minuto.
 
-## Cómo se instala y se ejecuta
+## Prueba de concepto (Avance 7)
+
+**Qué hace.** Demuestra una sola acción de punta a punta con piezas reales, **preparar la guía de una orden**. La persona presiona *Preparar guía*, la base de datos vuelve a revisar cada producto contra el inventario, guarda la guía y la pantalla muestra su número interno. Si hay un código que no existe, la guía no se guarda y aparece el mensaje para corregirlo. El diagrama, las piezas y lo que queda fuera están en [docs/arquitectura.md](docs/arquitectura.md).
+
+**Dirección pública.** [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app). Se abre sin iniciar sesión.
+
+**Video (1 a 2 minutos).** Se agrega el enlace cuando esté grabado.
+
+**Qué flujo demuestra.**
+
+| Caso | Cómo se prueba | Qué se ve |
+|---|---|---|
+| Exitoso | Orden 3001 → *Cargar pedido* → *Validar* → *Preparar guía* | La pantalla de guía lista con el **N.º interno** de la guía |
+| Error | Orden 3002 → *Cargar pedido* → *Validar* | La guía queda bloqueada con el mensaje *"Corrige 1 producto para continuar"* por el código `SD-63A20-9999`, que no existe |
+| Volver a empezar | Botón *Reiniciar demo* | Las órdenes 3001 y 3002 vuelven a estar como al inicio |
+
+**Qué tecnología requiere.**
+- Para usarla, solo un navegador.
+- Para levantarla en tu computador, [Node.js](https://nodejs.org) 18 o superior, Python 3 (solo para abrir un servidor local) y Git o la descarga en ZIP del repositorio.
+- Una base en [Supabase](https://supabase.com). Puede ser la del grupo, ya preparada, o una propia creada con los scripts de `supabase/`.
+
+**Qué variables necesita.** Están en `.env.example`, sin valores. Se copian a un archivo `.env`, que no se sube al repositorio.
+
+| Variable | Qué es | Dónde se obtiene |
+|---|---|---|
+| `SUPABASE_URL` | La dirección del proyecto, con la forma `https://xxxx.supabase.co` | Supabase → *Project Settings* → *Data API* |
+| `SUPABASE_PUBLISHABLE_KEY` | La clave **publicable**, que empieza con `sb_publishable_` | Supabase → *Project Settings* → *API Keys*. Si usas la base del grupo, pídela al equipo por un canal privado. Nunca uses la clave secreta |
+
+### Cómo levantarla desde cero
+
+Los comandos son para PowerShell en Windows. En Mac o Linux, usa `cp` en vez de `copy` y `python3` en vez de `py`.
+
+**Paso 1. Descargar el proyecto.**
+
+```
+git clone https://github.com/diegoneves-design/Automatizacion_bodega.git
+cd Automatizacion_bodega
+```
+
+**Paso 2. Preparar la base.** Si usas la base del grupo, ya está lista y puedes pasar al paso 3. Si creas una propia, en Supabase entra a *SQL Editor* y ejecuta estos archivos de `supabase/` en este orden, cada uno en una consulta nueva: `schema.sql`, `acceso.sql`, `funciones.sql` y `seed_poc.sql`.
+
+**Paso 3. Completar las variables.**
+
+```
+copy .env.example .env
+```
+
+Abre `.env` con el Bloc de notas y completa `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`. Deja el resto como está.
+
+**Paso 4. Generar la configuración del prototipo.**
+
+```
+node prototipo/generar-config.mjs
+```
+
+Tiene que decir `prototipo/js/config.js creado.` Si dice que falta una variable, revisa el paso 3.
+
+**Paso 5. Abrir el prototipo.**
+
+```
+cd prototipo
+py -m http.server 8000
+```
+
+Entra a `http://127.0.0.1:8000` en el navegador y prueba los casos de la tabla de arriba. Para cerrarlo, vuelve a PowerShell y presiona `Ctrl + C`.
+
+**Si algo falla.**
+- *"Falta la configuración de la base de datos"* en la pantalla. No se hizo el paso 4, o se abrió el archivo `index.html` con doble clic en vez de usar el servidor del paso 5.
+- *"No hay conexión con la base de datos"*. Revisa tu internet y que `SUPABASE_URL` esté bien escrita.
+- La orden 3001 ya tiene guía. Presiona *Reiniciar demo*.
+
+**En Vercel** el sitio se publica solo desde `main`, con las variables `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` configuradas en el proyecto y el comando de construcción que genera la configuración (detalle en «Prueba de concepto con Supabase: qué hay que configurar», más abajo).
+
+## Aplicación Streamlit (MVP): cómo se instala y se ejecuta
+
+Esta es la aplicación Streamlit de `src/`, el MVP. La profesora pidió (Avance 5) no invertirle más horas hasta confirmar el flujo con usuarios; por decisión de Bastián, desde el 20 de noviembre de 2026 se retomó el trabajo sobre ella: ahora se conecta a Supabase (`docs/mvp-supabase.md`). La prueba de concepto de arriba sigue siendo la del prototipo; en «Congelado» se explica qué parte del MVP sigue congelada y cuál no.
+
 
 Guía paso a paso para Windows, pensada para quien nunca ha usado una terminal. Se hace una sola vez; las veces siguientes basta con los pasos 3 y 5. Toma entre 10 y 15 minutos.
 
@@ -233,25 +316,72 @@ Las pruebas contra PostgreSQL de verdad (capa de datos, rol limitado y recorrido
 
 ## En qué estado está
 
-Al 5 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance 6**. Ya está diseñado cómo vamos a probar el prototipo con personas de fuera del equipo, pero la prueba todavía no se hace. A partir de la conversación con un subjefe de bodega que hoy hace la tarea (integrante del equipo), de las historias de usuario y de los wireframes del Avance 4, se construyó un prototipo navegable del flujo principal, publicado en [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app) e independiente de la app, y se hizo su análisis ético. Ni el prototipo ni la app están probados con usuarios reales, y varias decisiones pueden cambiar.
+Al 15 de noviembre de 2026 el proyecto está en **etapa inicial**, en el **Avance 6**. A partir de la conversación con un subjefe de bodega que hoy hace la tarea (integrante del equipo), de las historias de usuario y de los wireframes del Avance 4, se construyó un prototipo navegable del flujo principal, independiente de la aplicación Streamlit, y se hizo su análisis ético. Después se conectó a una base real en Supabase como prueba de concepto. Ya está diseñado y preparado cómo se va a probar con personas de fuera del equipo, pero **esa prueba todavía no se hace**. Ni el prototipo ni la aplicación están probados con usuarios reales, y varias decisiones pueden cambiar.
 
-| Hecho | Pendiente |
+La profesora indicó en la retroalimentación del Avance 5 que, mientras la prueba con usuarios no confirme el flujo, no se le dediquen más horas a la aplicación Streamlit. Por eso el estado se ordena en cuatro bloques.
+
+### Hecho
+
+| Qué | Dónde |
 |---|---|
-| Problema, caso de uso y maqueta de tres pantallas | Medir cuánto demoran hoy las guías y cuántas se rehacen |
-| Conversación con el usuario (`docs/entrevistas`) | Ejecutar la prueba de usuarios diseñada en el Avance 6 (`docs/prueba-usuarios.md`) |
-| Historias HU-01 a HU-05 con criterios principal y alternativo (`docs/historias.md`) | Que el equipo confirme los criterios de HU-02 a HU-05, propuestos con ayuda de IA |
-| Wireframes del flujo principal con sus notas (`docs/wireframes`) | Subir el límite de 50 a 60 productos por guía en la app (máximo real del ERP; el prototipo ya usa 60; el MVP conectado a Supabase, en la rama `feature/mvp-supabase`, ya usa 60) |
-| Prototipo navegable P1 a P4 con sistema mínimo, mapa de navegación y registro de decisiones (`prototipo/`, `docs/prototipo.md`) | Destacar los cambios de último minuto en el validador de la app (HU-04) |
-| Análisis ético: exclusión, datos personales, accesibilidad, sostenibilidad y riesgos (`docs/etica.md`) | Hacer obligatorio el motivo del cambio y corregir el borde del campo Cliente (riesgos 3 y 5 de `docs/etica.md`) |
-| Carga masiva, validador de SKU y ajuste de última hora con registro de cambios; la app bloquea la emisión de la guía si algún SKU no valida | Cuentas y permisos (la app Streamlit queda congelada hasta validar el flujo con usuarios) |
-| Diseño de la base de datos con el esquema SQL y datos de ejemplo consistentes (`docs/datos`, `supabase/`) | Validar con el jefe de bodega que el retiro tenga solo los motivos falla y mantención preventiva, y si existe un retiro normal sin motivo |
-| Base SQLite con inventario simulado, tests y CI en GitHub Actions. Los cuatro scripts de `supabase/` corrieron en Supabase y las 82 comprobaciones con la clave publicable pasan (`supabase/probar_en_supabase.py`) | Cerrar el acceso con inicio de sesión antes de usar datos reales: hoy las políticas son abiertas |
-| | Integración con el ERP (etapa posterior, fuera del alcance del MVP) |
-| Diseño de la prueba con usuarios y guion de cada sesión (`docs/prueba-usuarios.md`, `docs/pauta-validacion.md`) | |
-| Prueba de concepto escrita: el prototipo lee órdenes, valida SKU, registra cambios (con motivo obligatorio) y prepara la guía en Supabase, con validación en tres capas (`prototipo/`, `supabase/`, `docs/poc-supabase.md`), probada en Supabase: las reglas de la base y la pantalla en un navegador contra la base real | Probarla en un celular, con poca señal y con personas ajenas al equipo (prueba de usuarios, `docs/prueba-usuarios.md`) |
-| MVP (Streamlit) sobre Supabase, en la rama `feature/mvp-supabase`: capa de datos `src/db.py` (Supabase o SQLite) que llama a las funciones SQL, folio de la orden, `crear_pedido`, vistas de lectura y un rol de base limitado `app_mvp` (`docs/mvp-supabase.md`). Probado contra un PostgreSQL local y en SQLite | Ejecutar en Supabase los archivos `mvp_*.sql` y `funciones.sql`, definir la contraseña del rol `app_mvp`, correr `supabase/verificar_mvp.sql` y `probar_en_supabase.py`, y decidir dónde se publica el MVP (Streamlit no corre en Vercel) |
-| Portal público para Vercel (`portal/`): una página con un botón hacia el MVP, desactivado mientras no haya dirección en `portal/config.js`. El prototipo sigue publicado aparte, sin cambios | Crear el proyecto nuevo `bodega-portal` en Vercel una vez que el portal esté en `main` (pasos en «Portal público en Vercel»); publicar el MVP en un hosting y poner su dirección en `portal/config.js`; volver a conectar `bodega-prototipo` al repositorio correcto (hoy publica la versión del 25 de octubre) |
-| Inventario real cargado en Supabase (1.617 equipos y 319 extensiones eléctricas) y Dashboard interactivo con 12 gráficos, filtros cruzados, tabla de casos y vistas por rol (`prototipo/dashboard.html`, `supabase/dashboard.sql`, `docs/analisis-inventario.md`) | Ejecutar `supabase/dashboard.sql` en Supabase, revisar el Dashboard en la página publicada y confirmar con Oscar o el jefe de bodega los supuestos del análisis (valores numéricos = arrendado, significado de POR HABILITAR y de BAJA, y si el inventario real puede mostrarse en una demo pública) |
+| Problema, caso de uso y maqueta de tres pantallas | `docs/unidad1` |
+| Conversación con el usuario | `docs/entrevistas` |
+| Historias HU-01 a HU-05 con criterios principal y alternativo, y HU-05 con una acción de la persona | `docs/historias.md` |
+| Wireframes del flujo principal con sus notas | `docs/wireframes` |
+| Prototipo navegable P1 a P4 con sistema mínimo, mapa de navegación y registro de decisiones; borde del campo Cliente corregido (contraste 3:1) | `prototipo/`, `docs/prototipo.md` |
+| Análisis ético: exclusión, datos personales, accesibilidad, sostenibilidad y riesgos; plazo de conservación propuesto de 24 meses | `docs/etica.md` |
+| Aplicación Streamlit: carga masiva, validador de SKU, ajuste de última hora con registro de cambios y bloqueo de la guía si algún SKU no valida; base SQLite con inventario simulado, pruebas y CI en GitHub Actions | `src/`, `tests/` |
+| Diseño de la base de datos con el esquema SQL y datos de ejemplo consistentes (modalidad solo en el despacho y motivo solo en el retiro) | `docs/datos`, `supabase/` |
+| Prueba de concepto en Supabase: el prototipo lee órdenes, valida SKU, registra cambios con motivo obligatorio y prepara la guía, con validación en tres capas. Los cuatro scripts corrieron en Supabase, las 82 comprobaciones con la clave publicable pasan y la pantalla se probó en un navegador contra la base real | `prototipo/`, `supabase/`, `docs/poc-supabase.md` |
+| Diseño de la prueba con usuarios y guion de cada sesión, con pauta imprimible de 2 planas | `docs/prueba-usuarios.md`, `docs/pauta-validacion.md` |
+| Kit para ejecutar la prueba (consentimiento, planilla, ensayo, plan de sesiones, regla de decisión), protocolo de la línea base con su herramienta de cálculo y checklist del celular. El prototipo se revisó en pantallas de 360 y 390 px de ancho | `docs/kit-prueba/`, `docs/linea-base.md`, `docs/checklist-celular.md` |
+| Inventario real cargado en Supabase (1.617 equipos y 319 extensiones eléctricas) y Dashboard interactivo con 12 gráficos, filtros cruzados, tabla de casos y vistas por rol | `prototipo/dashboard.html`, `supabase/dashboard.sql`, `docs/analisis-inventario.md` |
+| MVP (Streamlit) sobre Supabase, en la rama `feature/mvp-supabase`: capa de datos `src/db.py` (Supabase o SQLite) que llama a las funciones SQL de la base, folio de la orden, `crear_pedido`, vistas de lectura, un rol de base limitado `app_mvp` y el cierre de la lectura del RUT y la dirección de los clientes con la clave publicable. Ejecutado en Supabase el 23 de noviembre de 2026 (resultados informados por Bastián): `verificar_mvp.sql` con sus 46 filas OK y `probar_en_supabase.py` con 89 OK y 0 FALLAS; además probado contra un PostgreSQL local y en SQLite | `src/`, `supabase/mvp_*.sql`, `docs/mvp-supabase.md` |
+| Portal público para Vercel (`portal/`): una página estática con un único botón hacia el MVP, desactivado mientras no haya dirección en `portal/config.js`. El prototipo sigue publicado aparte, en su propio proyecto de Vercel, sin cambios | `portal/`, `portal/LEEME.md` |
+
+### Pendiente del avance
+
+| Qué | Por qué falta |
+|---|---|
+| Que el equipo verifique y apruebe los criterios de HU-01 a HU-05 de `docs/historias.md` | Se propusieron con ayuda de IA contra el código y la profesora pidió que los escriba el equipo |
+| Confirmar con administración el plazo de conservación de 24 meses | Es una propuesta del equipo (`docs/etica.md`, ficha B2) |
+| Ejecutar `supabase/seed_poc.sql` en Supabase con los RUT de ejemplo nuevos (`11.111.111-1` y `22.222.222-2`) y luego `select public.reiniciar_demo();` | La base real sigue con los RUT anteriores hasta que se vuelva a ejecutar la semilla |
+| Configurar Vercel (variables `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` y comando de construcción) y volver a publicar desde `main` | Hasta entonces el sitio publicado no es la versión conectada a Supabase |
+| Crear el proyecto nuevo `bodega-portal` en Vercel (Root Directory = `portal`) una vez que el portal esté en `main`, y poner la dirección del MVP en `portal/config.js` cuando el MVP esté publicado | Pasos y cómo comprobarlos en «Portal público en Vercel». No se modifica `bodega-prototipo`; reconectarlo al repositorio correcto es la fila anterior. El MVP todavía no tiene dirección publicada |
+| Revisar el Dashboard en la página publicada y confirmar con Oscar o el jefe de bodega los supuestos del análisis (valores numéricos = arrendado, significado de POR HABILITAR y de BAJA) y **si el inventario real puede mostrarse en una demo pública** (pregunta 4 de `docs/analisis-inventario.md`, todavía abierta) | `supabase/dashboard.sql` ya se ejecutó en Supabase (la función devuelve 1.617 equipos y 319 extensiones). Falta la respuesta de la bodega y publicar el prototipo desde `main` |
+| Elegir dónde se publica el MVP (Streamlit no corre en Vercel), guardar su `DATABASE_URL` como secreto del servicio y, más adelante, agregar inicio de sesión real y políticas por rol | Hoy el MVP corre solo en el computador y no tiene inicio de sesión: cualquiera con acceso opera como el usuario que elija (limitación documentada en «Seguridad de la base en esta etapa») |
+| Volver a ejecutar en Supabase `supabase/probar_en_supabase.py` y probar a mano el flujo de órdenes del MVP contra Supabase | El último resultado informado de `probar_en_supabase.py` (89 OK y 0 FALLAS) es anterior a dos comprobaciones nuevas sobre los clientes (dirección y razón social); `verificar_mvp.sql` ya se ejecutó completo (46 filas OK). El flujo de órdenes todavía no se probó en un navegador contra Supabase |
+
+### Congelado, no se hará por ahora
+
+Hasta el 20 de noviembre todo esto era de la **aplicación Streamlit**: la profesora pidió (retroalimentación del Avance 5) no invertirle más horas mientras la prueba con usuarios no confirme el flujo. **Por decisión de Bastián, desde el 20 de noviembre de 2026 el MVP (Streamlit, `src/`) retoma ese trabajo**: se migró a Supabase y se le agregan vistas (`docs/mvp-supabase.md`). Por eso la tabla se separa en lo que ya no está congelado y lo que sigue congelado.
+
+**Retomado en el MVP (ya no está congelado):**
+
+| Qué | Estado |
+|---|---|
+| Subir el límite de 50 a 60 productos por guía en la aplicación | **Hecho en el MVP** (rama `feature/mvp-supabase`): el límite lo define la base (60), igual que el prototipo. El MVP lo cubre sin usar la rama local `feature/avance5-pendientes-app`, que sigue sin subir ni fusionar |
+| Hacer obligatorio el motivo del cambio en la aplicación | **Hecho en el MVP**: la base lo exige (`registrar_cambio`) y la pantalla pide el motivo. El prototipo y la base ya lo exigían |
+
+**Sigue congelado:**
+
+| Qué | Estado |
+|---|---|
+| Destacar los cambios de último minuto en el validador de la aplicación (HU-04) | Sigue congelado. El detalle de la orden del MVP muestra una columna «Última modificación», pero no hay destaque visual como el que pide HU-04. El prototipo sí los destaca |
+| Corregir el borde del campo Cliente en la aplicación | Sigue pendiente, y ya no es cierto que la aplicación no tenga ese campo: el MVP tiene un selector de Cliente en Carga masiva (de Streamlit), cuyo contraste no se ha revisado. El del prototipo ya se corrigió |
+| Cuentas y permisos en la aplicación | Sigue congelado: el MVP no tiene inicio de sesión (se elige quién opera en el menú; limitación documentada en «Seguridad de la base en esta etapa»). Hay un inicio de sesión por jerarquía en la rama local `feature/login-etapa1`, sin subir ni fusionar |
+
+### Siguiente etapa (no es pendiente del avance)
+
+| Qué | Dónde |
+|---|---|
+| Línea base: medir cuánto demoran hoy las guías y cuántas se rehacen | `docs/linea-base.md` (protocolo y herramienta escritos, sin medir) |
+| Ensayo interno de la pauta, con alguien que no diseñó las tareas | `docs/kit-prueba/ensayo-interno.md` |
+| Prueba del prototipo en un celular real, con datos móviles | `docs/checklist-celular.md` |
+| Prueba con usuarios de fuera del equipo | `docs/prueba-usuarios.md` y el kit de `docs/kit-prueba/` |
+| Dos preguntas al jefe de bodega: qué motivos tiene un retiro y si existe un retiro normal sin motivo; y qué debe comprobar «Validar» en un retiro | `docs/poc-supabase.md` (sección 4) y `docs/datos/estructura_datos.md` (sección 5) |
+
+Quedan fuera del alcance del MVP la integración con el ERP, y antes de usar datos reales hay que cerrar el acceso con inicio de sesión (ver «Seguridad de la base en esta etapa»).
 
 ### Prueba de concepto con Supabase: qué hay que configurar
 

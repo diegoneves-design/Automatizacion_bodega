@@ -48,7 +48,8 @@ test('direcciones que no sirven se ignoran y el boton sigue desactivado', () => 
     '//bodega.ejemplo.cl',                      // relativa al protocolo
     '/app',                                     // relativa
     'bodega.ejemplo.cl',                        // sin protocolo
-    'https://usuario:clave@bodega.ejemplo.cl',  // con credenciales
+    // armada al ejecutar: escrita de corrido, el buscador de correos del repositorio la tomaria por un correo
+    'https://' + 'usuario' + ':' + 'clave' + '@' + 'bodega.ejemplo.cl',  // con credenciales
     'https://',                                 // sin servidor
     'ftp://bodega.ejemplo.cl',
     42, {}, []

@@ -10,9 +10,19 @@ Esta prueba todavía no se hace. Aquí dejamos escrito qué vamos a observar, co
 
 **Pregunta.** ¿Una persona que arma guías en una bodega puede validar un pedido, corregir un equipo que no corresponde y dejar la guía lista para el ERP, sin que nadie le explique cómo?
 
-**Hipótesis.** Creemos que un jefe o subjefe de bodega, sin ninguna explicación previa, puede revisar un pedido, darse cuenta de que un código no existe y corregirlo antes de dejar la guía lista. Lo sabremos cuando observemos que al menos 4 de 5 personas del perfil U1 terminan la tarea 1 sin ayuda en menos de 3 minutos, y que al menos 4 de 5 se dan cuenta solas del código que no existe en la tarea 2.
+**Hipótesis.** Creemos que un jefe o subjefe de bodega, sin ninguna explicación previa, puede revisar un pedido, darse cuenta de que un código no existe y corregirlo antes de dejar la guía lista. Lo sabremos cuando observemos que 4 o 5 de 5 personas del perfil U1 terminan la tarea 1 sin ayuda en menos de 3 minutos, y que 4 o 5 de 5 se dan cuenta solas del código que no existe en la tarea 2. **Solo 4 o 5 de 5 cuentan como «se cumple». Con 3 de 5 la hipótesis no se confirma:** ese resultado es «entorpece» y se corrige (ver los tres tramos más abajo).
 
-**Nos equivocamos si** 2 o más de esas 5 personas no logran la tarea 1 sin ayuda, o si 2 o más no ven el código malo y se quedan intentando avanzar sin entender por qué la guía no se deja preparar.
+**Nos equivocamos si** solo 2 o menos de esas 5 personas terminan la tarea 1 sin ayuda en menos de 3 minutos, o si solo 2 o menos ven el código malo y se quedan intentando avanzar sin entender por qué la guía no se deja preparar.
+
+**Cómo leemos el resultado: tres tramos, para 5 personas.** A cada medida de arriba se le cuenta cuántas de las 5 personas de U1 la cumplen, y todo resultado cae en uno de estos tres tramos. No queda ninguna zona sin regla.
+
+| Cuántas de 5 la cumplen | Se lee como | Qué hacemos |
+|---|---|---|
+| 4 o 5 | **Se cumple** | La hipótesis se mantiene |
+| 3 | **Entorpece** | Se corrige según la hoja de la regla de decisión (`docs/kit-prueba/regla-decision.md`), por cuántas personas lo vivieron |
+| 2 o menos | **Bloquea** | Nos equivocamos: se corrige en el prototipo antes de construir esa parte |
+
+Estos tres tramos son los que el equipo definió para la tarea 1 y se aplican igual a la medida «se dan cuenta solas del código malo» de la tarea 2. La medida «terminan sin ayuda en menos de 5 minutos» de la tarea 2 ya tenía su umbral de 3 de 5; sus tramos de 2 de 5 (entorpece) y de 1 o menos (bloquea) se agregaron **por analogía** y se confirman en el ensayo interno, antes de la primera sesión.
 
 **Una segunda hipótesis, sobre a quién dejamos fuera.** En el Avance 5 dijimos que el bodeguero de terreno queda excluido, porque no arma guías y casi no usa computador en su trabajo ([docs/etica.md](etica.md), B1). Creemos que, si le damos la tarea 2, va a necesitar ayuda. Lo sabremos cuando 3 o más de 5 personas del perfil U2 pidan ayuda o dejen la tarea a medias. Si 3 o más la terminan solas, nos equivocamos sobre quién queda fuera, y hay que revisar el riesgo 1 de `docs/etica.md`.
 
@@ -27,8 +37,8 @@ Elegimos dos tareas y no tres, porque con tres la sesión pasaba de los 20 minut
 
 | Tarea | HU | Escenario (se lee tal cual, sin nombrar la pantalla) | Objetivo | Éxito (se puede comprobar en la grabación) | No revelar | Umbral |
 |---|---|---|---|---|---|---|
-| **T1 · Un despacho sin problemas** | HU-02, HU-01 (escenario principal), HU-05 | "Le llegó por correo el pedido de despacho de la Constructora Andes, orden 3001. Antes de armar la guía, revise que todo lo pedido se pueda despachar y déjela lista para pasarla al ERP." | Cargar el pedido 3001, comprobar que los 4 productos se pueden despachar y llegar a la guía lista | En la pantalla aparece la guía de la orden 3001 con 4 productos y el mensaje "Lista para pasar al ERP" | Que primero hay que cargar el pedido y después validarlo, el nombre de los botones ("Cargar pedido", "Validar", "Preparar guía") y cuántas pantallas tiene | 4 de 5 personas de U1 la terminan sin ayuda, en menos de 3 minutos y equivocándose de camino 1 vez como máximo |
-| **T2 · Un retiro con un código que no corresponde** | HU-01 (escenario alternativo), HU-03, HU-04 | "Ahora le toca el retiro de la Minera Cordillera, orden 3002. Mantenimiento le confirmó que la extensión que corresponde retirar es la de 63 amperes y 20 metros número 0315. Deje la guía de ese retiro lista para el ERP." | Darse cuenta de que `SD-63A20-9999` no existe, cambiarlo por la extensión 0315 dejando el motivo, volver a validar y llegar a la guía lista | La persona señala, con el cursor o en voz alta, el código marcado "no existe". El cambio queda registrado con su motivo, y aparece la guía de la orden 3002 con "Lista para pasar al ERP" | Que hay un código mal escrito y cuál es, que la guía queda bloqueada, el botón "Registrar cambio" y dónde se elige el equipo que entra | 4 de 5 personas de U1 se dan cuenta solas del código malo. 3 de 5 terminan la tarea sin ayuda, en menos de 5 minutos y equivocándose de camino 2 veces como máximo |
+| **T1 · Un despacho sin problemas** | HU-02, HU-01 (escenario principal), HU-05 | "Le llegó por correo el pedido de despacho de la Constructora Andes, orden 3001. Antes de armar la guía, revise que todo lo pedido se pueda despachar y déjela lista para pasarla al ERP." | Cargar el pedido 3001, comprobar que los 4 productos se pueden despachar y llegar a la guía lista | En la pantalla aparece la guía de la orden 3001 con 4 productos y el mensaje "Lista para pasar al ERP" | Que primero hay que cargar el pedido y después validarlo, el nombre de los botones ("Cargar pedido", "Validar", "Preparar guía") y cuántas pantallas tiene | 4 o 5 de 5 personas de U1 la terminan sin ayuda, en menos de 3 minutos y equivocándose de camino 1 vez como máximo (3 de 5 entorpece; 2 o menos bloquea) |
+| **T2 · Un retiro con un código que no corresponde** | HU-01 (escenario alternativo), HU-03, HU-04 | "Ahora le toca el retiro de la Minera Cordillera, orden 3002. Mantenimiento le confirmó que la extensión que corresponde retirar es la de 63 amperes y 20 metros número 0315. Deje la guía de ese retiro lista para el ERP." | Darse cuenta de que `SD-63A20-9999` no existe, cambiarlo por la extensión 0315 dejando el motivo, volver a validar y llegar a la guía lista | La persona dice en voz alta cuál es el código marcado "no existe". El cambio queda registrado con su motivo, y aparece la guía de la orden 3002 con "Lista para pasar al ERP" | Que hay un código mal escrito y cuál es, que la guía queda bloqueada, el botón "Registrar cambio" y dónde se elige el equipo que entra | 4 o 5 de 5 personas de U1 se dan cuenta solas del código malo (3 de 5 entorpece; 2 o menos bloquea). 3 o más de 5 terminan la tarea sin ayuda, en menos de 5 minutos y equivocándose de camino 2 veces como máximo (2 de 5 entorpece; 1 o menos bloquea) |
 
 ### Qué vamos a medir en cada tarea
 
@@ -41,6 +51,8 @@ Elegimos dos tareas y no tres, porque con tres la sesión pasaba de los 20 minut
 | **Satisfacción** | El puntaje SUS, de 0 a 100, una sola vez al final de la sesión | Con el cuestionario de la pauta. **Esperamos un promedio de 68 o más en U1**. Adaptamos la redacción de las frases para leerlas en voz alta, así que el 68 lo usamos como referencia |
 
 Contamos como **ayuda** cualquier cosa que le diga a la persona qué hacer, como señalarle algo, nombrarle un botón o decirle "va bien". Si nos pide que le repitamos el escenario, eso no cuenta como ayuda.
+
+**Fallas del sistema.** Si el prototipo falla durante una sesión (muestra «No hay conexión» o «problema del sistema»), eso no es una observación sobre la persona: se anota aparte, no cuenta a favor ni en contra de ningún umbral y la tarea se repite en otra sesión. Es una regla propuesta, que el equipo aceptó como propuesta el 14 de noviembre de 2026 y que se confirma en el ensayo interno, antes de la primera sesión.
 
 **Estos números los fijamos ahora, antes de cualquier sesión, y no los vamos a mover después de ver los resultados.** Los resultados de U2 los informamos aparte, porque responden a la segunda hipótesis y no cuentan para el umbral de U1.
 
@@ -70,11 +82,13 @@ Vamos a hacer **10 sesiones con usuarios** (5 de U1 y 5 de U2) y **4 consultas a
 
 Para la prueba vamos a estar dos integrantes. Hay algo que nos importa cuidar. Uno de nosotros está a cargo de la bodega del caso, y si él les hace las preguntas a sus propios compañeros, lo más probable es que se sientan evaluados por su jefe y no se atrevan a equivocarse. Por eso **él no facilita ni está presente en las sesiones con su gente**, ni en la del conocido, si lo incluimos.
 
-| Sesión | Facilita (la única persona que habla con el participante) | Registra | Guarda la evidencia |
+| Sesión | Facilitador (la única persona que habla con el participante) | Registrador | Resguardo de evidencia |
 |---|---|---|---|
-| Participantes de la bodega del caso, y el conocido del equipo | Sebastián Carmona | Oscar Ynchaustegui, **después de la sesión**, mirando la grabación | Sebastián Carmona |
-| Participantes de otras empresas | Oscar Ynchaustegui | Sebastián Carmona, en vivo | Sebastián Carmona |
-| Consultas a stakeholders | Oscar Ynchaustegui | Sebastián Carmona, en vivo | Sebastián Carmona |
+| Participantes de la bodega del caso, y el conocido del equipo | Integrante A | Integrante A, **después de la sesión**, mirando la grabación | Integrante A |
+| Participantes de otras empresas | Integrante B | Integrante A, en vivo | Integrante A |
+| Consultas a stakeholders | Integrante B | Integrante A, en vivo | Integrante A |
+
+**Los nombres no van en el repositorio.** El integrante A y el integrante B son las dos personas del equipo que hacen la prueba. El integrante B es quien trabaja en la bodega del caso, así que en las sesiones con su gente **no tiene ningún papel**: ni facilita, ni está presente, ni mira la grabación. Por eso, en esas sesiones, quien facilitó registra después, viendo la grabación, y no al mismo tiempo que conversa.
 
 **Una persona a la vez, y la demo vuelve a empezar entre una y otra.** Todas las sesiones usan la misma base de datos: lo que hace un participante lo ve el siguiente. Por eso nunca hay dos personas probando al mismo tiempo, y antes de cada sesión quien facilita presiona **Reiniciar demo** y comprueba que la primera pantalla muestre las órdenes 3001 y 3002 sin cambios. El botón Reiniciar demo está visible en la pantalla, pero no se le menciona al participante. Si lo presiona, se anota como desvío en la planilla y se reinicia antes de seguir.
 
