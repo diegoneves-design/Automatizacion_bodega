@@ -14,6 +14,13 @@ MIN_BUSQUEDA = 2
 MAX_RESULTADOS = 30
 
 
+def texto_del_sku(descripcion, resultado):
+    """Texto bajo "SKU a reemplazar". Sin validar no se sabe si existe; solo una linea ya validada puede no existir."""
+    if isinstance(descripcion, str):
+        return descripcion
+    return "Aún sin validar" if resultado == "pendiente" else "No existe en el inventario"
+
+
 def _guardar(repo, folio):
     """Callback: registra el reemplazo en la base. Si una regla lo rechaza, deja el mensaje exacto en pantalla."""
     ss = st.session_state
@@ -79,6 +86,7 @@ def render(repo):
 
     vigentes = list(lineas["sku"])
     descripcion = dict(zip(lineas["sku"], lineas["descripcion"]))
+    resultado = dict(zip(lineas["sku"], lineas["resultado"]))
     problemas = [f.sku for f in lineas.itertuples() if f.resultado in ("no_existe", "no_disponible")]
     inicial = ss.sku_corregir if ss.sku_corregir in vigentes else (problemas[0] if problemas else vigentes[0])
 
@@ -91,7 +99,7 @@ def render(repo):
             mostrar(Html('<div class="bp-subtitulo bp-sin-margen">Reemplazar equipo</div>'))
             original = st.selectbox("SKU a reemplazar", vigentes, index=vigentes.index(inicial), key="aj_orig")
             desc = descripcion.get(original)
-            st.markdown(f'<div class="bp-ayuda">{esc(desc if isinstance(desc, str) else "No existe en el inventario")}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="bp-ayuda">{esc(texto_del_sku(desc, resultado.get(original)))}</div>', unsafe_allow_html=True)
 
             st.markdown(f'<div class="bp-flecha-par">{icono("ajuste", 22)}</div>', unsafe_allow_html=True)
             buscar = st.text_input("Buscar el equipo que entra", placeholder="Escribe parte del SKU o de la descripción", key="aj_buscar")

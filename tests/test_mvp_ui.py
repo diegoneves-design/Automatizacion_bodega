@@ -134,3 +134,31 @@ def test_la_carga_no_pasa_de_60_sku(at):
     at.button(key="menu_carga").click().run()
     at.text_area(key="cm_texto").set_value("\n".join(f"X-{i}" for i in range(61))).run()
     assert "Se detectaron 61 SKU" in textos(at) and at.button(key="cm_cargar").disabled
+
+
+def test_el_ajuste_distingue_sin_validar_validada_que_existe_y_validada_que_no_existe(at):
+    at.button(key="ver_GUIA-2026-002").click().run()
+    at.session_state.vista = "ajuste"
+    at.run()
+    at.selectbox(key="aj_orig").select("SD-63A20-9999").run()
+    assert "Aún sin validar" in textos(at) and "No existe en el inventario" not in textos(at)  # pendiente
+
+    at.session_state.vista = "detalle"
+    at.run()
+    at.button(key="validar_skus").click().run()
+    at.button(key="validacion_corregir").click().run()
+    assert at.selectbox(key="aj_orig").value == "SD-63A20-9999"
+    assert "No existe en el inventario" in textos(at) and "Aún sin validar" not in textos(at)  # validada y no existe
+
+    at.selectbox(key="aj_orig").select("ST-0042").run()
+    assert "No existe en el inventario" not in textos(at) and "Aún sin validar" not in textos(at)  # validada y existe
+
+
+def test_texto_del_sku_en_los_tres_casos():
+    from views.ajuste import texto_del_sku
+
+    assert texto_del_sku(None, "pendiente") == "Aún sin validar"
+    assert texto_del_sku(float("nan"), "pendiente") == "Aún sin validar"
+    assert texto_del_sku(None, "no_existe") == "No existe en el inventario"
+    assert texto_del_sku("Compresor 5 HP", "ok") == "Compresor 5 HP"
+    assert texto_del_sku("Compresor 5 HP", "pendiente") == "Compresor 5 HP"
