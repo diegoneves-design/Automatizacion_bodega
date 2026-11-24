@@ -869,3 +869,28 @@ Lo hizo Oscar Ynchaustegui el 2026-11-22, con Claude. Lo revisa Sebastián Carmo
 - El buscador de teléfonos y correos da 0 hallazgos en las cuatro ramas.
 - **No se verificó:** el CI en GitHub (el servicio de PostgreSQL del flujo nunca se ha ejecutado allá; se validó solo su sintaxis) ni nada subido: no hay *push* ni PR.
 
+---
+
+## Encargo 34. Sin emojis en el código: un test que lo vigila y revisión de las pantallas
+
+**Objetivo.** Eliminar los emojis del código (una sola vez, en la rama 1, y propagar a las otras tres) y dejar un test que impida que vuelvan. Por la definición pedida, el resultado fue que **no había emojis que eliminar**: el aporte es el test y la línea del README.
+
+**Instrucción entregada.**
+- Alcance: archivos rastreados `.py`, `.js`, `.mjs`, `.html`, `.css`, `.sql`, `.json`, `.yml`, `.yaml`, `.toml`, `Dockerfile` y `.env.example` (comentarios, docstrings, mensajes y textos de interfaz incluidos), sin `prototipo/js/vendor/`, `node_modules/`, `.git/` ni `datos_locales/`. Los `.md`, la bitácora y `docs/` no se modifican: solo se cuenta cuántos emojis hay y dónde.
+- Definición: emoji es lo que tiene presentación emoji o es pictográfico con selector de emoji, más el selector U+FE0F, el unidor U+200D cuando une emojis, las banderas y las teclas. No se toca la tipografía normal (tildes, eñes, signos de apertura, comillas angulares, guiones largos, puntos medios, N.º, mayor o igual, menor o igual, por, entre) ni las flechas planas sin selector de emoji.
+- Restricciones: el test se escribe sin emojis literales (rangos con escapes) y se comprueba que falla con un texto de ejemplo armado al ejecutar; un commit por rama; las mismas tres suites en verde; revisar visualmente la app, la vista Dashboard y el prototipo; añadir al README «sin emojis en el código; lo vigila `tests/test_sin_emojis.py`».
+
+**Respuesta obtenida.**
+- `tests/test_sin_emojis.py`: recorre `git ls-files` con ese alcance y falla listando archivo y línea; incluye pruebas del detector (encuentra presentación emoji, pictográficos con selector, uniones, banderas, teclas y tonos de piel; no toca la tipografía normal ni las flechas planas) y del alcance. La línea del README está junto a la estructura del repositorio.
+- Commits: rama 1 `b4f543b`, y las fusiones en cadena `e593463` (rama 2), `173c6c6` (rama 3) y `fb7563e` (rama 4); las tres fusiones entraron sin conflictos.
+
+**Qué se aceptó y qué se corrigió.**
+- Conteo: **0 emojis en las cuatro ramas**, tanto en el código como, solo para informe, en `.md`, `.csv` y `.txt`. Se contrastó con un segundo método independiente (`git grep` con rangos Unicode): solo coincide con U+2713 y U+2715, las marcas de texto que `main` ya permitía y que no son emojis (cinco archivos: la bitácora, dos documentos del Avance 5, el checklist del celular y `prototipo/js/app.js`). No se tocaron.
+- Hallazgo propio: la herramienta con la que la IA escribe archivos convierte las secuencias `\uXXXX` de barra simple en el carácter real (ya lo anotaba el Encargo 29). Dejó un U+200D literal en el primer borrador de `tests/test_sin_emojis.py`, que el test antiguo de `main` marcó, y un separador de línea U+2028 literal en dos líneas de `tests/test_ui_dashboard.py`. Se corrigieron armando esos textos con `chr()` y se añadió una prueba que exige que `tests/test_sin_emojis.py` no tenga ningún carácter fuera de ASCII.
+- Hallazgo sin corregir, que toca código y por eso se le preguntó a Bastián: en la pantalla «Ajuste de última hora» del MVP, bajo «SKU a reemplazar» aparece «No existe en el inventario» para una línea que todavía no se validó (por ejemplo un SKU de la demo que sí existe), porque antes de validar la línea no tiene equipo asociado y no hay descripción. Una corrección mínima sería mostrar «Aún sin validar» mientras el resultado sea «pendiente».
+
+**Cómo se verificó.**
+- Suites tras cada fusión (`pytest`; `pytest` con PostgreSQL; `node --test`): rama 1, 282, 278 con 4 omitidas y 30; rama 2, 356 con 69 omitidas, 415 con 10 omitidas y 30; rama 3, 382 con 71 omitidas, 443 con 10 omitidas y 38; rama 4, 391 con 71 omitidas, 452 con 10 omitidas y 42. Sin marcadores de conflicto, claves ni SKU reales.
+- Revisión visual en Chrome sin ventana, con la aplicación local conectada a Supabase y el prototipo en el puerto 8777, **solo lectura**: MVP, Órdenes (sin órdenes de hoy y luego con el filtro en el 23 de noviembre), Detalle de la orden, Validador (orden sin validar), Ajuste de última hora, Carga masiva, Historial y Dashboard; prototipo, la pantalla Pedidos y su Dashboard. El detector de emojis aplicado al texto visible de esas diez pantallas dio 0.
+- **No se vio:** la guía generada, el Validador con resultados y el Historial con cambios, porque exigen validar, emitir o guardar (escribir en la base); ninguna pantalla en tamaño de celular; el CI en GitHub.
+
