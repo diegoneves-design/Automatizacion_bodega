@@ -43,3 +43,16 @@ prototipo/js/config.js
 *.xlsx
 *.xls
 datos_locales/
+
+# Evidencia de la prueba con usuarios y mediciones reales: van en Drive con acceso restringido, nunca al repositorio
+evidencia/
+datos-medicion/
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.avi
+*.m4a
+*.mp3
+*.wav
+*.aac

@@ -1,6 +1,6 @@
 # MVP (Streamlit) conectado a Supabase
 
-Estado: **escrito y probado contra un PostgreSQL local y en SQLite (2026-11-20); falta ejecutarlo en Supabase.** Ver la sección 10.
+Estado: **escrito y probado contra un PostgreSQL local y en SQLite (2026-11-20) y ejecutado en Supabase el 2026-11-23** (ver «Verificado en Supabase» en la sección 7). Ver la sección 10.
 
 Este documento explica cómo el MVP (la aplicación Streamlit de `src/`) pasó de una base SQLite con datos de ejemplo a la base real de Supabase: qué se cambió, en qué orden se ejecuta el SQL, cómo conectarla sin exponer ninguna clave, qué permisos tiene la aplicación y qué falta. No contiene contraseñas, cadenas de conexión ni datos reales.
 
@@ -140,12 +140,12 @@ El MVP no tiene login. Quien opera se elige en el menú («Operar como») y la b
 - Los recorridos de pantalla (cargar, validar, corregir, emitir la guía, historial y los mensajes de las reglas) en SQLite y contra PostgreSQL con el rol limitado.
 - Las pruebas del prototipo (`node --test prototipo/pruebas/filtros.test.js`, 30) siguen pasando: el prototipo no se tocó.
 
+**Verificado en Supabase** (2026-11-23): Bastián ejecutó los cinco archivos de la sección 3 y puso la contraseña del rol, y informó que `verificar_mvp.sql` dio todas sus filas OK (41 con la primera versión del archivo y 46 con la actual, que sumó las de la clave publicable) y que `probar_en_supabase.py` dio 89 OK y 0 FALLAS. Esa prueba encontró un defecto anterior al MVP (la clave publicable leía el RUT y la dirección de los clientes): se cerró y quedó en `acceso.sql` (ver `docs/poc-supabase.md`). Ese mismo día la IA comprobó, solo con lecturas, que la conexión por el pooler con el usuario `app_mvp.<referencia>` funciona y que el rol lee órdenes, clientes y usuarios.
+
 **No verificado:**
 
-- **Nada de esto se ejecutó en Supabase.** Falta la sección 3. Supabase agrega cosas que un PostgreSQL local no tiene (la API REST, `pg_safeupdate`, permisos por omisión sobre lo nuevo); por eso las vistas y las funciones nuevas quitan los permisos de forma explícita, y por eso hay que correr `verificar_mvp.sql` y `probar_en_supabase.py`.
-- Las comprobaciones por la API pública de `probar_en_supabase.py` (modificadas en esta etapa) no se ejecutaron: necesitan la API de Supabase.
-- La conexión por el **pooler** de Supabase con el usuario `app_mvp.<referencia>` (la forma exacta del usuario y que el pooler acepte un rol propio).
-- El MVP en un navegador contra Supabase, y el servicio de PostgreSQL del CI de GitHub (el flujo no se ejecutó; se validó solo su sintaxis).
+- **`probar_en_supabase.py` ganó dos comprobaciones después de su último resultado informado** (la dirección y la razón social de los clientes): hay que volver a correrlo en Supabase.
+- El flujo de órdenes del MVP (cargar, validar, corregir, emitir la guía) en un navegador contra Supabase, y el servicio de PostgreSQL del CI de GitHub (el flujo del CI no se ha ejecutado nunca en GitHub; se validó solo su sintaxis).
 
 ## 8. Efectos sobre el prototipo y los datos
 
@@ -166,8 +166,8 @@ Es una vista más del menú, apagada por omisión (`DASHBOARD_INVENTARIO=1` la e
 
 ## 10. Pendiente
 
-1. Ejecutar la sección 3 en Supabase, definir la contraseña de `app_mvp` y correr `verificar_mvp.sql` y `probar_en_supabase.py`.
-2. Levantar el MVP en el computador contra Supabase y probarlo a mano (Bastián).
+1. Volver a correr en Supabase `probar_en_supabase.py`, que ganó dos comprobaciones después de su último resultado informado.
+2. Probar a mano el flujo de órdenes del MVP en el computador contra Supabase (Bastián).
 3. **Elegir dónde se publica el MVP.** Streamlit necesita un servidor siempre encendido, así que no corre en Vercel; Vercel queda como entrada pública. Hay un `Dockerfile` listo. Queda decidir el servicio y cargar `DATABASE_URL` como secreto del servicio.
 4. Inicio de sesión real y políticas por rol (siguiente etapa).
 5. Que el equipo confirme los criterios de aceptación de HU-01 a HU-05 y el plazo de conservación de datos, que siguen pendientes de antes.

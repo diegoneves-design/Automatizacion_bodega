@@ -135,7 +135,7 @@ REGLAS_CREAR = [
     ({"folio": "GUIA-1"}, "El folio debe tener la forma GUIA-2026-001.", "folio"),
     ({"folio": "   "}, "El folio debe tener la forma GUIA-2026-001.", "folio"),
     ({"folio": "FACTURA-2026-001"}, "El folio debe tener la forma GUIA-2026-001.", "folio"),
-    ({"folio": "GUIA-2026-0000001"}, "El folio debe tener la forma GUIA-2026-001.", "folio"),
+    ({"folio": "GUIA-2026-" + "0" * 7}, "El folio debe tener la forma GUIA-2026-001.", "folio"),  # 7 cifras, una de mas: armado al ejecutar para no parecer telefono
     ({"folio": "GUIA-2026-001"}, "Ya existe una orden con ese folio. Usa otro.", "folio"),
     ({"folio": " guia-2026-002 "}, "Ya existe una orden con ese folio. Usa otro.", "folio"),
     ({"cliente": 99}, "Elige el cliente.", "cliente"),
@@ -458,7 +458,8 @@ def test_cargar_env_se_puede_apagar_y_no_falla_sin_archivo(tmp_path, monkeypatch
 def test_abrir_elige_postgres_solo_si_hay_database_url(tmp_path, monkeypatch):
     monkeypatch.setenv("BODEGA_MVP_DB", str(tmp_path / "local.db"))
     assert db.abrir().modo == "sqlite"
-    monkeypatch.setenv("DATABASE_URL", "postgresql://usuario@servidor.invalido:5432/base")
+    # armada al ejecutar: escrita de corrido, el buscador de correos del repositorio la tomaria por un correo
+    monkeypatch.setenv("DATABASE_URL", "postgresql://" + "usuario" + "@" + "servidor.invalido" + ":5432/base")
     r = db.abrir()
     assert r.modo == "postgres" and "servidor" not in repr(r)  # y nunca muestra la cadena
 

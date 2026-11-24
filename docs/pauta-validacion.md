@@ -2,7 +2,7 @@
 
 Este es el guion que lee quien facilita, en este orden. El diseño completo de la prueba está en [docs/prueba-usuarios.md](prueba-usuarios.md). La versión para imprimir, en dos planas, es [pauta-validacion.pdf](pauta-validacion.pdf).
 
-**Dura 20 minutos en total.** Antes de que llegue la persona, el prototipo debe estar abierto en [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app), con **Reiniciar demo** ya presionado y las órdenes 3001 y 3002 sin cambios en la primera pantalla, y la planilla lista con su código (P01, P02, P03…). Una persona a la vez: los datos se comparten entre sesiones. Quien facilita es la única persona que habla con el participante, y **en ningún momento le explica la pantalla**.
+**Dura 19 minutos en total** (el máximo es 20, así que queda un minuto de holgura). Antes de que llegue la persona, el prototipo debe estar abierto en [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app), con **Reiniciar demo** ya presionado y las órdenes 3001 y 3002 sin cambios en la primera pantalla, y la planilla lista con su código (P01, P02, P03…). Una persona a la vez: los datos se comparten entre sesiones. Quien facilita es la única persona que habla con el participante, y **en ningún momento le explica la pantalla**.
 
 ## 1. Bienvenida y consentimiento (2 min)
 
@@ -10,11 +10,10 @@ Este es el guion que lee quien facilita, en este orden. El diseño completo de l
 
 *(Si dice que "no", no se graba y quien registra anota a mano. La grabación parte solo después del "sí".)*
 
-## 2. Preguntas de contexto (3 min)
+## 2. Preguntas de contexto (2 min)
 
-1. ¿Cuándo fue la última vez que preparó o revisó una guía de despacho o de retiro? ¿Me cuenta cómo lo hizo, paso a paso?
-2. La última vez que le cambiaron un equipo cuando la guía ya estaba casi lista, ¿cómo se enteró? ¿Qué hizo?
-3. Esa vez, ¿cómo revisó que los códigos de los equipos estuvieran bien escritos?
+1. La última vez que le cambiaron un equipo cuando la guía ya estaba casi lista, ¿cómo se enteró? ¿Qué hizo?
+2. Esa vez, antes de dejar lista la guía, ¿qué revisó?
 
 *Si hace falta profundizar, solo se pregunta* "¿Y después qué pasó?" *o* "¿Me da un ejemplo de esa vez?"
 
@@ -56,7 +55,7 @@ Para calcular el puntaje, a cada frase impar se le resta 1 a la nota y en las pa
 ## 6. Preguntas de cierre (2 min)
 
 1. En lo que hizo recién, ¿hubo algún momento en que no supo qué hacer? ¿Qué estaba buscando en ese momento?
-2. ¿Qué hizo distinto de como lo hace hoy en su trabajo?
+2. Cuando lo hace en su trabajo, ¿en qué se parece o en qué no se parece a lo que acaba de hacer?
 
 *(Quien registra anota si la persona habla, sin que se lo preguntemos, de anotar en papel o de traspasar datos a mano. No se le sugiere ninguna solución.)*
 
