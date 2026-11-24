@@ -100,10 +100,11 @@ Se muestran solo las familias con 30 o más equipos (siete con los datos de hoy)
 2. ¿Qué significa exactamente POR HABILITAR? ¿Son equipos que se pueden recuperar?
 3. ¿BAJA es definitiva, o un equipo dado de baja puede volver?
 4. ¿Puede mostrarse el inventario real en una demo pública, o solo con datos de ejemplo?
+   **Respondida el 24 de noviembre de 2026 por Oscar: sí, el inventario real puede mostrarse en el Dashboard público.** Sigue fuera de lo público todo dato personal de clientes (RUT, dirección, correo y teléfono): `inventario_dashboard()` no los devuelve y los permisos de `clientes` no los exponen.
 
 ## 8. Nota de riesgo
 
-La política de lectura de la prueba de concepto es abierta y la clave pública está en el sitio publicado. Quien tenga esa clave puede leer los equipos reales (SKU y descripciones; no hay nombres de personas porque el importador no los guarda). Está aceptado para la prueba de concepto y queda pendiente confirmarlo con Oscar. Antes de un uso real hay que agregar inicio de sesión y cerrar las políticas por rol.
+La política de lectura de la prueba de concepto es abierta y la clave pública está en el sitio publicado. Quien tenga esa clave puede leer los equipos reales (SKU y descripciones; no hay nombres de personas porque el importador no los guarda). Oscar confirmó el 24 de noviembre de 2026 que el inventario real puede mostrarse en el Dashboard público (pregunta 4 de la sección 7), así que este riesgo queda aceptado. Lo que nunca se publica son los datos personales de clientes (RUT, dirección, correo y teléfono). Antes de un uso real hay que agregar inicio de sesión y cerrar las políticas por rol.
 
 ## 9. Dashboard
 
