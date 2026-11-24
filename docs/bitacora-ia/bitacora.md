@@ -839,3 +839,33 @@ Lo hizo Oscar Ynchaustegui el 2026-11-22, con Claude. Lo revisa Sebastián Carmo
 - En Chrome sin ventana, con el portal servido en el computador, en 375 px y 1366 px y con la dirección vacía y con una dirección de prueba (en una copia fuera del repositorio): siempre un único botón visible con el texto pedido, sin desplazamiento horizontal, sin errores de consola y sin más recursos que los cinco archivos del portal; el único enlace de la página es el de la constante. Los servidores y el navegador se cerraron por su número de proceso.
 - **No se verificó:** nada en Vercel (ni la creación del proyecto nuevo, ni la conexión al repositorio, ni Root Directory, ni la publicación, ni que los encabezados de `vercel.json` se apliquen); la configuración interna de `bodega-prototipo` (solo se vio lo que publica, no su panel); otros navegadores ni un celular real; la dirección real del MVP, que no existe todavía.
 
+---
+
+## Encargo 33. Poner al día con main las cuatro ramas apiladas
+
+**Objetivo.** Que los cuatro pull requests (prototipo con Dashboard, migración del MVP a Supabase, Dashboard del MVP y portal) se puedan fusionar en ese orden, con *merge commit*, sin conflictos con `main`. `main` había avanzado (PR #28, #30 y #31) y las tres primeras ramas chocaban con él en `.gitignore`, `README.md` y la bitácora.
+
+**Instrucción entregada.**
+- Contexto: las ramas están apiladas, cada una contiene a la anterior (`feature/dashboard-inventario`, `feature/mvp-supabase`, `feature/mvp-dashboard`, `feature/portal`); el portal estaba en la misma rama que el Dashboard del MVP y había que separarlo.
+- Intención: crear `feature/portal` y devolver `feature/mvp-dashboard` a su commit propio; fusionar `main` en cadena (en la rama 1, esa en la 2, luego en la 3 y por último en la 4); en el README adoptar la estructura de `main` (Hecho, Pendiente, Congelado) y reubicar las filas propias sin perder contenido; conservar en la bitácora los Encargos 1 a 27 de `main` y los propios desde el 28.
+- Restricciones: solo *merge commit* (nada de rebase ni *force-push*); antes de mover nada, anotar los hashes de las ramas para poder deshacerlo; correr `pytest`, `node --test` y la suite con PostgreSQL después de cada fusión y parar ante cualquier falla nueva; sin *push* ni PR; no tocar el buscador de datos ficticios de `main` salvo lo ya autorizado.
+
+**Respuesta obtenida.**
+- Separación: `feature/portal` en `c2fa74c` y `feature/mvp-dashboard` de vuelta en `f4df7de`. Hashes anteriores guardados para deshacer.
+- Fusiones confirmadas: etapa A `5f902da` (`main` en `feature/dashboard-inventario`), etapa B `59c26ec`, etapa C `6c28cc8` y etapa D `e0c7f55`.
+
+**Qué se aceptó y qué se corrigió (decisión por conflicto).**
+- `.gitignore`: se conservaron los dos bloques, el del inventario real y el de la evidencia de la prueba con usuarios.
+- Bitácora: Encargos 22 a 27 de `main`, luego 28 y 29, y después 30, 31 y 32 de las ramas siguientes, en orden y sin repetidos.
+- README: se adoptó la estructura de `main`. Las filas del inventario real, del MVP y del portal pasaron a «Hecho», y sus pendientes a «Pendiente del avance». «Congelado» se partió en lo retomado en el MVP (límite de 60 productos y motivo obligatorio, ya hechos) y lo que sigue congelado (destacar cambios de último minuto, el contraste del selector de Cliente y el inicio de sesión). Se cambió el encabezado «Aplicación Streamlit (congelada)» por «(MVP)» por decisión de Bastián.
+- `docs/mvp-supabase.md`: se actualizó el estado, porque el SQL ya se ejecutó en Supabase el 23 de noviembre.
+- Cifra de `verificar_mvp.sql`: el README decía 41 filas OK; con el historial se comprobó que el archivo tenía 41 filas con la primera versión y tiene 46 desde el arreglo de `clientes`, y Bastián informó 46 filas OK. Se dejó 46. `probar_en_supabase.py` ganó dos comprobaciones después de su último resultado informado (89 OK), por eso queda como pendiente volver a ejecutarlo.
+- Prueba de teléfonos de `main` (`tests/test_kit_prueba.py`): marcaba un número de la biblioteca ECharts (`Number.MAX_SAFE_INTEGER`). Autorizado por Bastián, ahora ignora `prototipo/js/vendor/` (código de terceros minificado), con dos pruebas nuevas que comprueban que sigue detectando un teléfono falso en un `.js` propio y que la excepción es por carpeta y no por número.
+- Tres textos de las propias pruebas de la IA que ese buscador marcaba (una URL de conexión de prueba, un folio de siete ceros y una dirección con usuario y contraseña) se arman ahora al ejecutar. No se tocó la lógica del buscador.
+
+**Cómo se verificó.**
+- Etapa A: 261 pasan (`pytest`), 257 pasan y 4 se omiten con PostgreSQL, 30 en `node --test`. Etapa B: 335 (69 omitidas), 394 (10 omitidas) y 30. Etapa C: 361 (71 omitidas), 422 (10 omitidas) y 38. Etapa D: 370 (71 omitidas), 431 (10 omitidas) y 42.
+- En las cuatro ramas: sin marcadores de conflicto; ningún `datos_locales/`, `*.xlsx` ni `.env` rastreado; sin claves, contraseñas ni URL con credenciales; ninguno de los SKU reales (comparados contra `datos_locales/` sin imprimirlos); cada rama contiene a la anterior; ninguna está detrás de `origin/main` (`f68dcec`).
+- El buscador de teléfonos y correos da 0 hallazgos en las cuatro ramas.
+- **No se verificó:** el CI en GitHub (el servicio de PostgreSQL del flujo nunca se ha ejecutado allá; se validó solo su sintaxis) ni nada subido: no hay *push* ni PR.
+
