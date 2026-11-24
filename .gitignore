@@ -39,6 +39,11 @@ Thumbs.db
 # Configuracion del prototipo (se genera con prototipo/generar-config.mjs)
 prototipo/js/config.js
 
+# Inventario real: el Excel y todo lo generado con datos reales viven solo en datos_locales/, nunca en el repositorio
+*.xlsx
+*.xls
+datos_locales/
+
 # Evidencia de la prueba con usuarios y mediciones reales: van en Drive con acceso restringido, nunca al repositorio
 evidencia/
 datos-medicion/

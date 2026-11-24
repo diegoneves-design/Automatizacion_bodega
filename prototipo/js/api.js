@@ -141,6 +141,11 @@
 
     reiniciarDemo: function () {
       return ejecutar(function (c) { return c.rpc('reiniciar_demo'); });
+    },
+
+    /* Todo lo que necesita el Dashboard, en una sola llamada (supabase/dashboard.sql) */
+    leerDashboard: function () {
+      return ejecutar(function (c) { return c.rpc('inventario_dashboard'); });
     }
   };
 })();

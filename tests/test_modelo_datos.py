@@ -66,7 +66,7 @@ def test_el_motivo_del_cambio_es_obligatorio(con_datos):
 
 
 def test_la_modalidad_solo_aplica_al_despacho(con_datos):
-    ins = "insert into ordenes values (4000, 10, 1, '2026-10-06 08:00:00', ?, ?, ?, 'pendiente')"
+    ins = "insert into ordenes (id_orden, id_cliente, id_usuario_carga, fecha_orden, tipo_movimiento, modalidad, motivo_retiro, estado) values (4000, 10, 1, '2026-10-06 08:00:00', ?, ?, ?, 'pendiente')"
     con_datos.execute(ins, ("despacho", "alternativo", None))
     for tipo, modalidad, motivo in [
         ("retiro", "convencional", "falla"),    # un retiro no tiene modalidad
@@ -78,7 +78,7 @@ def test_la_modalidad_solo_aplica_al_despacho(con_datos):
 
 
 def test_el_motivo_del_retiro_solo_aplica_al_retiro(con_datos):
-    ins = "insert into ordenes values (4001, 10, 1, '2026-10-06 08:00:00', ?, ?, ?, 'pendiente')"
+    ins = "insert into ordenes (id_orden, id_cliente, id_usuario_carga, fecha_orden, tipo_movimiento, modalidad, motivo_retiro, estado) values (4001, 10, 1, '2026-10-06 08:00:00', ?, ?, ?, 'pendiente')"
     con_datos.execute(ins, ("retiro", None, "mantencion_preventiva"))
     with pytest.raises(sqlite3.IntegrityError):
         con_datos.execute(ins.replace("4001", "4002"), ("retiro", None, None))  # un retiro exige motivo
@@ -112,3 +112,11 @@ def test_el_equipo_que_entra_es_obligatorio_y_distinto_del_que_sale(con_datos):
         con_datos.execute("insert into registro_cambios values (9, 3002, 'X', null, null, 1, '2026-10-05 12:00:00', 'm')")
     with pytest.raises(sqlite3.IntegrityError):
         con_datos.execute("insert into registro_cambios values (9, 3002, 'SD-32A10-0102', 504, 504, 1, '2026-10-05 12:00:00', 'm')")
+
+
+def test_el_folio_es_opcional_pero_unico(con_datos):
+    con_datos.execute("update ordenes set folio = 'GUIA-2026-001' where id_orden = 3001")
+    con_datos.execute("update ordenes set folio = null where id_orden = 3002")  # varios sin folio conviven
+    con_datos.execute("update ordenes set folio = null where id_orden = 3003")
+    with pytest.raises(sqlite3.IntegrityError):
+        con_datos.execute("update ordenes set folio = 'GUIA-2026-001' where id_orden = 3002")

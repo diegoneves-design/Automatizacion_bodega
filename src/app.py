@@ -3,11 +3,14 @@ MVP - Automatizacion de Bodega
 Control de carga masiva de SKUs, validacion contra inventario y ajustes de ultima hora.
 
 Ejecutar con: streamlit run src/app.py
+
+main() usa la capa de datos de db.py: PostgreSQL (Supabase) si hay DATABASE_URL, o SQLite local si no.
+Las funciones de datos de este modulo (SQLite con bodega.db: init_db, insertar_ordenes, validar_orden...) son las de
+la interfaz clasica (main_clasico) y las de sus pruebas; main() ya no las usa. Se conservan hasta confirmar su eliminacion.
 """
 
 import os
 import sqlite3
-import sys
 from datetime import datetime
 
 import pandas as pd
@@ -433,14 +436,22 @@ def vista_ajuste_ultima_hora():
 # Main
 # ---------------------------------------------------------------------------
 
+@st.cache_resource
+def _repositorio():
+    """Un solo repositorio para todas las sesiones: PostgreSQL si hay DATABASE_URL; si no, SQLite local (bodega_mvp.db)."""
+    import db
+
+    db.cargar_env()  # .env local (en el hosting no existe: mandan sus secretos)
+    return db.abrir()
+
+
 def main():
-    """Interfaz actual: la logica de datos de este modulo + las pantallas de ui_router."""
+    """Interfaz actual: las pantallas de ui_router sobre la capa de datos de db.py (Supabase o SQLite)."""
     import ui_router
     import ui_theme
 
     st.set_page_config(page_title=ui_theme.NOMBRE_APP, layout="wide", initial_sidebar_state="auto")
-    init_db()
-    ui_router.run(sys.modules[__name__])
+    ui_router.run(_repositorio())
 
 
 def main_clasico():

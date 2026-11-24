@@ -138,3 +138,103 @@ def neutralizar_csv(df):
                 lambda v: "'" + v if isinstance(v, str) and v[:1] in ("=", "+", "-", "@") else v
             )
     return limpio
+
+
+# ---------------------------------------------------------------------------
+# MVP con base real (src/db.py): el estado y el resultado de cada linea vienen guardados en la base.
+# Lo anterior (estado_orden, RESULTADOS, describir_resultado, contar_validos) sigue para la interfaz clasica.
+# ---------------------------------------------------------------------------
+
+# estado de la orden en la base -> (etiqueta, tono de la etiqueta)
+ESTADOS_ORDEN = {
+    "pendiente": (ESTADO_PENDIENTE, "pendiente"),
+    "bloqueada": ("Bloqueada", "error"),
+    "validada": ("Validada", "ok"),
+    "emitida": (ESTADO_COMPLETADA, "completada"),
+}
+
+ESTADOS_EQUIPO = {
+    "disponible": "Disponible",
+    "arrendado": "Arrendado",
+    "en_mantencion": "En mantención",
+    "fuera_servicio": "Fuera de servicio",
+}
+
+
+ROLES = {"jefe_bodega": "Jefe de bodega", "mantenimiento": "Mantenimiento", "comercial": "Comercial", "gerente": "Gerente"}
+
+
+def nombre_rol(rol):
+    """Nombre del rol para mostrar."""
+    return ROLES.get(rol, str(rol))
+
+
+def estado_visible(estado):
+    """(etiqueta, tono) del estado de una orden tal como lo guarda la base."""
+    return ESTADOS_ORDEN.get(estado, (str(estado), "neutro"))
+
+
+def describir_resultado_base(resultado, estado_equipo=None):
+    """(etiqueta, tono, detalle) del resultado guardado de una linea: ok, pendiente, no_existe o no_disponible."""
+    if resultado == "ok":
+        return "OK", "ok", "Disponible en bodega"
+    if resultado == "pendiente":
+        return "Sin validar", "pendiente", "Aún sin validar"
+    if resultado == "no_existe":
+        return "No existe", "error", "No existe en inventario"
+    if resultado == "no_disponible":
+        estado = ESTADOS_EQUIPO.get(estado_equipo, "Sin stock") if isinstance(estado_equipo, str) else "Sin stock"
+        return "No disponible", "error", estado
+    return str(resultado), "error", ""
+
+
+def contar_validos_lineas(lineas):
+    """(validos, total) de un DataFrame de db.Repositorio.lineas."""
+    if lineas.empty:
+        return 0, 0
+    return int((lineas["resultado"] == "ok").sum()), len(lineas)
+
+
+def sin_validar(lineas):
+    """True si alguna linea todavia no se valida."""
+    return (not lineas.empty) and bool((lineas["resultado"] == "pendiente").any())
+
+
+def texto_o_guion(valor, convertir=str):
+    """El valor como texto, o un guion si falta (None, NaN o NaT)."""
+    if valor is None or (not isinstance(valor, str) and pd.isna(valor)):
+        return "-"
+    return convertir(valor)
+
+
+MAX_MOTIVO = 200  # el motivo de un cambio no puede pasar de esto (regla de la base)
+
+
+def motivo_con_observaciones(motivo, observaciones):
+    """El motivo de la lista y, si hay, las observaciones: 'Sin stock: el equipo llego danado'."""
+    observaciones = (observaciones or "").strip()
+    return f"{motivo}: {observaciones}" if observaciones else motivo
+
+
+def texto_guia(guia, orden, lineas):
+    """
+    Texto plano de la guia emitida. guia: {numero_guia, fecha_emision}; orden: fila de db.ordenes();
+    lineas: DataFrame de db.lineas (solo las vigentes).
+    """
+    ancho_sku, ancho_desc = 18, 40
+    filas = [
+        "GUIA DE DESPACHO / RETIRO",
+        f"N de guia: {guia['numero_guia']}",
+        f"Folio: {orden['folio']}",
+        f"Cliente: {orden.get('cliente') or '-'}",
+        f"Tipo de movimiento: {orden['tipo_movimiento']} ({orden['modalidad']})",
+        f"Fecha de emision: {fecha_emision(guia['fecha_emision'])}",
+        "",
+        f"{'SKU':<{ancho_sku}}{'Descripcion':<{ancho_desc}}",
+        "-" * (ancho_sku + ancho_desc),
+    ]
+    for f in lineas.itertuples():
+        descripcion = f.descripcion if isinstance(f.descripcion, str) else "(sin descripcion)"
+        filas.append(f"{f.sku:<{ancho_sku}}{descripcion:<{ancho_desc}}")
+    filas += ["-" * (ancho_sku + ancho_desc), f"Total de equipos: {len(lineas)}"]
+    return "\n".join(filas)

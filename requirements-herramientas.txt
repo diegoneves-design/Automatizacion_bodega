@@ -1,0 +1,3 @@
+# Dependencias solo de las herramientas de apoyo (no de la aplicacion). La app usa requirements.txt.
+# Instalar con:  py -m pip install -r requirements-herramientas.txt
+openpyxl>=3.1

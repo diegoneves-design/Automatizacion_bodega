@@ -157,8 +157,9 @@ def archivos_de_texto():
     carpetas = [DOCS, RAIZ / "herramientas", RAIZ / "prototipo", RAIZ / "supabase", RAIZ / "tests"]
     for carpeta in carpetas:
         for p in carpeta.rglob("*"):
+            # "vendor" es codigo de terceros minificado (ECharts): trae numeros largos que no son telefonos
             if p.is_file() and p.suffix.lower() in {".md", ".csv", ".py", ".js", ".html", ".sql", ".mjs"} \
-                    and "__pycache__" not in p.parts and p.name != "config.js":
+                    and "__pycache__" not in p.parts and "vendor" not in p.parts and p.name != "config.js":
                 yield p
     yield RAIZ / "README.md"
     yield RAIZ / ".env.example"
@@ -182,6 +183,41 @@ def test_los_correos_y_telefonos_del_repositorio_son_ficticios():
             if len(re.sub(r"\D", "", tel)) < 9:
                 continue
             assert es_ficticio(tel), f"{p.relative_to(RAIZ)}: telefono que no parece ficticio: {tel.strip()}"
+
+
+def _arbol_falso(tmp_path, monkeypatch, js_propio, js_de_terceros):
+    """Un repositorio de mentira con un .js propio y otro de terceros (prototipo/js/vendor/), para probar el buscador de telefonos."""
+    for carpeta in ("docs", "herramientas", "prototipo/js/vendor", "supabase", "tests"):
+        (tmp_path / carpeta).mkdir(parents=True)
+    (tmp_path / "README.md").write_text("", encoding="utf-8")
+    (tmp_path / ".env.example").write_text("", encoding="utf-8")
+    (tmp_path / "prototipo/js/propio.js").write_text(js_propio, encoding="utf-8")
+    (tmp_path / "prototipo/js/vendor/libreria.min.js").write_text(js_de_terceros, encoding="utf-8")
+    modulo = sys.modules[__name__]
+    monkeypatch.setattr(modulo, "RAIZ", tmp_path)
+    monkeypatch.setattr(modulo, "DOCS", tmp_path / "docs")
+
+
+# Se arman al ejecutar: este mismo buscador revisa tests/*.py y marcaria los literales.
+TELEFONO_FALSO = "+56 9 " + "8765" + " " + "4321"
+NUMERO_LARGO_DE_UNA_LIBRERIA = str(2**53 - 1)  # Number.MAX_SAFE_INTEGER, que ECharts trae en su codigo
+
+
+def test_el_buscador_de_telefonos_sigue_detectando_un_telefono_falso_en_un_js_propio(tmp_path, monkeypatch):
+    _arbol_falso(tmp_path, monkeypatch, js_propio=f'const contacto = "{TELEFONO_FALSO}";', js_de_terceros="")
+    with pytest.raises(AssertionError, match=r"propio\.js.*telefono que no parece ficticio"):
+        test_los_correos_y_telefonos_del_repositorio_son_ficticios()
+
+
+def test_el_buscador_ignora_el_codigo_de_terceros_de_vendor_pero_no_lo_propio(tmp_path, monkeypatch):
+    _arbol_falso(tmp_path, monkeypatch, js_propio="const a = 1;", js_de_terceros=f"var MAX={NUMERO_LARGO_DE_UNA_LIBRERIA};")
+    test_los_correos_y_telefonos_del_repositorio_son_ficticios()  # en vendor/ no falla
+    assert [p.name for p in archivos_de_texto() if p.suffix == ".js"] == ["propio.js"]
+
+    # el mismo numero en un archivo propio SI se marca: la excepcion es por carpeta, no por numero
+    (tmp_path / "prototipo/js/propio.js").write_text(f"var MAX={NUMERO_LARGO_DE_UNA_LIBRERIA};", encoding="utf-8")
+    with pytest.raises(AssertionError, match=r"propio\.js"):
+        test_los_correos_y_telefonos_del_repositorio_son_ficticios()
 
 
 @pytest.mark.parametrize("doc", documentos_nuevos(), ids=lambda p: p.name)

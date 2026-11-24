@@ -6,6 +6,9 @@ cinco funciones (casos que funcionan y casos que deben ser rechazados con su men
 ATENCION: modifica los datos compartidos de la demo (carga pedidos, registra cambios, prepara guias) y al final
 llama a reiniciar_demo. No lo ejecutes mientras alguien hace una sesion de prueba de usuarios.
 
+Solo mira las ordenes 3001 y 3002 y los equipos 501 a 507 (la demo): puede haber, ademas, el inventario real
+(equipos desde 1000) y las ordenes que se crean desde el MVP, que esta prueba no toca ni cuenta.
+
 Uso (desde la raiz del repositorio, con SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY en .env o en el entorno):
     py supabase/probar_en_supabase.py --si          # muestra solo las fallas
     py supabase/probar_en_supabase.py --si -v       # muestra todas las comprobaciones
@@ -41,6 +44,10 @@ KEY = env["SUPABASE_PUBLISHABLE_KEY"]
 H = {"apikey": KEY, "Content-Type": "application/json"}
 
 resultados = []
+
+# La demo: dos ordenes (3001 y 3002) y siete equipos (501 a 507). Lo demas de la base no es de esta prueba.
+DEMO = "id_orden=in.(3001,3002)"
+EQUIPOS_DEMO = "id_equipo=gte.501&id_equipo=lte.507"
 
 
 def llamar(metodo, ruta, cuerpo=None, extra=None):
@@ -120,12 +127,20 @@ st, c = llamar("GET", "/usuarios?select=correo")
 prueba("El correo de usuarios NO se puede leer", st in (401, 403) or (isinstance(c, dict) and c.get("code") == "42501"), f"HTTP {st} {str(c)[:120]}")
 st, c = llamar("GET", "/usuarios?select=telefono")
 prueba("El teléfono de usuarios NO se puede leer", st in (401, 403) or (isinstance(c, dict) and c.get("code") == "42501"), f"HTTP {st}")
-st, c = llamar("GET", "/equipos?select=id_equipo")
-prueba("Lectura de equipos (7)", st == 200 and len(c) == 7, f"HTTP {st}")
-st, c = llamar("GET", "/ordenes?select=id_orden,detalle_orden(id_detalle)&order=id_orden")
+st, c = llamar("GET", f"/equipos?select=id_equipo&{EQUIPOS_DEMO}")
+prueba("Lectura de equipos de la demo (7)", st == 200 and len(c) == 7, f"HTTP {st}")
+st, c = llamar("GET", f"/ordenes?select=id_orden,detalle_orden(id_detalle)&{DEMO}&order=id_orden")
 prueba("Lectura de órdenes con sus líneas (2 órdenes, 4 + 4)", st == 200 and [len(o["detalle_orden"]) for o in c] == [4, 4], f"HTTP {st} {str(c)[:120]}")
-st, c = llamar("GET", "/guias?select=id_guia")
-prueba("Lectura de guías (0)", st == 200 and c == [], f"HTTP {st}")
+st, c = llamar("GET", f"/guias?select=id_guia&{DEMO}")
+prueba("Lectura de guías de la demo (0)", st == 200 and c == [], f"HTTP {st}")
+st, c = llamar("GET", "/ordenes?select=id_orden,folio&id_orden=in.(3001,3002)&order=id_orden")
+prueba("Las órdenes de la demo tienen su folio", st == 200 and c == [{"id_orden": 3001, "folio": "GUIA-2026-001"}, {"id_orden": 3002, "folio": "GUIA-2026-002"}], f"HTTP {st} {str(c)[:120]}")
+st, c = llamar("GET", "/clientes?select=rut")
+prueba("El RUT de clientes NO se puede leer con la clave pública", st in (401, 403) or (isinstance(c, dict) and c.get("code") == "42501"), f"HTTP {st}")
+st, c = llamar("GET", "/clientes?select=direccion")
+prueba("La dirección de clientes NO se puede leer con la clave pública", st in (401, 403) or (isinstance(c, dict) and c.get("code") == "42501"), f"HTTP {st}")
+st, c = llamar("GET", "/clientes?select=id_cliente,razon_social")
+prueba("La razón social de clientes SÍ se puede leer (la usa el prototipo)", st == 200 and len(c) >= 2, f"HTTP {st}")
 
 # ------------------------------------------------------------------ escritura directa: debe estar cerrada
 for tabla, cuerpo in [("clientes", {"id_cliente": 99, "razon_social": "x", "rut": "x", "direccion": "x"}),
@@ -137,10 +152,17 @@ st, c = llamar("PATCH", "/equipos?id_equipo=eq.501", {"estado": "fuera_servicio"
 st2, c2 = llamar("GET", "/equipos?id_equipo=eq.501&select=estado")
 prueba("UPDATE directo en equipos rechazado y sin efecto", st in (401, 403) and c2[0]["estado"] == "disponible", f"HTTP {st} estado={c2}")
 st, c = llamar("DELETE", "/ordenes?id_orden=eq.3001")
-st2, c2 = llamar("GET", "/ordenes?select=id_orden")
+st2, c2 = llamar("GET", f"/ordenes?select=id_orden&{DEMO}")
 prueba("DELETE directo en ordenes rechazado y sin efecto", st in (401, 403) and len(c2) == 2, f"HTTP {st} ordenes={len(c2)}")
 st, c = rpc("_fallo", p_mensaje="x")
 prueba("La función interna _fallo no es llamable", st in (401, 403, 404), f"HTTP {st}")
+st, c = rpc("_skus_limpios", p_skus=["a"])
+prueba("La función interna _skus_limpios no es llamable", st in (401, 403, 404), f"HTTP {st}")
+st, c = rpc("crear_pedido", p_folio="GUIA-2026-990", p_id_cliente=10, p_id_usuario=1, p_tipo="despacho", p_modalidad="convencional", p_motivo_retiro=None, p_skus=["ST-0042"])
+prueba("crear_pedido NO se puede llamar con la clave pública (solo el rol del MVP)", st in (401, 403, 404), f"HTTP {st} {str(c)[:100]}")
+for vista in ("v_ordenes_resumen", "v_detalle_orden", "v_historial_cambios"):
+    st, c = llamar("GET", "/" + vista + "?select=*&limit=1")
+    prueba(f"La vista {vista} NO se puede leer con la clave pública", st in (401, 403, 404), f"HTTP {st}")
 
 # ------------------------------------------------------------------ cargar_pedido
 base = dict(p_id_orden=3001, p_tipo="despacho", p_modalidad="convencional", p_motivo_retiro=None)
@@ -190,7 +212,7 @@ regla("guía: usuario que no es jefe de bodega", rpc("preparar_guia", p_id_orden
 regla("guía: usuario inexistente", rpc("preparar_guia", p_id_orden=3001, p_id_usuario=999), "Solo el jefe de bodega puede preparar la guía.", "usuario")
 rpc("validar_pedido", p_id_orden=3002)
 regla("guía: con un SKU que no existe", rpc("preparar_guia", p_id_orden=3002, p_id_usuario=1), "Corrige 1 producto para continuar.", "productos")
-st, c = llamar("GET", "/guias?select=id_guia")
+st, c = llamar("GET", f"/guias?select=id_guia&{DEMO}")
 prueba("guía: los rechazos no crearon ninguna guía", c == [], str(c))
 
 # ------------------------------------------------------------------ registrar_cambio
@@ -209,10 +231,10 @@ regla("cambio: motivo de más de 200 caracteres", rpc("registrar_cambio", **{**c
 regla("cambio: motivo solo tabulacion", rpc("registrar_cambio", **{**cam, "p_motivo": "\t\t"}), "Elige el motivo del cambio.", "motivo")
 regla("cambio: motivo solo salto de linea", rpc("registrar_cambio", **{**cam, "p_motivo": "\n"}), "Elige el motivo del cambio.", "motivo")
 regla("cambio: usuario inexistente", rpc("registrar_cambio", **{**cam, "p_id_usuario": 999}), "Elige quién registra el cambio.", "responsable")
-st, c = llamar("GET", "/registro_cambios?select=id_cambio")
+st, c = llamar("GET", f"/registro_cambios?select=id_cambio&{DEMO}")
 prueba("cambio: los rechazos no dejaron registro", c == [], str(c))
 exito("cambio: 9999 → 0315 con motivo", rpc("registrar_cambio", **cam))
-st, c = llamar("GET", "/registro_cambios?select=sku_sale,id_equipo_sale,id_equipo_entra,id_usuario,motivo_cambio,fecha_hora_cambio")
+st, c = llamar("GET", f"/registro_cambios?select=sku_sale,id_equipo_sale,id_equipo_entra,id_usuario,motivo_cambio,fecha_hora_cambio&{DEMO}")
 prueba("cambio: queda registrado con SKU anterior, sin equipo anterior, motivo, usuario y hora",
        len(c) == 1 and c[0]["sku_sale"] == "SD-63A20-9999" and c[0]["id_equipo_sale"] is None and c[0]["id_equipo_entra"] == 502
        and c[0]["id_usuario"] == 2 and c[0]["motivo_cambio"] == "Código mal digitado" and c[0]["fecha_hora_cambio"], str(c))
@@ -227,10 +249,13 @@ exito("validar 3002 tras el cambio", rpc("validar_pedido", p_id_orden=3002))
 prueba("validar: las 4 vigentes ok", all(x["resultado_validacion"] == "ok" for x in lineas(3002) if x["vigente"]) and sum(1 for x in lineas(3002) if x["vigente"]) == 4)
 
 # ------------------------------------------------------------------ preparar_guia (camino feliz)
+# El MVP tambien emite guias: los numeros son consecutivos a partir del mayor que ya exista (15230 si no hay ninguno).
+st, existentes = llamar("GET", "/guias?select=numero_guia&order=numero_guia.desc&limit=1")
+base_guia = existentes[0]["numero_guia"] if st == 200 and existentes else 15229
 st, g = rpc("preparar_guia", p_id_orden=3002, p_id_usuario=1)
-prueba("guía 3002: se prepara", st == 200 and isinstance(g, dict) and g.get("numero_guia") == 15230 and g.get("fecha_emision"), f"HTTP {st} {g}")
-st, c = llamar("GET", "/guias?select=numero_guia,id_usuario_emite,id_orden,fecha_emision")
-prueba("guía 3002: queda guardada con número 15230 y el jefe de bodega", len(c) == 1 and c[0]["id_orden"] == 3002 and c[0]["id_usuario_emite"] == 1, str(c))
+prueba("guía 3002: se prepara", st == 200 and isinstance(g, dict) and g.get("numero_guia") == base_guia + 1 and g.get("fecha_emision"), f"HTTP {st} {g}")
+st, c = llamar("GET", f"/guias?select=numero_guia,id_usuario_emite,id_orden,fecha_emision&{DEMO}")
+prueba("guía 3002: queda guardada con el número siguiente y el jefe de bodega", len(c) == 1 and c[0]["id_orden"] == 3002 and c[0]["id_usuario_emite"] == 1 and c[0]["numero_guia"] == base_guia + 1, str(c))
 st, c = llamar("GET", "/ordenes?id_orden=eq.3002&select=estado")
 prueba("guía 3002: la orden queda 'emitida'", c == [{"estado": "emitida"}], str(c))
 regla("guía: no se prepara dos veces", rpc("preparar_guia", p_id_orden=3002, p_id_usuario=1), "Esta orden ya tiene la guía preparada. Presiona Reiniciar demo para volver a empezar.", "orden")
@@ -239,16 +264,16 @@ regla("orden con guía: no admite validar", rpc("validar_pedido", p_id_orden=300
 regla("orden con guía: no admite cambios", rpc("registrar_cambio", p_id_orden=3002, p_sku_sale="SD-63A20-0315", p_sku_entra="SD-63A20-0314", p_id_usuario=2, p_motivo="x"), "Esta orden ya tiene la guía preparada. Presiona Reiniciar demo para volver a empezar.", "orden")
 rpc("validar_pedido", p_id_orden=3001)
 st, g = rpc("preparar_guia", p_id_orden=3001, p_id_usuario=1)
-prueba("guía 3001: se prepara con número consecutivo 15231", st == 200 and g.get("numero_guia") == 15231, f"HTTP {st} {g}")
+prueba("guía 3001: se prepara con número consecutivo", st == 200 and g.get("numero_guia") == base_guia + 2, f"HTTP {st} {g}")
 
 # ------------------------------------------------------------------ reinicio
 ok_final = reiniciar()
 prueba("reiniciar_demo responde (reinicio final)", ok_final)
-st, c = llamar("GET", "/guias?select=id_guia")
-prueba("reiniciar: sin guías", c == [])
-st, c = llamar("GET", "/registro_cambios?select=id_cambio")
-prueba("reiniciar: sin cambios", c == [])
-st, c = llamar("GET", "/ordenes?select=id_orden,tipo_movimiento,modalidad,motivo_retiro,estado,detalle_orden(sku_informado,vigente,resultado_validacion)&order=id_orden")
+st, c = llamar("GET", f"/guias?select=id_guia&{DEMO}")
+prueba("reiniciar: las órdenes de la demo quedan sin guías", c == [])
+st, c = llamar("GET", f"/registro_cambios?select=id_cambio&{DEMO}")
+prueba("reiniciar: las órdenes de la demo quedan sin cambios", c == [])
+st, c = llamar("GET", f"/ordenes?select=id_orden,tipo_movimiento,modalidad,motivo_retiro,estado,detalle_orden(sku_informado,vigente,resultado_validacion)&{DEMO}&order=id_orden")
 ok = (len(c) == 2 and c[0]["id_orden"] == 3001 and c[0]["modalidad"] == "convencional" and c[1]["motivo_retiro"] == "falla"
       and all(o["estado"] == "pendiente" for o in c)
       and [len(o["detalle_orden"]) for o in c] == [4, 4]
@@ -256,8 +281,8 @@ ok = (len(c) == 2 and c[0]["id_orden"] == 3001 and c[0]["modalidad"] == "convenc
 prueba("reiniciar: 3001 despacho convencional y 3002 retiro por falla, 4 líneas pendientes cada una", ok, str(c)[:200])
 skus3002 = sorted(d["sku_informado"] for d in c[1]["detalle_orden"])
 prueba("reiniciar: 3002 trae SD-63A20-9999", "SD-63A20-9999" in skus3002, str(skus3002))
-st, c = llamar("GET", "/equipos?select=id_equipo,estado,ubicacion&order=id_equipo")
-prueba("los equipos no cambiaron (el 503 sigue en mantención en el taller)", len(c) == 7 and c[2] == {"id_equipo": 503, "estado": "en_mantencion", "ubicacion": "taller"} and all(e["estado"] == "disponible" for i, e in enumerate(c) if i != 2), str(c))
+st, c = llamar("GET", f"/equipos?select=id_equipo,estado,ubicacion&{EQUIPOS_DEMO}&order=id_equipo")
+prueba("los equipos de la demo no cambiaron (el 503 sigue en mantención en el taller)", len(c) == 7 and c[2] == {"id_equipo": 503, "estado": "en_mantencion", "ubicacion": "taller"} and all(e["estado"] == "disponible" for i, e in enumerate(c) if i != 2), str(c))
 
 # ------------------------------------------------------------------ informe
 fallas = [r for r in resultados if not r[1]]

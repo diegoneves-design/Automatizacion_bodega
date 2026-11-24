@@ -6,8 +6,8 @@ MVP del Grupo 6 para el electivo *Ingeniería Digital en Acción: Datos, IA, MVP
 
 Una aplicación web que **genera automáticamente la guía de despacho o retiro** de equipos de arriendo. Hoy el jefe de bodega digita cada guía a mano, y la rehace cuando mantenimiento cambia un equipo a último minuto. El MVP reemplaza esa digitación por un flujo con tres pasos:
 
-1. **Carga masiva** de SKU (pegados o desde archivo), eligiendo el tipo de movimiento: Despacho (Convencional o Alternativo) o Retiro (Preventivo o Por falla). Elimina duplicados y bloquea la carga si se exceden los 50 SKU por guía.
-2. **Validación automática** de cada SKU contra el inventario. Cada fila queda como `OK`, `SIN STOCK DISPONIBLE` o `SKU NO EXISTE EN INVENTARIO`, con exportación a CSV.
+1. **Carga masiva** de SKU (pegados o desde archivo), eligiendo el tipo de movimiento: Despacho (Convencional o Alternativo) o Retiro (Preventivo o Por falla). Elimina duplicados y bloquea la carga si se exceden los 60 SKU por guía.
+2. **Validación automática** de cada SKU contra el inventario. Cada fila queda como `OK`, `No disponible` (el equipo existe pero está arrendado, en mantención o fuera de servicio) o `No existe`, con exportación a CSV.
 3. **Ajuste de última hora**: reemplaza un SKU ya cargado por otro. El original se archiva (no se borra) y el cambio queda en un registro con fecha, hora, responsable y motivo.
 
 Indicador de éxito: porcentaje de guías emitidas sin errores y sin necesidad de rehacerlas.
@@ -20,10 +20,14 @@ Documentación del proyecto:
 - Historias de usuario y criterios de aceptación (Avance 4): [docs/historias.md](docs/historias.md)
 - Wireframes del flujo principal (Avance 4): [docs/wireframes/](docs/wireframes/)
 - Conversación con el usuario (Avance 4): [docs/entrevistas/entrevista_subjefe_bodega.md](docs/entrevistas/entrevista_subjefe_bodega.md)
-- Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app)
+- Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app). Sigue publicado en su propio proyecto de Vercel (`bodega-prototipo`) para el video de este README y para la prueba con usuarios; no se rehace y el portal no lo enlaza
+- Portal público para Vercel (una página con un botón hacia el MVP): [portal/LEEME.md](portal/LEEME.md); la dirección del MVP vive en `portal/config.js`
 - Análisis ético del prototipo (Avance 5): [docs/etica.md](docs/etica.md)
 - **Arquitectura y camino delgado de la prueba de concepto (Avance 7): [docs/arquitectura.md](docs/arquitectura.md)**
 - Prueba de concepto con Supabase (reglas, mensajes de error y pruebas de rotura): [docs/poc-supabase.md](docs/poc-supabase.md)
+- Inventario real de la bodega: método, supuestos y orden de carga a Supabase: [docs/analisis-inventario.md](docs/analisis-inventario.md)
+- Dashboard (en el menú del prototipo, junto a Pedidos; archivo `prototipo/dashboard.html`): gráficos con filtros que se combinan; sus reglas están en `docs/analisis-inventario.md`
+- MVP (Streamlit) conectado a Supabase: orden de ejecución del SQL, rol limitado, cómo conectarlo y límites: [docs/mvp-supabase.md](docs/mvp-supabase.md)
 - Diseño de la prueba de usuarios (Avance 6): [docs/prueba-usuarios.md](docs/prueba-usuarios.md)
 - Guion para cada sesión de la prueba (Avance 6): [docs/pauta-validacion.md](docs/pauta-validacion.md) · [versión para imprimir](docs/pauta-validacion.pdf)
 - Kit para ejecutar la prueba (consentimiento, planilla, ensayo, plan de sesiones y regla de decisión): [docs/kit-prueba/](docs/kit-prueba/)
@@ -33,7 +37,7 @@ Documentación del proyecto:
 ### Estructura del repositorio
 
 ```
-src/                  código de la solución (app.py)
+src/                  código de la solución (app.py y las pantallas; db.py es la capa de datos: Supabase o SQLite)
 tests/                pruebas automáticas
 docs/unidad1/         Avances 2 y 3 de la Unidad 1 (PDF)
 docs/bitacora-ia/     registro de encargos a un agente de IA
@@ -46,11 +50,14 @@ herramientas/         scripts de apoyo: cálculo de la línea base y PDF imprimi
 docs/wireframes/      wireframes del flujo principal, con sus notas (Avance 4)
 docs/entrevistas/     conversación con el usuario y su guion (Avance 4)
 docs/recorrido-usuario/ borrador del mapa de recorrido (ensayo, sin validar)
-prototipo/            prototipo del flujo principal (Avance 5), en HTML, CSS y JS sin build; conectado a Supabase en la prueba de concepto
+prototipo/            prototipo del flujo principal (Avance 5), en HTML, CSS y JS sin build; conectado a Supabase en la prueba de concepto. Sigue publicado en su propio proyecto de Vercel
+portal/               entrada pública que publica Vercel: una página estática con un botón hacia el MVP (la dirección, en portal/config.js)
 README.md             portada del proyecto
 .gitignore            archivos locales que no se suben (base de datos, .env)
 .env.example          nombres de variables de entorno, sin valores
 ```
+
+Sin emojis en el código; lo vigila `tests/test_sin_emojis.py`.
 
 ## Para quién es
 
@@ -130,9 +137,9 @@ Entra a `http://127.0.0.1:8000` en el navegador y prueba los casos de la tabla d
 
 **En Vercel** el sitio se publica solo desde `main`, con las variables `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` configuradas en el proyecto y el comando de construcción que genera la configuración (detalle en «Prueba de concepto con Supabase: qué hay que configurar», más abajo).
 
-## Aplicación Streamlit (congelada): cómo se instala y se ejecuta
+## Aplicación Streamlit (MVP): cómo se instala y se ejecuta
 
-Esta es la aplicación de los avances anteriores. La profesora pidió no seguir invirtiéndole horas, así que no es parte de la prueba de concepto.
+Esta es la aplicación Streamlit de `src/`, el MVP. La profesora pidió (Avance 5) no invertirle más horas hasta confirmar el flujo con usuarios; por decisión de Bastián, desde el 20 de noviembre de 2026 se retomó el trabajo sobre ella: ahora se conecta a Supabase (`docs/mvp-supabase.md`). La prueba de concepto de arriba sigue siendo la del prototipo; en «Congelado» se explica qué parte del MVP sigue congelada y cuál no.
 
 
 Guía paso a paso para Windows, pensada para quien nunca ha usado una terminal. Se hace una sola vez; las veces siguientes basta con los pasos 3 y 5. Toma entre 10 y 15 minutos.
@@ -197,7 +204,7 @@ py -m streamlit run src/app.py
 - La primera vez, Streamlit puede pedir un correo electrónico: **déjalo vacío y presiona Enter**.
 - Se abre solo el navegador con la aplicación. Si no se abre, escribe en la barra de direcciones: `http://localhost:8501`.
 - **No cierres la ventana de PowerShell mientras uses la aplicación**: ahí es donde está corriendo.
-- La primera vez se crea sola la base de datos `bodega.db`, con un inventario simulado de 10 equipos. No hay que configurar nada más.
+- Sin configurar nada, la aplicación usa una **base local de pruebas** (`bodega_mvp.db`, que se crea sola) con 7 equipos y 2 órdenes de ejemplo; el menú lo dice: «Base local de pruebas (SQLite)». Para trabajar con la base real en Supabase hay que definir `DATABASE_URL` (ver `docs/mvp-supabase.md`); entonces el menú dice «Base: Supabase (PostgreSQL)».
 
 ### Paso 6. Cerrar el programa
 
@@ -210,39 +217,67 @@ La aplicación abre en **Órdenes**. A la izquierda hay un menú con cinco opcio
 | Vista | Para qué sirve |
 |---|---|
 | **Órdenes** | Ver las órdenes del día, buscarlas por número, cambiar la fecha y filtrar por Despacho o Retiro. *Ver detalle* abre la orden con sus equipos, el estado de cada uno y su última modificación |
-| **Carga masiva** | Cargar el listado de SKU de una orden (pegados o desde un archivo `.txt` o `.csv`), eligiendo el tipo de movimiento: Despacho (Convencional o Alternativo) o Retiro (Preventivo o Por falla). Elimina duplicados y no deja cargar más de 50 SKU por guía. Al cargar, abre el detalle de la orden nueva |
-| **Validador** | Revisar cada SKU de la orden contra el inventario. Cada fila queda como `OK`, `Sin stock` o `No existe`, y se puede descargar en CSV. Si algún SKU tiene problemas, *Emitir guía* queda bloqueado y *Corregir SKU* lleva al ajuste. Con todo `OK`, emite la guía y la deja para descargar en `.txt` |
-| **Ajuste de última hora** | Reemplazar un SKU por otro del inventario, con motivo y responsable. El original no se borra y el cambio queda en el historial de la orden |
+| **Carga masiva** | Cargar el listado de SKU de una orden (pegados o desde un archivo `.txt` o `.csv`), eligiendo el tipo de movimiento: Despacho (Convencional o Alternativo) o Retiro (Preventivo o Por falla). Pide el folio (con la forma `GUIA-2026-003`) y el cliente, elimina duplicados y no deja cargar más de 60 SKU por guía. Al cargar, abre el detalle de la orden nueva |
+| **Validador** | Revisar cada SKU de la orden contra el inventario. El resultado queda guardado en la base. Cada fila queda como `OK`, `No disponible` o `No existe`, y se puede descargar en CSV. Si algún SKU tiene problemas, *Emitir guía* queda bloqueado y *Corregir SKU* lleva al ajuste. Con todo `OK`, emite la guía (solo el jefe de bodega puede) con su número y la deja para descargar en `.txt`. Una orden con guía ya no admite cambios |
+| **Ajuste de última hora** | Reemplazar un SKU por otro del inventario (se busca por parte del SKU o de la descripción), con motivo y responsable (se elige de la lista de usuarios). El original no se borra y el cambio queda en el historial de la orden; después hay que volver a validar |
 | **Historial** | Ver todos los cambios de última hora (fecha y hora, orden, SKU original y nuevo, responsable y motivo) y descargarlos en CSV |
+| **Dashboard** (opcional, apagado por omisión) | Análisis del inventario real: 5 indicadores, 12 gráficos que se filtran entre sí, tabla de equipos con descarga en CSV, vistas rápidas por rol y «Lectura de los datos». Solo aparece con `DASHBOARD_INVENTARIO=1` |
+
+### Dashboard del inventario (opcional)
+
+Es el análisis del inventario real de la bodega (1.617 equipos y 319 extensiones), dentro del mismo menú del MVP. **Viene apagado por omisión**, pero la bodega ya autorizó mostrar el inventario real en público (Oscar, 24 de noviembre de 2026, pregunta 4 de `docs/analisis-inventario.md`), así que puede activarse al publicar el MVP. Los datos personales de clientes siguen fuera de lo público.
+
+- **En tu computador:** en `.env`, `DASHBOARD_INVENTARIO=1`, y que `DATABASE_URL` apunte a Supabase (con la base local de pruebas la vista sale vacía). Aparece «Dashboard» en el menú, y también se abre directo con `http://localhost:8501/?vista=dashboard`.
+- **En un hosting público:** al publicar el MVP puedes activarlo. Para encenderlo, agrega la variable de entorno `DASHBOARD_INVENTARIO` con el valor `1` en el servicio y reinícialo; para apagarlo, quítala. Cómo y por qué: `docs/analisis-inventario.md` (sección 11).
+- **Cómo funciona:** los gráficos son los mismos del prototipo (se arma la página con los mismos archivos, sin copiarlos). Los datos los lee el servidor con el rol limitado `app_mvp` y viajan dentro de la página: el navegador no usa la clave publicable ni llama a Supabase. Los filtros quedan en la dirección (`?vista=dashboard#estado=arrendado`) y se pueden compartir.
+- **Streamlit está fijo en la versión 1.65.0** (`requirements.txt`): el Dashboard usa `st.iframe`, que no existe en versiones antiguas.
+
+### Portal público en Vercel
+
+Streamlit necesita un servidor siempre encendido y no corre en Vercel. Por eso Vercel publica solo una **entrada**: `portal/`, una página estática con el nombre del proyecto, una frase de qué hace y **un único botón**.
+
+- **La dirección del MVP vive en un solo lugar:** `portal/config.js` (`URL_APLICACION`). Mientras esté vacía, el botón aparece desactivado con el texto «Aplicación en despliegue»; con una dirección `https`, pasa a «Abrir la aplicación». Cambiarla es editar esa línea y volver a publicar.
+- **El prototipo no cambia ni se desconecta.** Sigue publicado en `bodega-prototipo.vercel.app`, en su propio proyecto de Vercel (`bodega-prototipo`, con Root Directory = `prototipo` y Build Command = `node generar-config.mjs`), para el video de este README y para la prueba con usuarios. **Ese proyecto no se modifica.** El portal no lo enlaza ni enlaza a su dashboard.
+- **Sin dependencias, sin claves y sin Supabase.** La página lleva su propia política de seguridad (no puede conectarse a ninguna red) y `vercel.json` agrega encabezados de seguridad.
+- **Pendiente aparte, que el portal no resuelve:** el proyecto `bodega-prototipo` hoy no está conectado al repositorio correcto. Lo publicado es la versión del 25 de octubre (la de Avance 5: sin conexión a Supabase y sin dashboard). La pauta de la prueba con usuarios supone la versión actual (órdenes 3001 y 3002 y «Reiniciar demo»), que se publica cuando ese proyecto se vuelva a conectar a `main` y tenga sus dos variables (`SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`).
+
+**Crear el proyecto nuevo en Vercel** (lo hace una persona del equipo en el panel; el repositorio no puede hacerlo por sí solo). Es un proyecto **nuevo** de Vercel: **no se modifica `bodega-prototipo`**.
+
+1. **Esperar a que el portal esté en `main`.** El proyecto nuevo publica la rama de producción (`main`) y, si `portal/` todavía no existe ahí, su primera publicación falla (la carpeta no está). Por eso se crea después de fusionar el pull request del portal.
+2. En Vercel, en el equipo `automatizacion-de-bodega`: *Add New…* → *Project* → importar el repositorio de GitHub `diegoneves-design/Automatizacion_bodega`. Vercel necesita permiso sobre esa cuenta de GitHub (lo da quien la administra, instalando la aplicación de Vercel en ese repositorio). Según el plan de Vercel puede no permitir repositorios de otra cuenta u organización: si lo rechaza, hay que resolverlo antes de seguir.
+3. En la pantalla de configuración, **antes de publicar**:
+   - *Project Name*: `bodega-portal`.
+   - *Framework Preset*: **Other**.
+   - *Root Directory*: **`portal`** (*Edit* y elegir la carpeta).
+   - *Build and Output Settings*: no cambiar nada: **sin Build Command**, sin Install Command y sin Output Directory (los interruptores *Override* apagados).
+   - *Environment Variables*: **ninguna**.
+4. *Deploy*. La rama de producción es `main` (*Settings* → *Git*).
+
+**Cómo comprobar que quedó bien:**
+
+- Abrir la dirección del proyecto nuevo: se ve «Del pedido a la guía, sin errores.» y **un botón gris desactivado** que dice «Aplicación en despliegue».
+- `/config.js` debe mostrar `URL_APLICACION: ''` sin ninguna clave, y `/dashboard.html` y `/prototipo/index.html` deben dar **404** (este proyecto solo sirve el portal).
+- En las herramientas de desarrollo (F12) → *Network*: solo cinco archivos (`index`, `config.js`, `portal.js`, `estilos.css`, `icono.svg`) y ninguna llamada a `supabase`. En los encabezados de la página: `Content-Security-Policy` y `X-Frame-Options: DENY`.
+- En *Deployments*, el registro de construcción (*Build Logs*) no debe ejecutar ningún comando `node` ni mencionar `generar-config.mjs`, y debe terminar sin errores.
+- Abrirlo en el celular: sin desplazamiento horizontal y con el botón visible.
+- **Comprobar que `bodega-prototipo` no cambió:** su dirección sigue abriendo el prototipo y su configuración (Root Directory, Build Command y variables) sigue como estaba.
+- Cuando el MVP esté publicado: poner su dirección `https` en `portal/config.js`, pull request, fusión, y comprobar que el botón pasa a azul con «Abrir la aplicación» y lleva al MVP.
 
 ### Prueba guiada (5 minutos)
 
-Sirve para comprobar que todo funciona. Sigue los pasos en orden.
+Sirve para comprobar que todo funciona. Sigue los pasos en orden. Usa las dos órdenes de ejemplo (`GUIA-2026-001` y `GUIA-2026-002`), que ya vienen cargadas.
 
-> Si ya probaste la app antes, borra `bodega.db` para partir con los datos de ejemplo: la app no rechaza un folio repetido y mezclaría las órdenes.
+> Si ya probaste la app antes con la base local, borra `bodega_mvp.db` para volver a partir con los datos de ejemplo. Con la base de Supabase, quien administra el prototipo puede reiniciar la demo (`select public.reiniciar_demo();`, que solo restaura esas dos órdenes).
 
-1. En el menú de la izquierda elige **Carga masiva**.
-   - En *Folio de guía u orden* escribe `GUIA-2026-001`.
-   - *Tipo de movimiento*: `Despacho`. *Modalidad*: `Convencional`.
-   - En el cuadro grande pega estas cinco líneas (una por línea):
-
-     ```
-     EXC-001
-     EXC-002
-     RET-010
-     GRU-020
-     MON-050
-     ```
-
-   - Presiona **Cargar orden**. Se abre *Detalle de la orden* con el mensaje `Orden GUIA-2026-001 cargada con 5 SKU. Revisa los equipos y valídala.` Los cinco equipos aparecen como `Sin validar`.
-2. Presiona **Validar SKUs →**. En *Resultado de validación* aparece `Validación con diferencias` (4 de 5 SKU válidos): `MON-050` sale como `Sin stock`. Es a propósito, porque en el inventario simulado tiene stock 0. *Emitir guía* queda bloqueado.
-3. Presiona **Corregir SKU**. Se abre *Ajuste de última hora* con `MON-050` ya elegido en *SKU a reemplazar*. En el formulario:
-   - *Nuevo SKU*: `PLA-060`.
-   - *Motivo del cambio*: `Sin stock`.
-   - *Responsable*: tu nombre (es obligatorio).
-   - Presiona **Guardar cambio**. Vuelves a la validación con el mensaje `Cambio registrado: MON-050 → PLA-060.`
-4. Ahora aparece `Validación completada` (5 de 5) y todo sale `OK`. Presiona **Emitir guía →**: se abre *Guía generada* con el botón **Descargar guía (.txt)**. La guía emitida se recuerda solo mientras la página esté abierta.
+1. En **Órdenes** elige `GUIA-2026-002` (un retiro por falla) y presiona **Ver detalle**. Aparecen sus cuatro equipos como `Sin validar`.
+2. Presiona **Validar SKUs →**. En *Resultado de validación* aparece `Validación con diferencias` (3 de 4 SKU válidos): `SD-63A20-9999` sale como `No existe`. Es a propósito. *Emitir guía* queda bloqueado.
+3. Presiona **Corregir SKU**. Se abre *Ajuste de última hora* con `SD-63A20-9999` ya elegido en *SKU a reemplazar*. En el formulario:
+   - *Buscar el equipo que entra*: escribe `0315` y en *Nuevo SKU* elige `SD-63A20-0315`.
+   - *Motivo del cambio*: `Otro`. *Responsable*: el nombre de la lista (por ejemplo, `Camila Rojas`).
+   - Presiona **Guardar cambio**. Vuelves a la validación, que dice que la orden aún no se valida y avisa `Cambio registrado: SD-63A20-9999 → SD-63A20-0315. Vuelve a validar la orden.`
+4. Presiona **Validar ahora**: aparece `Validación completada` (4 de 4) y todo sale `OK`. Presiona **Emitir guía →** (el menú de la izquierda dice quién opera: debe ser el jefe de bodega, `Pedro Soto`; con otro usuario la base responde `Solo el jefe de bodega puede preparar la guía.`). Se abre *Guía generada* con su número y el botón **Descargar guía (.txt)**. La primera guía lleva el número 15230.
 5. En el menú elige **Historial**: el cambio queda anotado con fecha, hora, orden, responsable y motivo.
+6. En **Carga masiva** crea una orden nueva: folio `GUIA-2026-003`, un cliente, `Despacho` y `Convencional`, y pega `ST-0042` y `MP-0107`. Se abre su detalle. Si repites el folio, la base responde `Ya existe una orden con ese folio. Usa otro.`
 
 ### Si algo falla
 
@@ -253,14 +288,15 @@ Sirve para comprobar que todo funciona. Sigue los pasos en orden.
 | `can't open file ... src/app.py` | Estás en la carpeta equivocada | Vuelve al paso 3 y haz la comprobación con `dir` |
 | El navegador no abre nada | A veces Streamlit no abre el navegador solo | Abre tú `http://localhost:8501` |
 | `Port 8501 is already in use` | Ya hay otra copia del programa abierta | Ciérrala con `Ctrl + C`, o usa otro puerto: `py -m streamlit run src/app.py --server.port 8502` y abre `http://localhost:8502` |
-| Quiero empezar de cero, sin las órdenes que cargué | Los datos quedan guardados en `bodega.db` | Cierra el programa (`Ctrl + C`), borra el archivo `bodega.db` y vuelve a ejecutar; se crea de nuevo con el inventario original |
-| Dice "Debes ingresar un folio antes de cargar la orden" | Falta escribir el folio | Escribe un folio, por ejemplo `GUIA-2026-001`, y presiona de nuevo **Cargar orden** |
+| Quiero empezar de cero, sin las órdenes que cargué | Con la base local, los datos quedan en `bodega_mvp.db` | Cierra el programa (`Ctrl + C`), borra el archivo `bodega_mvp.db` y vuelve a ejecutar; se crea de nuevo con los datos de ejemplo |
+| Dice «El folio debe tener la forma GUIA-2026-001.» | El folio tiene otra forma | Escribe `GUIA`, el año de cuatro cifras y un número, por ejemplo `GUIA-2026-003` |
+| Dice «No se pudo conectar con la base de datos.» | `DATABASE_URL` está mal escrita, la contraseña no es la del rol o no hay internet | Revisa `DATABASE_URL` en `.env` (ver `docs/mvp-supabase.md`), sin compartirla, y presiona **Reintentar** |
 
 Sobre Mac o Linux: es lo mismo, pero se escribe `python3` en lugar de `py` (por ejemplo, `python3 -m streamlit run src/app.py`).
 
 ### Opciones para quien ya tiene experiencia
 
-**Variable de entorno (opcional).** `BODEGA_DB_PATH` indica dónde se guarda la base SQLite; si no se define, se usa `bodega.db` en la carpeta desde donde se ejecuta. La aplicación **no lee el archivo `.env`**: la variable hay que definirla en el sistema (por ejemplo, `$env:BODEGA_DB_PATH = "C:\ruta\bodega.db"` en PowerShell, antes del paso 5). Las claves reales nunca se suben al repositorio; `.env.example` solo muestra los nombres.
+**Variables de entorno (opcionales).** `DATABASE_URL` es la conexión a PostgreSQL (Supabase) con el rol limitado `app_mvp`; si no se define, se usa una base SQLite local (`BODEGA_MVP_DB` indica dónde; por omisión, `bodega_mvp.db`). La aplicación lee un archivo `.env` en la raíz del repositorio, **sin pisar** las variables que ya estén definidas en el sistema (en un hosting mandan sus secretos). La contraseña y la cadena de conexión nunca se suben al repositorio: `.env` está en `.gitignore` y `.env.example` solo muestra los nombres. Cómo armar `DATABASE_URL`: `docs/mvp-supabase.md`.
 
 **Con Docker:**
 
@@ -269,12 +305,16 @@ docker build -t automatizacion-bodega .
 docker run -p 8501:8501 automatizacion-bodega
 ```
 
-**Pruebas automáticas** (18 casos sobre la capa de datos y la lógica de negocio). Requieren instalar `pytest`, que no viene con el paso 4:
+Para conectarla a Supabase, pasa la variable sin escribirla en ningún archivo: `docker run -p 8501:8501 -e DATABASE_URL automatizacion-bodega` (toma el valor de tu sistema).
+
+**Pruebas automáticas.** Corren sin conexión a internet. Requieren instalar `pytest`, que no viene con el paso 4:
 
 ```powershell
 py -m pip install -r requirements-dev.txt
-py -m pytest -v
+py -m pytest tests
 ```
+
+Las pruebas contra PostgreSQL de verdad (capa de datos, rol limitado y recorridos de pantalla) son **opcionales**: corren solo si defines `DATABASE_URL_TEST` con una base vacía de prueba cuyo nombre termine en `_test`. En el CI de GitHub corren siempre, contra un PostgreSQL temporal. Detalle en `docs/mvp-supabase.md`.
 
 ## En qué estado está
 
@@ -297,6 +337,9 @@ La profesora indicó en la retroalimentación del Avance 5 que, mientras la prue
 | Prueba de concepto en Supabase: el prototipo lee órdenes, valida SKU, registra cambios con motivo obligatorio y prepara la guía, con validación en tres capas. Los cuatro scripts corrieron en Supabase, las 82 comprobaciones con la clave publicable pasan y la pantalla se probó en un navegador contra la base real | `prototipo/`, `supabase/`, `docs/poc-supabase.md` |
 | Diseño de la prueba con usuarios y guion de cada sesión, con pauta imprimible de 2 planas | `docs/prueba-usuarios.md`, `docs/pauta-validacion.md` |
 | Kit para ejecutar la prueba (consentimiento, planilla, ensayo, plan de sesiones, regla de decisión), protocolo de la línea base con su herramienta de cálculo y checklist del celular. El prototipo se revisó en pantallas de 360 y 390 px de ancho | `docs/kit-prueba/`, `docs/linea-base.md`, `docs/checklist-celular.md` |
+| Inventario real cargado en Supabase (1.617 equipos y 319 extensiones eléctricas) y Dashboard interactivo con 12 gráficos, filtros cruzados, tabla de casos y vistas por rol | `prototipo/dashboard.html`, `supabase/dashboard.sql`, `docs/analisis-inventario.md` |
+| MVP (Streamlit) sobre Supabase, en la rama `feature/mvp-supabase`: capa de datos `src/db.py` (Supabase o SQLite) que llama a las funciones SQL de la base, folio de la orden, `crear_pedido`, vistas de lectura, un rol de base limitado `app_mvp` y el cierre de la lectura del RUT y la dirección de los clientes con la clave publicable. Ejecutado en Supabase el 23 de noviembre de 2026 (resultados informados por Bastián): `verificar_mvp.sql` con sus 46 filas OK y `probar_en_supabase.py` con 89 OK y 0 FALLAS; además probado contra un PostgreSQL local y en SQLite | `src/`, `supabase/mvp_*.sql`, `docs/mvp-supabase.md` |
+| Portal público para Vercel (`portal/`): una página estática con un único botón hacia el MVP, desactivado mientras no haya dirección en `portal/config.js`. El prototipo sigue publicado aparte, en su propio proyecto de Vercel, sin cambios | `portal/`, `portal/LEEME.md` |
 
 ### Pendiente del avance
 
@@ -306,18 +349,29 @@ La profesora indicó en la retroalimentación del Avance 5 que, mientras la prue
 | Confirmar con administración el plazo de conservación de 24 meses | Es una propuesta del equipo (`docs/etica.md`, ficha B2) |
 | Ejecutar `supabase/seed_poc.sql` en Supabase con los RUT de ejemplo nuevos (`11.111.111-1` y `22.222.222-2`) y luego `select public.reiniciar_demo();` | La base real sigue con los RUT anteriores hasta que se vuelva a ejecutar la semilla |
 | Configurar Vercel (variables `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` y comando de construcción) y volver a publicar desde `main` | Hasta entonces el sitio publicado no es la versión conectada a Supabase |
+| Crear el proyecto nuevo `bodega-portal` en Vercel (Root Directory = `portal`) una vez que el portal esté en `main`, y poner la dirección del MVP en `portal/config.js` cuando el MVP esté publicado | Pasos y cómo comprobarlos en «Portal público en Vercel». No se modifica `bodega-prototipo`; reconectarlo al repositorio correcto es la fila anterior. El MVP todavía no tiene dirección publicada |
+| Revisar el Dashboard en la página publicada y confirmar con Oscar o el jefe de bodega los supuestos del análisis (valores numéricos = arrendado, significado de POR HABILITAR y de BAJA) (el inventario real **sí puede mostrarse** en una demo pública: Oscar lo confirmó el 24 de noviembre de 2026, pregunta 4 de `docs/analisis-inventario.md`; los datos personales de clientes, como RUT, dirección, correo y teléfono, siguen fuera de lo público) | `supabase/dashboard.sql` ya se ejecutó en Supabase (la función devuelve 1.617 equipos y 319 extensiones). Falta la respuesta de la bodega sobre los supuestos y publicar el prototipo desde `main` |
+| Elegir dónde se publica el MVP (Streamlit no corre en Vercel), guardar su `DATABASE_URL` como secreto del servicio y, más adelante, agregar inicio de sesión real y políticas por rol | Hoy el MVP corre solo en el computador y no tiene inicio de sesión: cualquiera con acceso opera como el usuario que elija (limitación documentada en «Seguridad de la base en esta etapa») |
+| Volver a ejecutar en Supabase `supabase/probar_en_supabase.py` y probar a mano el flujo de órdenes del MVP contra Supabase | El último resultado informado de `probar_en_supabase.py` (89 OK y 0 FALLAS) es anterior a dos comprobaciones nuevas sobre los clientes (dirección y razón social); `verificar_mvp.sql` ya se ejecutó completo (46 filas OK). El flujo de órdenes todavía no se probó en un navegador contra Supabase |
 
 ### Congelado, no se hará por ahora
 
-Todo esto es de la **aplicación Streamlit**. La razón: la profesora pidió no invertirle más horas mientras la prueba con usuarios no confirme el flujo, y el prototipo ya cubre lo que la etapa pide.
+Hasta el 20 de noviembre todo esto era de la **aplicación Streamlit**: la profesora pidió (retroalimentación del Avance 5) no invertirle más horas mientras la prueba con usuarios no confirme el flujo. **Por decisión de Bastián, desde el 20 de noviembre de 2026 el MVP (Streamlit, `src/`) retoma ese trabajo**: se migró a Supabase y se le agregan vistas (`docs/mvp-supabase.md`). Por eso la tabla se separa en lo que ya no está congelado y lo que sigue congelado.
+
+**Retomado en el MVP (ya no está congelado):**
 
 | Qué | Estado |
 |---|---|
-| Subir el límite de 50 a 60 productos por guía en la aplicación | El prototipo y la base ya usan 60. En la aplicación hay un cambio hecho en la rama local `feature/avance5-pendientes-app`, sin subir ni fusionar |
-| Destacar los cambios de último minuto en el validador de la aplicación (HU-04) | Igual: en esa rama local. El prototipo ya los destaca |
-| Hacer obligatorio el motivo del cambio en la aplicación | Igual: en esa rama local. El prototipo y la base ya lo exigen |
-| Corregir el borde del campo Cliente en la aplicación | La aplicación no tiene ese campo. El del prototipo ya se corrigió |
-| Cuentas y permisos en la aplicación | Hay un inicio de sesión por jerarquía en la rama local `feature/login-etapa1`, sin subir ni fusionar |
+| Subir el límite de 50 a 60 productos por guía en la aplicación | **Hecho en el MVP** (rama `feature/mvp-supabase`): el límite lo define la base (60), igual que el prototipo. El MVP lo cubre sin usar la rama local `feature/avance5-pendientes-app`, que sigue sin subir ni fusionar |
+| Hacer obligatorio el motivo del cambio en la aplicación | **Hecho en el MVP**: la base lo exige (`registrar_cambio`) y la pantalla pide el motivo. El prototipo y la base ya lo exigían |
+
+**Sigue congelado:**
+
+| Qué | Estado |
+|---|---|
+| Destacar los cambios de último minuto en el validador de la aplicación (HU-04) | Sigue congelado. El detalle de la orden del MVP muestra una columna «Última modificación», pero no hay destaque visual como el que pide HU-04. El prototipo sí los destaca |
+| Corregir el borde del campo Cliente en la aplicación | Sigue pendiente, y ya no es cierto que la aplicación no tenga ese campo: el MVP tiene un selector de Cliente en Carga masiva (de Streamlit), cuyo contraste no se ha revisado. El del prototipo ya se corrigió |
+| Cuentas y permisos en la aplicación | Sigue congelado: el MVP no tiene inicio de sesión (se elige quién opera en el menú; limitación documentada en «Seguridad de la base en esta etapa»). Hay un inicio de sesión por jerarquía en la rama local `feature/login-etapa1`, sin subir ni fusionar |
 
 ### Siguiente etapa (no es pendiente del avance)
 
@@ -351,15 +405,19 @@ Para comprobar que quedó bien, desde la raíz del repositorio y con `.env` comp
 **2. El prototipo.** Necesita la dirección del proyecto y la clave **publicable** (empieza con `sb_publishable_`). Nunca uses la clave secreta ni `service_role`: no se necesitan.
 
 - **En el computador:** copia `.env.example` a `.env`, completa `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`, y ejecuta `node prototipo/generar-config.mjs`. Eso crea `prototipo/js/config.js`. Luego, desde la carpeta `prototipo`, abre el sitio con un servidor local, por ejemplo `py -m http.server 8000`, y entra a `http://127.0.0.1:8000`.
-- **En Vercel:** en el proyecto, agrega las variables de entorno `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`, y como **Build Command** `node generar-config.mjs` (si la carpeta raíz del proyecto es `prototipo`) o `node prototipo/generar-config.mjs` (si es la raíz del repositorio). Sin eso el sitio muestra «Falta la configuración de la base de datos».
+- **En Vercel (proyecto `bodega-prototipo`, que no se modifica para el portal):** en el proyecto, agrega las variables de entorno `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`, y como **Build Command** `node generar-config.mjs` (si la carpeta raíz del proyecto es `prototipo`) o `node prototipo/generar-config.mjs` (si es la raíz del repositorio). Sin eso el sitio muestra «Falta la configuración de la base de datos».
 
 `.env` y `prototipo/js/config.js` no se suben a git (están en `.gitignore`).
 
 ### Seguridad de la base en esta etapa
 
-El prototipo **no tiene inicio de sesión**: cualquier persona con el enlace lo usa. Por eso, en esta etapa de prueba de concepto las políticas de acceso (RLS) son **abiertas**: quien abra el prototipo puede **leer** todas las tablas (de la tabla de usuarios solo el nombre, el cargo y si está activo; el correo y el teléfono no salen por la API) y puede llamar a las funciones. Es aceptable solo porque **los datos son de ejemplo y ficticios**: no cargues datos reales.
+El prototipo **no tiene inicio de sesión**: cualquier persona con el enlace lo usa. Por eso, en esta etapa de prueba de concepto las políticas de acceso (RLS) son **abiertas**: quien abra el prototipo puede **leer** todas las tablas (de la tabla de usuarios solo el nombre, el cargo y si está activo, y de la de clientes solo el identificador y la razón social; el correo, el teléfono, el RUT y la dirección no salen por la API) y puede llamar a las funciones. Es aceptable solo porque **los datos son de ejemplo y ficticios**: no cargues datos reales.
 
 Lo que sí se protege desde ya: las tablas **no aceptan escribir directo** desde el navegador; todo cambio pasa por funciones de la base que vuelven a validar antes de guardar, y las restricciones de las tablas son la última barrera. Como no hay sesión, quién prepara la guía o registra un cambio lo elige la persona en la pantalla: sirve para la demo, no es seguridad. Cualquiera puede además presionar «Reiniciar demo» y borrar lo hecho por otra persona.
+
+**El MVP (Streamlit) se conecta distinto.** No usa la clave publicable ni el usuario `postgres`: se conecta desde el servidor con un rol limitado, `app_mvp`, por la variable `DATABASE_URL`. Ese rol solo lee las columnas que las pantallas usan (sin correo ni teléfono de usuarios, ni RUT ni dirección de clientes), no puede insertar, actualizar ni borrar directo en ninguna tabla, no puede llamar a `reiniciar_demo` y tiene límite de conexiones y de tiempo por consulta. Todo cambio pasa por las funciones de la base. `crear_pedido` no está abierta a la API pública.
+
+**Limitación conocida del MVP: no hay inicio de sesión.** Quien opera se elige en el menú («Operar como»), y la base solo comprueba el rol para emitir la guía. Es decir, **cualquiera con acceso a la aplicación opera como el usuario que elija**: sirve para la demo y la prueba con datos ficticios, no es seguridad. El inicio de sesión real es la siguiente etapa. Por eso, el MVP publicado no debe tener datos personales reales y su dirección no debe difundirse más allá de quienes participen en la prueba.
 
 Antes de usar datos reales hay que agregar inicio de sesión y cerrar las políticas por rol.
 

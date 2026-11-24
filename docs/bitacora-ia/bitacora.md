@@ -503,7 +503,6 @@ El ensayo lo hicimos Sebastián Carmona y Oscar Ynchaustegui el 2026-11-06. Osca
 - **Sin probar:** celular, poca señal real, otros navegadores y uso simultáneo de dos personas.
 - La demo quedó reiniciada: 2 órdenes con 4 líneas pendientes, sin guías ni cambios.
 
-
 ---
 
 ## Encargo 22. Kit para ejecutar la prueba con usuarios, línea base y chequeo del celular
@@ -688,3 +687,238 @@ Lo hizo Oscar Ynchaustegui el 2026-11-22, con Claude. Lo revisa Sebastián Carmo
 - En `supabase/seed_poc.sql`, la orden 3002 trae `SD-63A20-9999`, que no está en el inventario, y sus otros tres productos están disponibles, así que el error es por un solo producto.
 - Que `preparar_guia` rechaza sin pasar por la pantalla está en la tabla de pruebas de rotura de `docs/poc-supabase.md` (sección 3), contra el Supabase real.
 - **Pendiente.** Abrir la dirección pública en una ventana de incógnito, grabar el video y agregar su enlace en la sección de evidencia.
+
+---
+
+## Encargo 28. Cargar el inventario real a Supabase (primera parte: carga)
+
+**Objetivo.** Pasar el Excel de inventario de la bodega a la base de datos de la prueba de concepto, sin subir datos reales al repositorio, como base de un tablero que se hará en una segunda parte.
+
+**Instrucción entregada.**
+- Contexto: el Excel de la bodega (tres hojas: equipos, extensiones eléctricas y catálogo de familias), `supabase/` y la prueba de concepto ya fusionada.
+- Intención: cargar 1.617 equipos y 319 extensiones; que `reiniciar_demo` no borre el inventario real; que `seed_poc.sql` no pueda borrarlo por accidente.
+- Restricciones: el Excel y lo generado viven solo en `datos_locales/` (ignorado por Git); el reporte solo trae totales; la IA no ejecuta nada en Supabase, lo hace Bastián; detenerse antes de que Bastián corra la carga.
+- Numeración: se usa el Encargo 28 porque el 22 al 26 están en el PR del kit (#28) y el 27 está reservado para el flujo que mantiene activo a Supabase.
+
+**Respuesta obtenida.** `herramientas/importar_inventario.py`, `supabase/inventario.sql`, cambios en `reiniciar_demo` (`supabase/funciones.sql`) y en `supabase/seed_poc.sql`, `docs/analisis-inventario.md` y `tests/test_importar_inventario.py`. El importador generó en `datos_locales/` seis archivos de carga y el de extensiones.
+
+**Qué se aceptó y qué se corrigió.**
+- Supuesto de la columna Ubicación (valor numérico o nombre = arrendado): lo definió Bastián y queda escrito como supuesto a confirmar con Oscar en `docs/analisis-inventario.md`.
+- Dos cifras preliminares de Bastián diferían del cálculo: EC, AP y AC suman 1.324 equipos, el 81,9 % (no 83 %), y Bastián lo corrigió a 82 %; y el «modelo más repetido» dependía de cómo se defina modelo, que se resolvió en el Encargo 29.
+- Corregido por la IA durante la prueba: un patrón de capacidad (TR) fallaba por un grupo faltante; se vio en las pruebas.
+- El importador usa `openpyxl`, que no está en `requirements.txt` (la app no lo usa); queda indicado en el propio script.
+
+**Cómo se verificó.**
+- `pytest tests`: 132 pruebas pasan (60 nuevas, con filas ficticias): mapeo de ubicación, extracción de capacidad, largos, trozos de máximo 300 filas, escape de comillas, que el reporte no traiga SKU ni descripciones ni ubicaciones, y revisiones estáticas de los SQL.
+- Los archivos generados se ejecutaron en una base SQLite en memoria con el esquema real: 1.617 equipos con id desde 1000, 319 extensiones, y una segunda ejecución no duplica. Las restricciones de estado y lugar pasan.
+- **No se verificó:** nada contra PostgreSQL ni Supabase (`inventario.sql`, la nueva `reiniciar_demo` y el guard de `seed_poc.sql` solo tienen revisión estática); el contenido real de los datos más allá de los totales; ni el tablero, que no existe todavía.
+
+---
+
+## Encargo 29. Dashboard interactivo de inventario
+
+**Objetivo.** Agregar al prototipo un Dashboard para todos los roles, con 12 gráficos que se filtran entre sí, sobre el inventario real ya cargado en Supabase.
+
+**Instrucción entregada.**
+- Contexto: el inventario cargado y verificado (1.617 equipos, 319 extensiones, 7 de demo; `reiniciar_demo` lo deja intacto), el prototipo y sus reglas de estilo.
+- Intención: una función de datos de solo lectura; 12 gráficos con etiquetas, filtro cruzado, tabla de casos con CSV y panel de detalle, vistas por rol, filtros en la dirección y lectura de datos que se recalcula.
+- Ajustes pedidos por Bastián: 82 % en lugar de 83 %; el Pareto agrupa por modelo y lo documenta; capacidad sin mezclar BTU/H y TR; nota con el criterio de las 7 familias; `openpyxl` en un archivo aparte.
+- Restricciones: sin CDN (ECharts copiado), sin datos reales ni claves en el repositorio, no tocar Supabase, no abrir el PR hasta que Bastián lo confirme.
+
+**Respuesta obtenida.** `supabase/dashboard.sql` (`inventario_dashboard()`), `prototipo/dashboard.html`, `css/dashboard.css`, `js/filtros.js` (lógica sin navegador), `js/graficos.js`, `js/dashboard.js`, `js/vendor/` (ECharts 5.5.1 con un build propio de 640 KB), `prototipo/pruebas/filtros.test.js`, `tests/test_dashboard.py` y `requirements-herramientas.txt`; un enlace desde `index.html`; la sección 9 de `docs/analisis-inventario.md`.
+
+**Qué se aceptó y qué se corrigió.**
+- Modelo: primera palabra tras «MODELO» en la descripción; da 362 equipos (22,4 %) para el mayor, como indicó Bastián.
+- Capacidad: se pasó TR a BTU/H (1 TR = 12.000 BTU/H) y la nota del gráfico lo declara; cada vista usa una sola unidad.
+- Dejado fuera por decisión de la IA, anotado como mejora futura: indicar en el panel si el equipo aparece en una orden del prototipo.
+- Corregido tras verlo en el navegador: leyenda del gráfico 4 con colores equivocados; etiquetas del Pareto y de las medianas encima de las barras; texto blanco ilegible sobre celdas medias del mapa de calor; treemap con colores oscuros; etiquetas de la dona cortadas a 375 px; mensaje de extensiones que decía «con el filtro de corriente» sin que hubiera uno.
+- Bastián pidió llamar a la vista «Dashboard» en toda la interfaz (antes se llamaba de otra forma) y que fuera una vista más del programa: se renombraron `dashboard.html`, `dashboard.css` y `dashboard.js`, y se agregó un menú principal compartido (Pedidos y Dashboard, con estado activo) en `index.html` y `dashboard.html`. Las menciones anteriores a ese nombre en el Encargo 28 se dejaron como estaban.
+- Un intento de la IA de cerrar un servidor de prueba terminando todos los procesos `node` fue bloqueado y no se repitió: se usó otro puerto.
+
+**Cómo se verificó.**
+- `node --test`: 30 pruebas de la lógica de filtros con datos ficticios. `pytest tests`: 146 pasan, incluida la revisión de que la función devuelve solo las 9 columnas permitidas, que la página no tiene estilos ni scripts en línea y que ECharts pesa menos de 1 MB.
+- Las cifras del Dashboard se recalcularon con la misma lógica sobre los datos reales (solo totales): estados, tasas por familia, Pareto, capacidad y extensiones coinciden con `docs/analisis-inventario.md`. El JSON real pesa 236 KB.
+- El Dashboard se probó en Chrome contra una página local con datos ficticios, no contra Supabase: clic en la dona y filtro, enlace con filtros (`#estado=fuera_servicio&familia=AC`), panel de detalle con Escape y foco, y 375 px (sin desborde horizontal, tabla desplazable, panel a pantalla completa).
+- **No se verificó:** la función `inventario_dashboard()` en Supabase (solo revisión estática); la página publicada en Vercel; la descarga del CSV en el navegador (solo la función que lo arma, con pruebas); la navegación solo con teclado más allá de los botones y el panel; el celular real ni otros navegadores que no sean Chrome.
+
+
+---
+
+## Encargo 30. Migrar el MVP (Streamlit) a Supabase
+
+**Objetivo.** Pasar el MVP de `src/` de una base SQLite con datos de ejemplo a la base real de Supabase, sin exponer ninguna clave y sin tocar el prototipo. El orden fue: auditoría y plan primero (sin cambiar nada), y recién después de que Bastián aprobó el plan, la implementación.
+
+**Instrucción entregada.**
+- Contexto: el MVP son las pantallas de `src/` y sus datos en SQLite; el prototipo de `prototipo/` ya está probado y no se rehace; Supabase ya tiene la base real (1.617 equipos desde el id 1000, 319 extensiones, demo 501 a 507) y las funciones del flujo. Streamlit no corre en Vercel.
+- Intención: que el MVP lea y escriba en Supabase llamando a las funciones SQL (fuente única de verdad), con una capa `db.py` de dos implementaciones (SQLite para pruebas y PostgreSQL con psycopg, sin ORM, para producción, elegida por `DATABASE_URL`).
+- Restricciones (no negociables): ninguna contraseña, cadena de conexión ni clave en el repositorio, en registros ni en el chat; la aplicación no se conecta como `postgres` sino con un rol limitado sin contraseña escrita en el SQL; pooler de Supabase en modo sesión; la IA no ejecuta nada en Supabase; rama `feature/mvp-supabase` desde `feature/dashboard-inventario`; no fusionar nada sin aprobación de otra persona y la orden «fusiona #N».
+- Verificación pedida: pruebas verdes sin conexión a internet, y detenerse antes de levantar el MVP contra Supabase hasta el «listo» de Bastián.
+- Decisiones de Bastián tras la auditoría: columna `ordenes.folio` (único, opcional, formato `GUIA-2026-001`, exigido por `crear_pedido`); `psycopg[binary]` con versión fija, importado solo si hay `DATABASE_URL`; el responsable del cambio sale de la tabla `usuarios` y la falta de inicio de sesión se documenta; `reiniciar_demo` solo restaura las órdenes 3001 y 3002 y no se le da al rol del MVP; evaluar un servicio de PostgreSQL en el CI.
+
+**Respuesta obtenida.**
+- Auditoría y plan: tabla de equivalencias entre el MVP y la base (folio contra `id_orden`, «stock» contra estado del equipo, 50 contra 60 SKU, modalidad y motivo de retiro separados, estados derivados contra guardados) y la lista de lo que Supabase no tenía (crear órdenes, listado, detalle, historial). Decisión recomendada y aprobada: llamar a las funciones SQL.
+- SQL nuevo: `supabase/mvp_folio.sql`, `mvp_funciones.sql` (`crear_pedido`), `mvp_vistas.sql` (tres vistas de lectura), `mvp_rol.sql` (rol `app_mvp`), `verificar_mvp.sql`; cambios en `schema.sql`, `funciones.sql` (ayuda `_skus_limpios` y `reiniciar_demo` acotado a la demo) y `probar_en_supabase.py`.
+- Python: `src/db.py` (interfaz, `RepoPostgres`, `RepoSqlite`, lector de `.env`), las siete pantallas de `src/views/` y `ui_router`, `ui_datos` y `app.py` adaptados; `requirements.txt` con `psycopg[binary]==3.3.9`.
+- Pruebas: `tests/test_contrato_repo.py` (las mismas pruebas contra las dos implementaciones, y las exclusivas de PostgreSQL), `tests/test_mvp_ui.py` (recorridos de pantalla), `tests/conftest.py`, y revisiones estáticas nuevas en `tests/test_supabase_scripts.py`. CI con un servicio de PostgreSQL 16.
+- Documentación: `docs/mvp-supabase.md` (orden de ejecución, contraseña, de dónde copiar la cadena del pooler, permisos, límites) y el README.
+
+**Qué se aceptó y qué se corrigió.**
+- La IA cambió `cargar_pedido` (una función ya probada con 82 comprobaciones) para que use la ayuda `_skus_limpios` compartida con `crear_pedido`, en lugar de duplicar la limpieza. No era pedido textual; se hizo para que las dos limpien igual, y se compensó con las pruebas de contrato. Bastián debe volver a correr las comprobaciones por la API pública tras ejecutar el SQL.
+- `crear_pedido` y las vistas no se dan a la API pública (decisión de la IA, no pedida): el sitio publicado no necesita crear órdenes y Supabase da permisos por omisión a lo que se crea después.
+- La IA mantuvo `main_clasico` y las funciones de SQLite de `app.py`, que ya no usa `main()`, porque el repositorio pide no eliminar código funcional sin confirmación. Queda la pregunta de si se borran.
+- Corregido durante el trabajo: (1) un error de la IA en su propia prueba (usaba una columna que no existía en `clientes`), visto en el primer intento contra PostgreSQL; (2) la IA notó que Streamlit no lee `.env`, así que agregó un lector que no pisa variables ya definidas, y blindó las pruebas para que nunca lo lean ni usen `DATABASE_URL`; (3) la revisión estática de credenciales encontró una contraseña falsa escrita literal en una prueba de la propia IA, y se pasó a armarla al ejecutar; (4) `probar_en_supabase.py` asumía exactamente 7 equipos y 2 órdenes, lo que ya no es cierto con el inventario real y las órdenes del MVP, así que se acotó a la demo; (5) los números de línea de `reiniciar_demo` eran fijos (9001 a 9008) y podían chocar con los de otras órdenes, así que ahora siguen al mayor existente.
+- Agregado después, al aprobar el plan de la vista Dashboard del MVP: `mvp_rol.sql` también le da al rol `app_mvp` el permiso de ejecutar `inventario_dashboard()` (solo lectura), con su fila en `verificar_mvp.sql` y sus pruebas.
+- Hallazgo al ejecutar en Supabase (2026-11-23): la comprobación nueva de `probar_en_supabase.py` mostró que la clave publicable podía leer el RUT y la dirección de los clientes, porque `acceso.sql` daba lectura de la tabla completa (un defecto anterior al MVP que ninguna prueba cubría). Bastián lo cerró a mano en Supabase y la IA lo replicó en `acceso.sql`, `verificar_mvp.sql`, el script de comprobación y sus pruebas, y corrigió `docs/poc-supabase.md` (que además decía que «Reiniciar demo» borra todas las órdenes). El prototipo no usa esas dos columnas (solo `id_cliente` y `razon_social`).
+- Limitación documentada, por decisión de Bastián: el MVP no tiene inicio de sesión; cualquiera con acceso opera como el usuario que elija (README y `docs/mvp-supabase.md`).
+- Contexto que consta: la profesora pidió en el Avance 5 no dedicar más horas a la app Streamlit hasta que la prueba con usuarios confirme el flujo; esta migración la decidió Bastián (2026-11-20).
+- Nombres de personas en el repositorio: solo los de los usuarios ficticios de siempre (Pedro Soto y Camila Rojas).
+
+**Cómo se verificó.**
+- `py -m pytest tests`: 221 pasan y 70 se omiten (las que necesitan PostgreSQL o `psycopg`). Con un PostgreSQL 16 local y desechable (`DATABASE_URL_TEST`): 285 pasan y 6 se omiten.
+- Las reglas de las cuatro funciones y sus mensajes exactos dan lo mismo en SQLite y en PostgreSQL; el rol `app_mvp` rechaza escribir directo en las ocho tablas, leer correo, teléfono, RUT y dirección, y ejecutar `reiniciar_demo`; `anon` no puede usar `crear_pedido` ni las vistas; `reiniciar_demo` como `anon` no borra las órdenes del MVP ni los equipos reales.
+- Los archivos SQL se aplicaron en el orden documentado sobre una base nueva y sobre una que simula la actual (estado anterior más inventario ficticio y una orden sin folio), dos veces cada una; `verificar_mvp.sql` solo falló en los conteos del inventario real, porque la base local no los tiene.
+- `node --test prototipo/pruebas/filtros.test.js`: 30 pruebas pasan; el prototipo no se modificó.
+- **No se verificó:** nada en Supabase (no se ejecutó ningún SQL ahí); las comprobaciones por la API pública de `probar_en_supabase.py`, que necesitan la API de Supabase; el pooler con el usuario `app_mvp.<referencia>`; el MVP en un navegador contra Supabase; el flujo del CI en GitHub (solo se validó su sintaxis). Tampoco se probó la aplicación a mano en un navegador: los recorridos usan Streamlit AppTest.
+
+---
+
+## Encargo 31. Dashboard del inventario dentro del MVP
+
+**Objetivo.** Llevar el análisis del inventario real (12 gráficos, filtro cruzado, indicadores, tabla de casos, CSV, vistas por rol y «Lectura de los datos») a una vista «Dashboard» del MVP, reutilizando el código del prototipo sin duplicarlo, con los datos entregados por el servidor y con una distribución pensada para pantallas anchas.
+
+**Instrucción entregada.**
+- Contexto: el MVP (Streamlit) ya usa `db.py` y el rol `app_mvp`; el prototipo ya fue evaluado y queda como archivo histórico (no se rehace, no se rompe) (más tarde, el 2026-11-23, Bastián decidió además mantenerlo publicado en su propio proyecto de Vercel para el video del README y la prueba con usuarios; ver Encargo 32). Rama `feature/mvp-dashboard`, desde `feature/mvp-supabase`.
+- Intención: enfoque a evaluar y confirmar antes de implementar (componente HTML incrustado con datos del servidor, un «modo incrustado» y una sola fuente de scripts); rediseño ancho (indicadores en una fila, 3 columnas en pantallas grandes y 2 en medianas, gráficos densos con más ancho, tabla a todo el ancho, panel lateral que no tape los gráficos); revisar CSV, panel y filtros en la dirección dentro de Streamlit.
+- Restricciones: ninguna clave, contraseña ni cadena de conexión en el repositorio; el navegador no usa la clave pública en esta vista; la vista solo aparece con `DASHBOARD_INVENTARIO=1`; no cambiar el flujo de pedidos del prototipo ni nada de su dashboard salvo lo necesario para compartir el código; fijar `streamlit==1.65.0`; probar los tamaños 1366×768, 1920×1080, 2560×1440 y 375 px de uno en uno y cerrar cada proceso por su número.
+- Decisiones de Bastián tras el plan: `st.iframe`, código compartido con marcadores, CSS ancho solo para el MVP, solución del panel y de los filtros en la URL, la bandera, y fijar la versión de Streamlit.
+
+**Respuesta obtenida.**
+- Plan evaluado: `st.components.v1.html` está obsoleto en la 1.65, y `st.iframe` mide el contenido. Alternativas descartadas con razones: reescribir en Plotly (cada clic sería un viaje al servidor, habría que reescribir `filtros.js` y sumar una dependencia) y `st.html` o componentes v2 (el código correría dentro de la página de Streamlit y chocaría con sus estilos).
+- Código compartido: dos pares de marcadores en `prototipo/dashboard.html` (solo comentarios) y un «entorno» opcional en `prototipo/js/dashboard.js` (por omisión se comporta como antes).
+- MVP: `src/ui_dashboard.py` (arma la página, escapa los datos y fija la política de seguridad por hash), `src/dashboard_incrustado/` (entorno, datos y CSS ancho), `src/views/dashboard.py`, el método `dashboard()` de `db.py` en SQLite y PostgreSQL, el menú y `?vista=dashboard`, el permiso del rol (en `mvp_rol.sql`, del Encargo 30), `requirements.txt` y `Dockerfile` (copia los archivos uno a uno, nunca `config.js`).
+- Pruebas: `tests/test_ui_dashboard.py`, `tests/js/incrustado.test.js` y el contrato de `dashboard()` en `tests/test_contrato_repo.py`.
+
+**Qué se aceptó y qué se corrigió.**
+- El panel lateral del prototipo es fijo: en un iframe del alto total del contenido habría quedado anclado al final de la página. Se resolvió como se había propuesto: el iframe ocupa el alto de la ventana, con el contenido desplazándose dentro, y en pantallas anchas el panel se acopla a un lado.
+- Corregido durante el trabajo: (1) mi primera captura «completa» salió del tamaño de la ventana, no del contenido, porque Streamlit desplaza su propio contenedor; se rehízo ampliando la ventana; (2) el iframe quedaba a 286 px del borde de la ventana: se compactó la fila del título con el botón «Actualizar datos» (224 px); (3) el selector «Operar como» del menú, de la etapa anterior, tenía texto blanco sobre fondo claro (ilegible); el primer arreglo de CSS no funcionó porque Streamlit 1.65 ya no usa `data-baseweb`, y se corrigió mirando el HTML real en el navegador; (4) una prueba mía comparaba objetos de un contexto aislado de Node con `deepEqual` estricto y fallaba por el prototipo; se comparan por contenido.
+- Dejado fuera: nada de lo pedido. Queda como decisión de Bastián si, en pantallas medianas, el treemap debe seguir a ancho completo.
+- Quedó apagado en público por decisión de Bastián, a la espera de la respuesta de Oscar (pregunta 4 de `docs/analisis-inventario.md`).
+
+**Cómo se verificó.**
+- `py -m pytest tests`: 248 pasan y 71 se omiten (las que necesitan un PostgreSQL de prueba). Con un PostgreSQL 16 local y desechable: 313 pasan y 6 se omiten. `node --test`: 38 pasan (30 del prototipo y 8 nuevas).
+- Contra Supabase real (rol `app_mvp`, solo lectura): `inventario_dashboard()` devuelve 1.617 equipos y 319 extensiones con las 9 columnas permitidas.
+- En Chrome sin ventana, con la aplicación local conectada a Supabase, un tamaño a la vez: 1366×768 (2 columnas), 1920×1080 y 2560×1440 (3 columnas) y 375 px (1 columna). En los cuatro: sin desplazamiento horizontal de la página ni del iframe, los 12 gráficos dibujados, ninguno aplastado (mínimo 300 px de alto), indicadores en una fila desde 720 px de ancho, y ningún error de consola (la política de seguridad no bloquea nada).
+- En el navegador, a 1920 y a 375: el filtro de un indicador queda en la dirección de la página de Streamlit; abrir con `#estado=arrendado` restaura el filtro (243 equipos); el CSV descargado trae 244 líneas (243 más el encabezado), también con la política estricta; el panel se acopla sin tapar los gráficos a 1920 y es modal a 375; Escape lo cierra.
+- Las otras vistas conservan su ancho (1120 px en Órdenes y Carga masiva) y el Dashboard usa el ancho completo. El prototipo, probado en el mismo navegador, da las mismas cifras (1.617, 899, 243, 195 y 280), 12 gráficos, su ancho de 1280 px y sus filtros en su propia dirección.
+- Las capturas están en la carpeta temporal de la sesión, no en el repositorio (muestran el inventario real).
+- **No se verificó:** otros navegadores distintos de Chrome ni un celular real; el MVP publicado en un hosting; una persona usándolo con el teclado o un lector de pantalla; la lectura de las etiquetas más pequeñas de los gráficos en todos los tamaños más allá de las capturas revisadas; la carga con muchas sesiones a la vez.
+
+---
+
+## Encargo 32. Portal para Vercel (entrada pública del proyecto)
+
+**Objetivo.** Dejar Vercel como entrada pública del proyecto: Streamlit no corre en Vercel, así que Vercel publica una página estática mínima con un único botón hacia el MVP, en un proyecto de Vercel aparte. El prototipo sigue publicado en el suyo.
+
+**Instrucción entregada.**
+- Contexto: el MVP (Streamlit) se publicará en un hosting aparte, todavía por elegir; el prototipo ya fue evaluado; Vercel sigue sin estar conectado al repositorio correcto y no se da por resuelto.
+- Intención: una carpeta `portal/` con título del proyecto, una frase de qué hace y un único botón «Abrir la aplicación» cuya dirección vive en una sola constante en un solo lugar; mientras esté vacía, el botón aparece desactivado con el texto «Aplicación en despliegue», para poder publicar el portal antes de que el MVP exista; mismo estilo del proyecto, responsive y en español; documentar en README y bitácora qué es el portal y dónde está la dirección del MVP; dar los pasos de Vercel.
+- **Decisión posterior de Bastián (2026-11-23):** NO cambiar el proyecto `bodega-prototipo` (Root Directory = `prototipo`, Build Command = `node generar-config.mjs`): el prototipo debe seguir publicado para el video del README y para la prueba con usuarios. El portal va en un **segundo proyecto** de Vercel (`bodega-portal`), conectado al mismo repositorio, con Root Directory = `portal`, *Framework Preset* «Other», sin Build Command y sin variables de entorno. La primera versión de este encargo suponía cambiar el proyecto existente; se reescribieron los pasos en `portal/LEEME.md` y en el README, y se quitó el aviso de que el prototipo dejaría de mostrarse.
+- Restricciones: no enlazar al prototipo ni a su dashboard; sin dependencias externas, sin claves y sin Supabase; no tocar nada en Vercel; commit aparte y sin abrir ningún pull request todavía.
+
+**Respuesta obtenida.** `portal/` con `index.html`, `estilos.css`, `portal.js`, `config.js` (la constante `URL_APLICACION`), `icono.svg`, `vercel.json` (encabezados de seguridad, sin comandos de construcción) y `LEEME.md`; las pruebas `tests/test_portal.py` y `tests/js/portal.test.js`; las secciones del README («Portal público en Vercel», la estructura, el estado y el aviso sobre el prototipo); los pasos de Vercel con su forma de comprobarlos.
+
+**Qué se aceptó y qué se corrigió.**
+- Solo se aceptan direcciones `https` sin usuario ni contraseña en `config.js`; `javascript:`, `data:`, `http:`, direcciones relativas y direcciones con credenciales se ignoran y el botón queda desactivado. Es una decisión de la IA, no pedida, para que una dirección mal escrita no deje un botón que lleve a un lugar inesperado.
+- Un solo botón visible en cada estado: el desactivado y el enlace son dos elementos del HTML, y `portal.js` deja visible solo uno. Sin JavaScript queda el desactivado y un aviso.
+- La IA no editó los documentos de los avances ya evaluados que mencionan `bodega-prototipo.vercel.app` (`docs/prototipo.md`, `docs/pauta-validacion.md`, `docs/prueba-usuarios.md`, `docs/etica.md`): cambiarlos alteraría entregas evaluadas. Con la decisión de mantener el prototipo en su dirección, la IA revisó si siguen siendo correctos, **comprobando el sitio publicado** (solo lectura, con `curl` y comparando con el historial de git). Hallazgo: lo publicado hoy es exactamente el prototipo del 25 de octubre (los archivos coinciden con los commits `feef798`, `a3a330c` y `8b86288`): no tiene `api.js` ni `reglas.js` (sin conexión a Supabase), `/js/config.js` da 404 y `/dashboard.html` da 404. Por eso `docs/prototipo.md` y `docs/etica.md` (Avance 5) describen correctamente lo publicado, pero `docs/pauta-validacion.md`, `docs/prueba-usuarios.md` y el kit de la prueba (Avance 6) suponen la versión conectada (órdenes 3001 y 3002, «Reiniciar demo», base compartida) que todavía **no** está publicada: se publicará cuando `bodega-prototipo` se vuelva a conectar a `main` con sus dos variables. Quedó anotado en el README como pendiente aparte.
+- Dos pruebas de la IA estaban mal planteadas (una exigía que `portal.js` nombrara la constante una sola vez, aunque la nombra también en un comentario) y se corrigieron para exigir lo que importa: que solo `config.js` la defina.
+- El `vercel.json` no define `buildCommand`: el proyecto nuevo se crea sin Build Command, así que no hay nada que anular. No se pudo comprobar en Vercel qué hace un valor vacío frente al de la configuración del proyecto, y por eso no se usa.
+
+**Cómo se verificó.**
+- `tests/test_portal.py` (9 pruebas: una sola constante, sin enlace al prototipo, sin claves ni dependencias externas, sin código en línea, política de seguridad, un solo botón, `vercel.json`) y `tests/js/portal.test.js` (4 pruebas: dirección vacía o inválida desactiva el botón, una `https` válida lo convierte en enlace).
+- En Chrome sin ventana, con el portal servido en el computador, en 375 px y 1366 px y con la dirección vacía y con una dirección de prueba (en una copia fuera del repositorio): siempre un único botón visible con el texto pedido, sin desplazamiento horizontal, sin errores de consola y sin más recursos que los cinco archivos del portal; el único enlace de la página es el de la constante. Los servidores y el navegador se cerraron por su número de proceso.
+- **No se verificó:** nada en Vercel (ni la creación del proyecto nuevo, ni la conexión al repositorio, ni Root Directory, ni la publicación, ni que los encabezados de `vercel.json` se apliquen); la configuración interna de `bodega-prototipo` (solo se vio lo que publica, no su panel); otros navegadores ni un celular real; la dirección real del MVP, que no existe todavía.
+
+---
+
+## Encargo 33. Poner al día con main las cuatro ramas apiladas
+
+**Objetivo.** Que los cuatro pull requests (prototipo con Dashboard, migración del MVP a Supabase, Dashboard del MVP y portal) se puedan fusionar en ese orden, con *merge commit*, sin conflictos con `main`. `main` había avanzado (PR #28, #30 y #31) y las tres primeras ramas chocaban con él en `.gitignore`, `README.md` y la bitácora.
+
+**Instrucción entregada.**
+- Contexto: las ramas están apiladas, cada una contiene a la anterior (`feature/dashboard-inventario`, `feature/mvp-supabase`, `feature/mvp-dashboard`, `feature/portal`); el portal estaba en la misma rama que el Dashboard del MVP y había que separarlo.
+- Intención: crear `feature/portal` y devolver `feature/mvp-dashboard` a su commit propio; fusionar `main` en cadena (en la rama 1, esa en la 2, luego en la 3 y por último en la 4); en el README adoptar la estructura de `main` (Hecho, Pendiente, Congelado) y reubicar las filas propias sin perder contenido; conservar en la bitácora los Encargos 1 a 27 de `main` y los propios desde el 28.
+- Restricciones: solo *merge commit* (nada de rebase ni *force-push*); antes de mover nada, anotar los hashes de las ramas para poder deshacerlo; correr `pytest`, `node --test` y la suite con PostgreSQL después de cada fusión y parar ante cualquier falla nueva; sin *push* ni PR; no tocar el buscador de datos ficticios de `main` salvo lo ya autorizado.
+
+**Respuesta obtenida.**
+- Separación: `feature/portal` en `c2fa74c` y `feature/mvp-dashboard` de vuelta en `f4df7de`. Hashes anteriores guardados para deshacer.
+- Fusiones confirmadas: etapa A `5f902da` (`main` en `feature/dashboard-inventario`), etapa B `59c26ec`, etapa C `6c28cc8` y etapa D `e0c7f55`.
+
+**Qué se aceptó y qué se corrigió (decisión por conflicto).**
+- `.gitignore`: se conservaron los dos bloques, el del inventario real y el de la evidencia de la prueba con usuarios.
+- Bitácora: Encargos 22 a 27 de `main`, luego 28 y 29, y después 30, 31 y 32 de las ramas siguientes, en orden y sin repetidos.
+- README: se adoptó la estructura de `main`. Las filas del inventario real, del MVP y del portal pasaron a «Hecho», y sus pendientes a «Pendiente del avance». «Congelado» se partió en lo retomado en el MVP (límite de 60 productos y motivo obligatorio, ya hechos) y lo que sigue congelado (destacar cambios de último minuto, el contraste del selector de Cliente y el inicio de sesión). Se cambió el encabezado «Aplicación Streamlit (congelada)» por «(MVP)» por decisión de Bastián.
+- `docs/mvp-supabase.md`: se actualizó el estado, porque el SQL ya se ejecutó en Supabase el 23 de noviembre.
+- Cifra de `verificar_mvp.sql`: el README decía 41 filas OK; con el historial se comprobó que el archivo tenía 41 filas con la primera versión y tiene 46 desde el arreglo de `clientes`, y Bastián informó 46 filas OK. Se dejó 46. `probar_en_supabase.py` ganó dos comprobaciones después de su último resultado informado (89 OK), por eso queda como pendiente volver a ejecutarlo.
+- Prueba de teléfonos de `main` (`tests/test_kit_prueba.py`): marcaba un número de la biblioteca ECharts (`Number.MAX_SAFE_INTEGER`). Autorizado por Bastián, ahora ignora `prototipo/js/vendor/` (código de terceros minificado), con dos pruebas nuevas que comprueban que sigue detectando un teléfono falso en un `.js` propio y que la excepción es por carpeta y no por número.
+- Tres textos de las propias pruebas de la IA que ese buscador marcaba (una URL de conexión de prueba, un folio de siete ceros y una dirección con usuario y contraseña) se arman ahora al ejecutar. No se tocó la lógica del buscador.
+
+**Cómo se verificó.**
+- Etapa A: 261 pasan (`pytest`), 257 pasan y 4 se omiten con PostgreSQL, 30 en `node --test`. Etapa B: 335 (69 omitidas), 394 (10 omitidas) y 30. Etapa C: 361 (71 omitidas), 422 (10 omitidas) y 38. Etapa D: 370 (71 omitidas), 431 (10 omitidas) y 42.
+- En las cuatro ramas: sin marcadores de conflicto; ningún `datos_locales/`, `*.xlsx` ni `.env` rastreado; sin claves, contraseñas ni URL con credenciales; ninguno de los SKU reales (comparados contra `datos_locales/` sin imprimirlos); cada rama contiene a la anterior; ninguna está detrás de `origin/main` (`f68dcec`).
+- El buscador de teléfonos y correos da 0 hallazgos en las cuatro ramas.
+- **No se verificó:** el CI en GitHub (el servicio de PostgreSQL del flujo nunca se ha ejecutado allá; se validó solo su sintaxis) ni nada subido: no hay *push* ni PR.
+
+---
+
+## Encargo 34. Sin emojis en el código: un test que lo vigila y revisión de las pantallas
+
+**Objetivo.** Eliminar los emojis del código (una sola vez, en la rama 1, y propagar a las otras tres) y dejar un test que impida que vuelvan. Por la definición pedida, el resultado fue que **no había emojis que eliminar**: el aporte es el test y la línea del README.
+
+**Instrucción entregada.**
+- Alcance: archivos rastreados `.py`, `.js`, `.mjs`, `.html`, `.css`, `.sql`, `.json`, `.yml`, `.yaml`, `.toml`, `Dockerfile` y `.env.example` (comentarios, docstrings, mensajes y textos de interfaz incluidos), sin `prototipo/js/vendor/`, `node_modules/`, `.git/` ni `datos_locales/`. Los `.md`, la bitácora y `docs/` no se modifican: solo se cuenta cuántos emojis hay y dónde.
+- Definición: emoji es lo que tiene presentación emoji o es pictográfico con selector de emoji, más el selector U+FE0F, el unidor U+200D cuando une emojis, las banderas y las teclas. No se toca la tipografía normal (tildes, eñes, signos de apertura, comillas angulares, guiones largos, puntos medios, N.º, mayor o igual, menor o igual, por, entre) ni las flechas planas sin selector de emoji.
+- Restricciones: el test se escribe sin emojis literales (rangos con escapes) y se comprueba que falla con un texto de ejemplo armado al ejecutar; un commit por rama; las mismas tres suites en verde; revisar visualmente la app, la vista Dashboard y el prototipo; añadir al README «sin emojis en el código; lo vigila `tests/test_sin_emojis.py`».
+
+**Respuesta obtenida.**
+- `tests/test_sin_emojis.py`: recorre `git ls-files` con ese alcance y falla listando archivo y línea; incluye pruebas del detector (encuentra presentación emoji, pictográficos con selector, uniones, banderas, teclas y tonos de piel; no toca la tipografía normal ni las flechas planas) y del alcance. La línea del README está junto a la estructura del repositorio.
+- Commits: rama 1 `b4f543b`, y las fusiones en cadena `e593463` (rama 2), `173c6c6` (rama 3) y `fb7563e` (rama 4); las tres fusiones entraron sin conflictos.
+
+**Qué se aceptó y qué se corrigió.**
+- Conteo: **0 emojis en las cuatro ramas**, tanto en el código como, solo para informe, en `.md`, `.csv` y `.txt`. Se contrastó con un segundo método independiente (`git grep` con rangos Unicode): solo coincide con U+2713 y U+2715, las marcas de texto que `main` ya permitía y que no son emojis (cinco archivos: la bitácora, dos documentos del Avance 5, el checklist del celular y `prototipo/js/app.js`). No se tocaron.
+- Hallazgo propio: la herramienta con la que la IA escribe archivos convierte las secuencias `\uXXXX` de barra simple en el carácter real (ya lo anotaba el Encargo 29). Dejó un U+200D literal en el primer borrador de `tests/test_sin_emojis.py`, que el test antiguo de `main` marcó, y un separador de línea U+2028 literal en dos líneas de `tests/test_ui_dashboard.py`. Se corrigieron armando esos textos con `chr()` y se añadió una prueba que exige que `tests/test_sin_emojis.py` no tenga ningún carácter fuera de ASCII.
+- Hallazgo que toca código y por eso se le preguntó a Bastián (corregido en el Encargo 35): en la pantalla «Ajuste de última hora» del MVP, bajo «SKU a reemplazar» aparece «No existe en el inventario» para una línea que todavía no se validó (por ejemplo un SKU de la demo que sí existe), porque antes de validar la línea no tiene equipo asociado y no hay descripción. Una corrección mínima sería mostrar «Aún sin validar» mientras el resultado sea «pendiente».
+
+**Cómo se verificó.**
+- Suites tras cada fusión (`pytest`; `pytest` con PostgreSQL; `node --test`): rama 1, 282, 278 con 4 omitidas y 30; rama 2, 356 con 69 omitidas, 415 con 10 omitidas y 30; rama 3, 382 con 71 omitidas, 443 con 10 omitidas y 38; rama 4, 391 con 71 omitidas, 452 con 10 omitidas y 42. Sin marcadores de conflicto, claves ni SKU reales.
+- Revisión visual en Chrome sin ventana, con la aplicación local conectada a Supabase y el prototipo en el puerto 8777, **solo lectura**: MVP, Órdenes (sin órdenes de hoy y luego con el filtro en el 23 de noviembre), Detalle de la orden, Validador (orden sin validar), Ajuste de última hora, Carga masiva, Historial y Dashboard; prototipo, la pantalla Pedidos y su Dashboard. El detector de emojis aplicado al texto visible de esas diez pantallas dio 0.
+- **No se vio:** la guía generada, el Validador con resultados y el Historial con cambios, porque exigen validar, emitir o guardar (escribir en la base); ninguna pantalla en tamaño de celular; el CI en GitHub.
+
+---
+
+## Encargo 35. Ajuste de última hora: «Aún sin validar» en lugar de «No existe en el inventario»
+
+**Objetivo.** Corregir un texto engañoso de la pantalla «Ajuste de última hora» del MVP, hallado en la revisión visual del Encargo 34.
+
+**Instrucción entregada.** Mostrar «Aún sin validar» mientras el resultado de la línea sea pendiente y reservar «No existe en el inventario» solo para líneas ya validadas y no encontradas. Hacerlo en la rama `feature/mvp-supabase`, propagar por fusión a las ramas 3 y 4, con una prueba que cubra los tres casos y sin tocar la regla de bloqueo de la guía ni los datos.
+
+**Respuesta obtenida.** La función `texto_del_sku` de `src/views/ajuste.py` decide el texto según la descripción y el resultado de la línea; solo cambia ese texto. Dos pruebas nuevas en `tests/test_mvp_ui.py`: un recorrido de pantalla (con SQLite y con PostgreSQL) con los tres casos —pendiente, validada que existe, validada que no existe— y una prueba directa de la función. Se comprobó que la prueba de pantalla falla con el código anterior.
+
+**Cómo se verificó.** Suites tras el cambio en la rama 2: `pytest` 358 pasan y 70 se omiten; `pytest` con PostgreSQL 418 pasan y 10 se omiten; `node --test` 30 pasan. Sin marcadores de conflicto, claves ni SKU reales.
+
+
+---
+
+## Encargo 36. Pregunta 4 respondida: el inventario real puede mostrarse en público
+
+**Objetivo.** Dejar constancia de que Oscar confirmó que el inventario real puede mostrarse en el Dashboard público (pregunta 4 de `docs/analisis-inventario.md`) y quitar la advertencia de «no fusionar hasta tener su respuesta».
+
+**Instrucción entregada.** Actualizar `docs/analisis-inventario.md` (respuesta, quién y fecha); quitar la advertencia del README y de la descripción del PR 1 (#29), dejando constancia de que los datos personales de clientes (RUT, dirección, correo y teléfono) siguen fuera de lo público; indicar en `docs/mvp-supabase.md` y en los borradores que `DASHBOARD_INVENTARIO` puede activarse al publicar el MVP; registrar el cambio; propagar por fusión a las ramas 2, 3 y 4 sin force.
+
+**Respuesta obtenida.** Solo documentación y un comentario de `.env.example`; no cambió código ni SQL. La respuesta de Oscar quedó en las secciones 7 y 8 y en la 11 de `docs/analisis-inventario.md`, en `docs/mvp-supabase.md`, en el README y en `.env.example`. La vista sigue apagada por omisión (`DASHBOARD_INVENTARIO=1` la enciende): activarla es una decisión explícita al publicar. La respuesta fue informada por Bastián; esta rama no guarda otra evidencia de ella.
+
+**Qué se aceptó y qué se corrigió.**
+- Esta entrada se registra aquí, en la última rama, para no dejar un hueco entre los Encargos 29 y 30 en el PR 1.
+- Las fusiones entre ramas tuvieron un conflicto cada una en la tabla «Pendiente del avance» del README (las ramas 2 y 4); se resolvió conservando las filas de cada rama más la fila actualizada del Dashboard.
+
+**Cómo se verificó.** Suites tras cada paso: rama 1, `pytest` 282 y `node --test` 30; rama 3, `pytest` 384 con 72 omitidas y `node --test` 38; rama 4, `pytest` 393 con 72 omitidas y `node --test` 42. No se corrió PostgreSQL local; el CI en GitHub se revisa aparte. Sin marcadores de conflicto, claves ni SKU reales.

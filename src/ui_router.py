@@ -2,16 +2,19 @@
 Estructura comun de la interfaz: menu lateral y despacho de pantallas.
 
 La navegacion vive en st.session_state (ver ui_nav). Cada pantalla es una funcion
-render(app) que recibe el modulo app.py, de modo que la capa de datos sigue en app.py
-(y los tests pueden redirigir app.DB_PATH).
+render(repo) que recibe el repositorio de datos (src/db.py): PostgreSQL (Supabase) si hay
+DATABASE_URL, o SQLite local si no.
 """
 
 import streamlit as st
 
+import db
+import ui_dashboard
+import ui_datos
 import ui_nav
 import ui_theme
-from ui_components import Html, esc, icono, mostrar
-from views import ajuste, carga, detalle, guia, historial, ordenes, validacion
+from ui_components import Html, banner, esc, icono, mostrar
+from views import ajuste, carga, dashboard, detalle, guia, historial, ordenes, validacion
 
 # (clave del boton, etiqueta, pantalla de destino)
 MENU = [
@@ -22,6 +25,9 @@ MENU = [
     ("menu_historial", "Historial", "historial"),
 ]
 
+# Solo aparece con DASHBOARD_INVENTARIO=1: el inventario real no se muestra en publico sin permiso (docs/analisis-inventario.md)
+MENU_DASHBOARD = ("menu_dashboard", "Dashboard", "dashboard")
+
 # Que opcion del menu queda resaltada en cada pantalla
 MENU_ACTIVO = {
     "ordenes": "menu_ordenes",
@@ -31,21 +37,44 @@ MENU_ACTIVO = {
     "validacion": "menu_validador",
     "ajuste": "menu_ajuste",
     "historial": "menu_historial",
+    "dashboard": "menu_dashboard",
 }
 
 # Paso del flujo (1 a 5) que corresponde a cada pantalla; las demas no resaltan ninguno
 PASO_POR_VISTA = {"ordenes": 1, "detalle": 2, "validacion": 3, "ajuste": 4, "guia": 5}
 
-# Usuario de ejemplo del menu: la app no tiene inicio de sesion (solo es una etiqueta).
-USUARIO_ETIQUETA = "Jefe de Bodega"
-USUARIO_INICIALES = "JB"
+# La app no tiene inicio de sesion: quien opera se elige en el menu (la base solo comprueba el rol).
+# Limitacion conocida, documentada en el README: cualquiera con acceso a la app opera como el usuario que elija.
+NOMBRE_BASE = {"postgres": "Base: Supabase (PostgreSQL)", "sqlite": "Base local de pruebas (SQLite)"}
 
 
-def _menu_lateral():
+def _iniciales(nombre):
+    return "".join(p[0] for p in nombre.split()[:2]).upper() or "?"
+
+
+def _usuario_actual(repo):
+    """Elige quien opera (selectbox del menu) y devuelve su nombre. Por omision, el primer jefe de bodega."""
+    ss = st.session_state
+    usuarios = {u["id_usuario"]: u for u in repo.usuarios()}
+    if not usuarios:
+        ss.id_usuario = None
+        return None
+    if ss.id_usuario not in usuarios:
+        ss.id_usuario = next((i for i, u in usuarios.items() if u["rol"] == "jefe_bodega"), next(iter(usuarios)))
+    st.selectbox(
+        "Operar como",
+        list(usuarios),
+        format_func=lambda i: f'{usuarios[i]["nombre"]} · {ui_datos.nombre_rol(usuarios[i]["rol"])}',
+        key="id_usuario",
+    )
+    return usuarios[ss.id_usuario]["nombre"]
+
+
+def _menu_lateral(repo):
     with st.sidebar:
         mostrar(Html(f'<div class="bp-marca">{icono("logo", 28)}<span>{esc(ui_theme.NOMBRE_APP)}</span></div>'))
         activo = MENU_ACTIVO.get(st.session_state.vista)
-        for clave, etiqueta, destino in MENU:
+        for clave, etiqueta, destino in MENU + ([MENU_DASHBOARD] if ui_dashboard.activo() else []):
             st.button(
                 etiqueta,
                 key=clave,
@@ -54,12 +83,15 @@ def _menu_lateral():
                 args=(destino,),
                 use_container_width=True,
             )
-        mostrar(
-            Html(
-                f'<div class="bp-usuario"><span class="bp-avatar">{esc(USUARIO_INICIALES)}</span>'
-                f"<div><strong>{esc(USUARIO_ETIQUETA)}</strong></div></div>"
+        nombre = _usuario_actual(repo)
+        if nombre:
+            mostrar(
+                Html(
+                    f'<div class="bp-usuario"><span class="bp-avatar">{esc(_iniciales(nombre))}</span>'
+                    f"<div><strong>{esc(nombre)}</strong></div></div>"
+                )
             )
-        )
+        st.caption(NOMBRE_BASE.get(repo.modo, ""))
         st.button("Cerrar sesión · Próximamente", key="menu_salir", disabled=True, use_container_width=True, help="Próximamente")
 
 
@@ -71,6 +103,7 @@ PANTALLAS = {
     "guia": guia.render,
     "historial": historial.render,
     "carga": carga.render,
+    "dashboard": dashboard.render,
 }
 
 
@@ -101,11 +134,20 @@ def _flujo(vista):
     mostrar(Html(f'<div class="bp-flujo">{unidos}</div><div class="bp-frase">{esc(ui_theme.FRASE_PIE)}</div>'))
 
 
-def run(app):
+def run(repo):
     """Punto de entrada de la interfaz: estado, tema, menu y pantalla actual."""
     ui_nav.iniciar_estado()
+    if st.session_state.vista == "dashboard" and not ui_dashboard.activo():
+        st.session_state.vista = "ordenes"  # apagado: ni por el menu ni por la direccion
     ui_theme.inyectar()
-    _menu_lateral()
-    _encabezado()
-    PANTALLAS[st.session_state.vista](app)
-    _flujo(st.session_state.vista)
+    try:
+        _menu_lateral(repo)
+        _encabezado()
+        PANTALLAS[st.session_state.vista](repo)
+    except db.ErrorDeBase as e:
+        # sin base no hay nada que mostrar: un solo mensaje claro (sin detalles de la conexion) y un boton para reintentar
+        mostrar(banner("error", "No se pudo leer la base de datos", str(e)))
+        st.button("Reintentar", key="reintentar")
+        return
+    if st.session_state.vista != "dashboard":  # el Dashboard no es un paso del flujo de la guia
+        _flujo(st.session_state.vista)

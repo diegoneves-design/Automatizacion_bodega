@@ -1,0 +1,43 @@
+/* Solo para el MVP: distribucion ancha del Dashboard dentro de Streamlit. Se carga DESPUES de estilos.css y dashboard.css
+   (los del prototipo, que no se tocan) y solo cambia la distribucion, no los colores ni los textos.
+   Los puntos de quiebre responden al ancho del iframe, que ya descuenta el menu lateral de Streamlit. */
+
+html, body { margin: 0; padding: 0; }
+body.dashboard { padding: 0; }
+body.dashboard .app {
+  max-width: none; min-height: 0; margin: 0; border: 0; border-radius: 0; box-shadow: none;
+  padding: calc(var(--u) * 2) calc(var(--u) * 2) calc(var(--u) * 3);
+}
+
+/* ---------- Indicadores: una sola fila ---------- */
+.indicadores { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 720px) {
+  .indicadores { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .kpi-total { grid-column: auto; }
+}
+
+/* ---------- Graficos: 1 columna en celular, 2 en pantallas medianas, 3 en grandes ---------- */
+.rejilla { grid-auto-flow: dense; }
+.grafico { min-height: 300px; }
+#tarjeta-6 .grafico, #tarjeta-9 .grafico, #tarjeta-10 .grafico { min-height: 400px; }
+
+@media (min-width: 760px) {
+  .rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tarjeta.ancha, #tarjeta-6 { grid-column: 1 / -1; }   /* Pareto, mapa de calor y treemap: toda la fila */
+}
+@media (min-width: 1180px) {
+  .rejilla { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tarjeta.ancha, #tarjeta-6 { grid-column: span 2; }   /* Pareto y mapa de calor (y el treemap): dos de tres columnas */
+}
+
+/* ---------- Tabla de casos: todo el ancho ---------- */
+.casos, .casos .envoltura-tabla { width: 100%; }
+.tabla-casos { min-width: 0; }
+@media (max-width: 719px) { .tabla-casos { min-width: 560px; } }   /* en celular se desplaza dentro de su caja, no la pagina */
+
+/* ---------- Panel lateral: en pantallas anchas se acopla y no tapa los graficos ---------- */
+@media (min-width: 1100px) {
+  body.panel-acoplado .velo { display: none; }
+  body.panel-acoplado .app { margin-right: 456px; }
+  body.panel-acoplado .panel { box-shadow: -6px 0 18px rgba(15, 37, 64, 0.14); }
+}

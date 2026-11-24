@@ -33,6 +33,7 @@ ICONOS_MENU = {
     "menu_validador": "validador",
     "menu_ajuste": "ajuste",
     "menu_historial": "historial",
+    "menu_dashboard": "dashboard",
 }
 
 
@@ -84,6 +85,11 @@ header[data-testid="stHeader"] { background: transparent; }
 /* ---------- Menu lateral (verde) ---------- */
 [data-testid="stSidebar"], [data-testid="stSidebar"] > div:first-child { background: var(--menu-green); }
 [data-testid="stSidebar"] * { color: #fff; }
+/* El selector "Operar como" tiene el campo claro: su texto y su flecha deben ser oscuros (la regla de arriba los pone blancos).
+   En Streamlit 1.65 es un ComboBox de React Aria: un input y un boton dentro de un grupo claro. */
+.stApp [data-testid="stSidebar"] [data-testid="stSelectbox"] [role="group"] input,
+.stApp [data-testid="stSidebar"] [data-testid="stSelectbox"] [role="group"] button { color: #0f2540 !important; -webkit-text-fill-color: #0f2540 !important; }
+.stApp [data-testid="stSidebar"] [data-testid="stSelectbox"] [role="group"] svg { color: #0f2540; fill: #0f2540; }
 [data-testid="stSidebar"] [data-testid="stSidebarUserContent"] { padding-top: 1.2rem; }
 .bp-marca { display: flex; align-items: center; gap: 10px; padding: 4px 6px 18px; font-size: 20px; font-weight: 700; letter-spacing: -0.2px; }
 .bp-marca svg { width: 28px; height: 28px; }

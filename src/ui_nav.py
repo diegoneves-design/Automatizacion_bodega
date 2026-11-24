@@ -3,20 +3,31 @@ Estado de navegacion de la interfaz (st.session_state). Lo usan el enrutador y l
 
   vista      pantalla actual (ordenes, detalle, validacion, ajuste, guia, historial, carga)
   folio      orden seleccionada
-  validadas  folios cuya validacion se pidio en esta sesion
-  guias      guias emitidas en esta sesion: folio -> {"numero", "fecha"}
+  id_usuario quien opera (se elige en el menu lateral; la app no tiene inicio de sesion)
+  validadas, guias  solo los usa la interfaz clasica; el MVP con base real lee ese estado de la base
   aviso      mensaje de una sola vez: (tipo, texto), tipo = ok / info / aviso / error
 """
 
 import streamlit as st
 
+import ui_dashboard
 from ui_components import banner, mostrar
+
+
+def _vista_inicial():
+    """La pantalla con la que abre la sesion. ?vista=dashboard abre el Dashboard, pero solo si esta encendido."""
+    try:
+        pedida = st.query_params.get("vista")
+    except Exception:  # noqa: BLE001 - sin parametros de direccion, se abre en Ordenes
+        pedida = None
+    return "dashboard" if pedida == "dashboard" and ui_dashboard.activo() else "ordenes"
 
 
 def iniciar_estado():
     ss = st.session_state
-    ss.setdefault("vista", "ordenes")
+    ss.setdefault("vista", _vista_inicial())
     ss.setdefault("folio", None)
+    ss.setdefault("id_usuario", None)
     ss.setdefault("validadas", set())
     ss.setdefault("guias", {})
     ss.setdefault("sku_corregir", None)

@@ -1,39 +1,57 @@
 """Pantalla 3: Resultado de validación (criterio de la HU-01: sin guía mientras haya SKU con problemas)."""
 
-from datetime import datetime
-
 import streamlit as st
 
+import db
 import ui_datos
 from ui_components import banner, mostrar, pill, tabla, titulo
-from ui_nav import boton_volver, ir, mostrar_aviso
+from ui_nav import avisar, boton_volver, ir, mostrar_aviso
 
-COLUMNAS_CSV = ["sku", "descripcion", "stock_disponible", "tipo_movimiento", "modalidad", "resultado"]
+COLUMNAS_CSV = ["sku", "descripcion", "resultado", "detalle"]
 
 
-def _emitir(app, folio):
-    """Callback: emite la guia solo si no queda ningun SKU con problemas."""
-    validos, total = ui_datos.contar_validos(app.validar_orden(folio))
-    if total == 0 or validos != total:
+def _validar_ahora(repo, folio):
+    """Callback: valida la orden en la base; el resultado queda guardado."""
+    try:
+        repo.validar(folio)
+    except (db.ReglaDeNegocio, db.ErrorDeBase) as e:
+        avisar("error", getattr(e, "mensaje", str(e)))
+
+
+def _emitir(repo, folio):
+    """Callback: pide la guia a la base, que vuelve a revisar todo antes de emitirla (solo el jefe de bodega puede)."""
+    try:
+        repo.preparar_guia(folio, st.session_state.get("id_usuario"))
+    except (db.ReglaDeNegocio, db.ErrorDeBase) as e:
+        avisar("error", getattr(e, "mensaje", str(e)))
         return
-    st.session_state.guias.setdefault(folio, {"numero": folio, "fecha": datetime.now()})
     ir("guia", folio)
 
 
-def render(app):
+def render(repo):
     ss = st.session_state
     folio = ss.folio
     boton_volver("← Volver al detalle", "detalle", "volver_detalle")
     mostrar(titulo("Resultado de validación", "Revisa el estado de cada SKU y corrige si es necesario."))
     mostrar_aviso()
 
-    validada = app.validar_orden(folio) if folio else None
-    if validada is None or validada.empty:
+    orden = repo.orden(folio) if folio else None
+    lineas = repo.lineas(folio) if orden else None
+    if orden is None or lineas.empty:
         mostrar(banner("info", "No hay equipos para validar", "Elige una orden con equipos desde Órdenes."))
         return
 
-    ss.validadas.add(folio)
-    validos, total = ui_datos.contar_validos(validada)
+    emitida = orden["estado"] == "emitida"
+    if ui_datos.sin_validar(lineas) and not emitida:
+        mostrar(banner("info", "Esta orden aún no se valida", "Valídala para ver el estado de cada equipo."))
+        c_volver, _, c_validar = st.columns(3)
+        c_volver.button("← Volver", key="validacion_volver_pend", on_click=ir, args=("detalle",), use_container_width=True)
+        c_validar.button(
+            "Validar ahora", key="validacion_validar", type="primary", on_click=_validar_ahora, args=(repo, folio), use_container_width=True
+        )
+        return
+
+    validos, total = ui_datos.contar_validos_lineas(lineas)
     con_problemas = validos != total
 
     if con_problemas:
@@ -42,12 +60,15 @@ def render(app):
         mostrar(banner("ok", "Validación completada", f"{validos} de {total} SKU son válidos."))
 
     filas = []
+    csv = []
     primer_problema = None
-    for i, f in enumerate(validada.itertuples(), start=1):
-        etiqueta, tono, detalle = ui_datos.describir_resultado(f.resultado, f.stock_disponible)
+    for i, f in enumerate(lineas.itertuples(), start=1):
+        etiqueta, tono, detalle = ui_datos.describir_resultado_base(f.resultado, f.estado_equipo)
+        descripcion = f.descripcion if isinstance(f.descripcion, str) else "—"
         if tono != "ok" and primer_problema is None:
             primer_problema = f.sku
-        filas.append([i, f.sku, f.descripcion if isinstance(f.descripcion, str) else "—", pill(etiqueta, tono), detalle])
+        filas.append([i, f.sku, descripcion, pill(etiqueta, tono), detalle])
+        csv.append({"sku": f.sku, "descripcion": descripcion, "resultado": etiqueta, "detalle": detalle})
     mostrar(
         tabla(
             [("#", "bp-oculto-movil"), ("SKU", "bp-sku"), ("Equipo", ""), ("Estado", ""), ("Detalle", "")],
@@ -55,7 +76,7 @@ def render(app):
         )
     )
 
-    if con_problemas:
+    if con_problemas and not emitida:
         mostrar(
             banner(
                 "aviso",
@@ -66,7 +87,7 @@ def render(app):
 
     c_volver, c_corregir, c_emitir = st.columns(3)
     c_volver.button("← Volver", key="validacion_volver", on_click=ir, args=("detalle",), use_container_width=True)
-    if con_problemas:
+    if con_problemas and not emitida:
         c_corregir.button(
             "Corregir SKU",
             key="validacion_corregir",
@@ -75,7 +96,7 @@ def render(app):
             args=("ajuste", folio, primer_problema),
             use_container_width=True,
         )
-    if folio in ss.guias:
+    if emitida:
         c_emitir.button(
             "Ver guía →", key="validacion_ver_guia", type="primary", on_click=ir, args=("guia", folio), use_container_width=True
         )
@@ -85,15 +106,16 @@ def render(app):
             key="validacion_emitir",
             type="primary",
             on_click=_emitir,
-            args=(app, folio),
+            args=(repo, folio),
             disabled=con_problemas,
             use_container_width=True,
         )
 
-    columnas = [c for c in COLUMNAS_CSV if c in validada.columns]
+    import pandas as pd
+
     st.download_button(
         "Descargar validación (CSV)",
-        data=ui_datos.neutralizar_csv(validada[columnas]).to_csv(index=False).encode("utf-8"),
+        data=ui_datos.neutralizar_csv(pd.DataFrame(csv, columns=COLUMNAS_CSV)).to_csv(index=False).encode("utf-8"),
         file_name=f"validacion_{folio}.csv",
         mime="text/csv",
         key="validacion_csv",

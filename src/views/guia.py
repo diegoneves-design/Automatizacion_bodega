@@ -9,28 +9,25 @@ from ui_nav import boton_volver, ir
 PROXIMAMENTE = "Próximamente"
 
 
-def render(app):
+def render(repo):
     ss = st.session_state
     folio = ss.folio
     mostrar(titulo("Guía generada", "La guía está lista para descargar."))
 
-    guia = ss.guias.get(folio) if folio else None
+    orden = repo.orden(folio) if folio else None
+    guia = repo.guia(folio) if orden else None
     if not guia:
         mostrar(banner("info", "Esta orden aún no tiene guía emitida", "Valida la orden y emite la guía desde el resultado de la validación."))
         boton_volver("← Volver a la validación", "validacion", "volver_validacion")
         return
 
-    resumen = app.obtener_resumen_ordenes()
-    fila = resumen[resumen["folio"] == folio].iloc[0]
-    orden = app.obtener_orden(folio)
-    inventario = app.obtener_inventario()
-    descripciones = dict(zip(inventario["sku"], inventario["descripcion"]))
+    lineas = repo.lineas(folio)
 
     mostrar(
         banner(
             "ok",
             "Guía generada correctamente",
-            "La guía de despacho o retiro quedó emitida y se puede descargar en esta sesión.",
+            "La guía de despacho o retiro quedó emitida y se puede descargar.",
         )
     )
 
@@ -39,21 +36,20 @@ def render(app):
         mostrar(
             ficha_guia(
                 [
-                    ("N° de guía", guia["numero"]),
-                    ("Fecha de emisión", ui_datos.fecha_emision(guia["fecha"])),
-                    ("Tipo de movimiento", f"{fila['tipo_movimiento']} ({fila['modalidad']})"),
-                    ("Total de equipos", len(orden)),
+                    ("N° de guía", guia["numero_guia"]),
+                    ("Orden", folio),
+                    ("Fecha de emisión", ui_datos.fecha_emision(guia["fecha_emision"])),
+                    ("Cliente", orden["cliente"] or "-"),
+                    ("Tipo de movimiento", f"{orden['tipo_movimiento']} ({orden['modalidad']})"),
+                    ("Total de equipos", len(lineas)),
                 ]
             )
         )
     with col_acciones:
-        texto = app.generar_guia_despacho(
-            folio, fila["tipo_movimiento"], fila["modalidad"], list(orden["sku"]), descripciones
-        )
         st.download_button(
             "Descargar guía (.txt)",
-            data=texto.encode("utf-8"),
-            file_name=f"guia_{folio}.txt",
+            data=ui_datos.texto_guia(guia, orden, lineas).encode("utf-8"),
+            file_name=f"guia_{guia['numero_guia']}.txt",
             mime="text/plain",
             type="primary",
             key="guia_descargar",

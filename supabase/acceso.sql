@@ -23,9 +23,11 @@ revoke all on all functions in schema public from public, anon, authenticated;
 grant usage on schema public to anon, authenticated;
 
 -- Lectura de las tablas del flujo
-grant select on public.clientes, public.equipos, public.ordenes, public.detalle_orden,
-                public.guias, public.registro_cambios
+grant select on public.equipos, public.ordenes, public.detalle_orden, public.guias, public.registro_cambios
   to anon, authenticated;
+
+-- De clientes solo se leen estas columnas: el RUT y la direccion no salen por la API (el prototipo solo usa estas dos)
+grant select (id_cliente, razon_social) on public.clientes to anon, authenticated;
 
 -- De usuarios solo se leen estas columnas: el correo y el telefono no salen por la API
 grant select (id_usuario, nombre, rol, activo) on public.usuarios to anon, authenticated;

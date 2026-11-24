@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard · Automatizacion_bodega</title>
+  <meta name="description" content="Dashboard interactivo del inventario de la bodega: estado, familias, modelos, extensiones eléctricas y actividad del prototipo.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body class="dashboard">
+  <div class="app">
+    <header class="cabecera">
+      <span class="marca">Automatizacion_bodega</span>
+      <span class="rol">Bodega</span>
+    </header>
+    <nav class="menu" aria-label="Secciones del programa">
+      <a href="index.html">Pedidos</a>
+      <a href="dashboard.html" aria-current="page">Dashboard</a>
+    </nav>
+
+    <main id="vista">
+      <noscript><p class="error">Este Dashboard necesita JavaScript activado para funcionar.</p></noscript>
+      <h1>Dashboard</h1>
+      <p class="ayuda-pantalla">Complemento del programa para todos los roles. Haz clic en un gráfico para filtrar; todo lo demás se recalcula.</p>
+
+      <!-- dashboard:contenido:inicio  (src/ui_dashboard.py reutiliza lo que hay entre este marcador y el de cierre en el MVP; no los borres) -->
+      <section aria-labelledby="vistas-titulo" class="bloque-vistas">
+        <h2 class="solo-lectores" id="vistas-titulo">Vistas rápidas por rol</h2>
+        <div class="vistas" id="vistas" role="group" aria-label="Vistas rápidas por rol"></div>
+        <p class="ayuda" id="vista-ayuda"></p>
+      </section>
+
+      <div id="estado-carga" role="status" aria-live="polite"></div>
+
+      <div id="contenido" hidden>
+        <section aria-label="Indicadores" class="indicadores" id="indicadores"></section>
+        <section aria-label="Filtros activos" class="filtros-activos" id="filtros-activos" aria-live="polite"></section>
+
+        <section aria-labelledby="graficos-titulo">
+          <h2 class="solo-lectores" id="graficos-titulo">Gráficos</h2>
+          <div class="rejilla" id="graficos"></div>
+        </section>
+
+        <section aria-labelledby="lectura-titulo" class="lectura">
+          <h2 id="lectura-titulo">Lectura de los datos</h2>
+          <ol class="hallazgos" id="hallazgos"></ol>
+          <h3>Limitaciones</h3>
+          <ul class="limitaciones">
+            <li>«Arrendado» es un supuesto: se deduce de que la ubicación del equipo sea un número (contrato u orden) o un nombre. Falta confirmarlo con la bodega.</li>
+            <li>No hay fechas ni historial: no se puede medir rotación ni tiempo de arriendo.</li>
+            <li>El inventario es una foto de un momento, no una serie en el tiempo.</li>
+            <li>«Fuera de servicio» incluye bajas definitivas junto con equipos que se podrían recuperar.</li>
+            <li>La capacidad se leyó de las descripciones, que están escritas a mano: puede faltar o estar mal leída.</li>
+            <li>Los porcentajes de los gráficos se calculan sobre lo que cada gráfico muestra con los filtros activos; el indicador «del total general» compara siempre con todo el inventario.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="casos-titulo" class="casos">
+          <h2 id="casos-titulo" tabindex="-1"></h2>
+          <div class="herramientas-tabla">
+            <div class="campo">
+              <label for="buscar">Buscar por SKU o descripción</label>
+              <input type="search" id="buscar" autocomplete="off" maxlength="80">
+            </div>
+            <button type="button" class="boton boton-secundario" id="descargar">Descargar CSV</button>
+          </div>
+          <div class="envoltura-tabla desplazable" tabindex="0" role="region" aria-label="Tabla de equipos de la selección">
+            <table class="tabla-datos tabla-casos" id="tabla-casos"></table>
+          </div>
+          <div class="paginacion">
+            <button type="button" class="boton boton-secundario" id="pag-ant">Anterior</button>
+            <span id="pag-num"></span>
+            <button type="button" class="boton boton-secundario" id="pag-sig">Siguiente</button>
+          </div>
+          <p class="ayuda" id="pagina-info" aria-live="polite"></p>
+        </section>
+      </div>
+      <!-- dashboard:contenido:fin -->
+    </main>
+
+    <footer class="pie">
+      <p>Datos del inventario de la bodega cargados en una base compartida. Cifras preliminares.</p>
+    </footer>
+  </div>
+
+  <!-- dashboard:panel:inicio -->
+  <div id="velo" class="velo" hidden></div>
+  <aside id="panel" class="panel" role="dialog" aria-modal="true" aria-labelledby="panel-titulo" hidden>
+    <div class="panel-cabecera">
+      <h2 id="panel-titulo">Detalle del equipo</h2>
+      <button type="button" class="boton boton-secundario panel-cerrar" id="panel-cerrar">Cerrar</button>
+    </div>
+    <div id="panel-cuerpo"></div>
+  </aside>
+  <!-- dashboard:panel:fin -->
+
+  <!-- config.js lo genera generar-config.mjs y no se sube a git -->
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"
+          integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+  <script src="js/vendor/echarts.custom.min.js"></script>
+  <script src="js/reglas.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/filtros.js"></script>
+  <script src="js/graficos.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -8,15 +8,15 @@ from ui_components import banner, mostrar, tabla, titulo
 COLUMNAS_CSV = ["folio", "sku_original", "sku_nuevo", "responsable", "fecha_hora", "motivo"]
 
 
-def render(app):
+def render(repo):
     mostrar(titulo("Historial", "Cambios de última hora registrados. El SKU original nunca se borra."))
 
-    log = app.obtener_log_cambios()
+    log = repo.cambios()
     if log.empty:
         mostrar(banner("info", "Aún no hay cambios registrados", "Aparecerán aquí cuando reemplaces un SKU."))
         return
 
-    log = log.sort_values("id", ascending=False)
+    log = log.sort_values("id", ascending=False)  # el mas reciente primero
     filas = [
         [ui_datos.fecha_hora_corta(f.fecha_hora), f.folio, f.sku_original, f.sku_nuevo, f.responsable, f.motivo or "—"]
         for f in log.itertuples()
