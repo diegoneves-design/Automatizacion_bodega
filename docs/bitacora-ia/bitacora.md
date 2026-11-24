@@ -887,10 +887,22 @@ Lo hizo Oscar Ynchaustegui el 2026-11-22, con Claude. Lo revisa Sebastián Carmo
 **Qué se aceptó y qué se corrigió.**
 - Conteo: **0 emojis en las cuatro ramas**, tanto en el código como, solo para informe, en `.md`, `.csv` y `.txt`. Se contrastó con un segundo método independiente (`git grep` con rangos Unicode): solo coincide con U+2713 y U+2715, las marcas de texto que `main` ya permitía y que no son emojis (cinco archivos: la bitácora, dos documentos del Avance 5, el checklist del celular y `prototipo/js/app.js`). No se tocaron.
 - Hallazgo propio: la herramienta con la que la IA escribe archivos convierte las secuencias `\uXXXX` de barra simple en el carácter real (ya lo anotaba el Encargo 29). Dejó un U+200D literal en el primer borrador de `tests/test_sin_emojis.py`, que el test antiguo de `main` marcó, y un separador de línea U+2028 literal en dos líneas de `tests/test_ui_dashboard.py`. Se corrigieron armando esos textos con `chr()` y se añadió una prueba que exige que `tests/test_sin_emojis.py` no tenga ningún carácter fuera de ASCII.
-- Hallazgo sin corregir, que toca código y por eso se le preguntó a Bastián: en la pantalla «Ajuste de última hora» del MVP, bajo «SKU a reemplazar» aparece «No existe en el inventario» para una línea que todavía no se validó (por ejemplo un SKU de la demo que sí existe), porque antes de validar la línea no tiene equipo asociado y no hay descripción. Una corrección mínima sería mostrar «Aún sin validar» mientras el resultado sea «pendiente».
+- Hallazgo que toca código y por eso se le preguntó a Bastián (corregido en el Encargo 35): en la pantalla «Ajuste de última hora» del MVP, bajo «SKU a reemplazar» aparece «No existe en el inventario» para una línea que todavía no se validó (por ejemplo un SKU de la demo que sí existe), porque antes de validar la línea no tiene equipo asociado y no hay descripción. Una corrección mínima sería mostrar «Aún sin validar» mientras el resultado sea «pendiente».
 
 **Cómo se verificó.**
 - Suites tras cada fusión (`pytest`; `pytest` con PostgreSQL; `node --test`): rama 1, 282, 278 con 4 omitidas y 30; rama 2, 356 con 69 omitidas, 415 con 10 omitidas y 30; rama 3, 382 con 71 omitidas, 443 con 10 omitidas y 38; rama 4, 391 con 71 omitidas, 452 con 10 omitidas y 42. Sin marcadores de conflicto, claves ni SKU reales.
 - Revisión visual en Chrome sin ventana, con la aplicación local conectada a Supabase y el prototipo en el puerto 8777, **solo lectura**: MVP, Órdenes (sin órdenes de hoy y luego con el filtro en el 23 de noviembre), Detalle de la orden, Validador (orden sin validar), Ajuste de última hora, Carga masiva, Historial y Dashboard; prototipo, la pantalla Pedidos y su Dashboard. El detector de emojis aplicado al texto visible de esas diez pantallas dio 0.
 - **No se vio:** la guía generada, el Validador con resultados y el Historial con cambios, porque exigen validar, emitir o guardar (escribir en la base); ninguna pantalla en tamaño de celular; el CI en GitHub.
+
+---
+
+## Encargo 35. Ajuste de última hora: «Aún sin validar» en lugar de «No existe en el inventario»
+
+**Objetivo.** Corregir un texto engañoso de la pantalla «Ajuste de última hora» del MVP, hallado en la revisión visual del Encargo 34.
+
+**Instrucción entregada.** Mostrar «Aún sin validar» mientras el resultado de la línea sea pendiente y reservar «No existe en el inventario» solo para líneas ya validadas y no encontradas. Hacerlo en la rama `feature/mvp-supabase`, propagar por fusión a las ramas 3 y 4, con una prueba que cubra los tres casos y sin tocar la regla de bloqueo de la guía ni los datos.
+
+**Respuesta obtenida.** La función `texto_del_sku` de `src/views/ajuste.py` decide el texto según la descripción y el resultado de la línea; solo cambia ese texto. Dos pruebas nuevas en `tests/test_mvp_ui.py`: un recorrido de pantalla (con SQLite y con PostgreSQL) con los tres casos —pendiente, validada que existe, validada que no existe— y una prueba directa de la función. Se comprobó que la prueba de pantalla falla con el código anterior.
+
+**Cómo se verificó.** Suites tras el cambio en la rama 2: `pytest` 358 pasan y 70 se omiten; `pytest` con PostgreSQL 418 pasan y 10 se omiten; `node --test` 30 pasan. Sin marcadores de conflicto, claves ni SKU reales.
 
