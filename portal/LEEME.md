@@ -2,7 +2,7 @@
 
 Página estática mínima que Vercel publica como entrada pública del proyecto. Tiene un solo botón que lleva a la aplicación (el MVP de `src/`). Streamlit necesita un servidor siempre encendido y no corre en Vercel, así que Vercel solo muestra esta entrada.
 
-No enlaza al prototipo ni a su dashboard. El prototipo (`prototipo/`) sigue publicado aparte, en su propio proyecto de Vercel (`bodega-prototipo`), para el video del README y para la prueba con usuarios.
+No enlaza al prototipo ni a su dashboard. El prototipo (`prototipo/`) sigue publicado aparte, en su propio proyecto de Vercel (`bodega-poc`), para el video del README y para la prueba con usuarios.
 
 ## Cómo cambiar la dirección de la aplicación
 
@@ -19,7 +19,7 @@ Desde esta carpeta: `py -m http.server 8001 --bind 127.0.0.1` y abrir `http://12
 
 ## Vercel: un segundo proyecto, sin tocar el del prototipo
 
-El portal va en un **proyecto nuevo** de Vercel (nombre sugerido: `bodega-portal`), conectado al mismo repositorio. **No se modifica `bodega-prototipo`**: ese proyecto conserva su configuración (Root Directory = `prototipo`, Build Command = `node generar-config.mjs` y sus variables), porque el prototipo debe seguir publicado.
+El portal va en un **proyecto nuevo** de Vercel (nombre sugerido: `bodega-portal`), conectado al mismo repositorio. **No se modifica `bodega-poc`**: ese proyecto conserva su configuración (Root Directory = `prototipo`, Build Command = `node generar-config.mjs` y sus variables), porque el prototipo debe seguir publicado.
 
 El proyecto nuevo se configura así: **Root Directory = `portal`**, *Framework Preset* «Other», **sin Build Command**, sin Install Command, sin Output Directory y **sin variables de entorno** (el portal no usa claves ni Supabase). Los pasos completos y cómo comprobarlos están en el README del repositorio, sección «Portal público en Vercel».
 
