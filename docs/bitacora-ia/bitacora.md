@@ -922,3 +922,36 @@ Lo hizo Oscar Ynchaustegui el 2026-11-22, con Claude. Lo revisa Sebastián Carmo
 - Las fusiones entre ramas tuvieron un conflicto cada una en la tabla «Pendiente del avance» del README (las ramas 2 y 4); se resolvió conservando las filas de cada rama más la fila actualizada del Dashboard.
 
 **Cómo se verificó.** Suites tras cada paso: rama 1, `pytest` 282 y `node --test` 30; rama 3, `pytest` 384 con 72 omitidas y `node --test` 38; rama 4, `pytest` 393 con 72 omitidas y `node --test` 42. No se corrió PostgreSQL local; el CI en GitHub se revisa aparte. Sin marcadores de conflicto, claves ni SKU reales.
+
+---
+
+## Encargo 37. Publicación de la prueba de concepto en Vercel (proyecto bodega-poc) y enlace del video
+
+**Autor.** Diego Neves, 26 de noviembre de 2026. Rama `feature/vercel-y-video`, desde `main`.
+
+**Objetivo.** Publicar la versión actual del prototipo, conectada a Supabase, en una dirección pública que funcione, y dejar en la documentación esa dirección y el enlace del video de la prueba de concepto.
+
+**Instrucción entregada.**
+- Contexto: el sitio publicado (`bodega-prototipo.vercel.app`) no mostraba la versión de `main`. La prueba de concepto ya se publica desde la cuenta de Vercel de Diego en `https://bodega-poc.vercel.app`, y el video está grabado.
+- Intención: reemplazar la dirección antigua por la nueva en el README y en los `.md` de `docs/` donde se usa como dirección vigente; poner el enlace del video, su duración y lo que recorre en el README y en `docs/arquitectura.md`; dar por resuelto el pendiente de Vercel en el README; registrar el encargo en esta bitácora.
+- Restricciones: no tocar esta bitácora en sus entradas anteriores (es un registro histórico) ni los PDF; no reescribir el procedimiento del portal (`bodega-portal`) de Bastián, solo cambiar el nombre del proyecto; un commit por punto, cada uno mostrado y aprobado antes; sin push; nombrar las variables de entorno sin escribir nunca sus valores.
+
+**Respuesta obtenida.**
+- Diagnóstico, con la API de GitHub: el repositorio tenía **0 despliegues** registrados y **ningún estado de Vercel** en los commits de `main`; el sitio publicado era la versión del **25 de octubre** (Avance 5: sin Supabase y sin dashboard). El proyecto antiguo `bodega-prototipo` no se podía conectar a este repositorio porque el repositorio está en la cuenta de GitHub de Diego.
+- Se creó el proyecto **`bodega-poc`** en la cuenta de Vercel de Diego: rama `main`, Root Directory = `prototipo`, Build Command = `node generar-config.mjs`, Output Directory = `.` y las variables `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`.
+- Documentación (tres commits):
+  - `fa8262a`: la dirección `bodega-poc.vercel.app` en ocho líneas (README 23, 71 y 240; `docs/arquitectura.md`, `docs/etica.md`, `docs/pauta-validacion.md`, `docs/prototipo.md` y `docs/prueba-usuarios.md`). No se cambió `docs/etica.md:69`, que describe un despliegue de prueba de ese momento.
+  - `475c788`: el enlace del video (Google Drive, 2 min 44 s) en el README y en `docs/arquitectura.md`, con lo que recorre: el caso exitoso (orden 3001), la guía que sigue guardada después de recargar y el caso de error (orden 3002).
+  - `f101f60`: en el README, el proyecto del prototipo pasa a ser `bodega-poc` (líneas 23, 240, 244, 263, 352 y 408); la nota «Pendiente aparte» pasa a «Publicación del prototipo, resuelta»; se elimina la fila de pendientes «Configurar Vercel…» y se quita «publicar el prototipo desde `main`» de la fila del Dashboard. Por el cambio de nombre también se actualizaron `portal/LEEME.md` (líneas 5 y 22) y `tests/test_portal.py` (docstring y frases esperadas en las líneas 108, 111 y 116), sin cambiar la lógica de la prueba.
+
+**Qué se aceptó y qué se corrigió.**
+- Corregido en Vercel: el **primer despliegue de `bodega-poc` falló** porque no tenía Output Directory. Con Root Directory = `prototipo`, el Build Command solo genera `js/config.js` y Vercel no sabía qué carpeta publicar. Se corrigió con Output Directory = `.` y el segundo despliegue funcionó. Se dejó anotado en la línea 408 del README para que no se repita.
+- Corregido: el video duraba 3 min 11 s; se recortó a 2 min 44 s con el mismo enlace y el commit del video se hizo con la duración final. El README decía «(1 a 2 minutos)», no «menos de 2 minutos»: se reemplazó por la duración real.
+- Corregido: el cambio de nombre en el README hizo fallar `tests/test_portal.py`, que exigía la frase «no se modifica `bodega-prototipo`». Se actualizó la frase esperada y el `LEEME.md` del portal, que decía lo mismo.
+- Aceptado sin cambios: los pasos del portal (`bodega-portal`) de Bastián, salvo el nombre del proyecto del prototipo.
+
+**Cómo se verificó.**
+- En una ventana de incógnito, en `https://bodega-poc.vercel.app`: `/js/config.js` abre (la configuración se generó al construir); al preparar la guía de la orden 3001 aparece el **N.º interno**; al recargar la página, la orden 3001 avisa que **ya tiene la guía preparada**.
+- Pruebas: `py -m pytest -q` con los cambios del punto 3: **386 pasan, 0 fallan y 79 se saltan**. Con los cambios guardados en `git stash`, el resultado era el mismo (386 y 79), así que las 79 pruebas que se saltan no vienen de este encargo.
+- Búsqueda en el repositorio de los prefijos de las claves publicable y secreta de Supabase y del nombre del rol de servicio: solo aparecen como texto de instrucciones o de validación (README, `.env.example`, `prototipo/generar-config.mjs`, `supabase/probar_en_supabase.py`, dos pruebas y una entrada anterior de esta bitácora), y en ningún caso con un valor de clave.
+- **No se verificó:** que el video en Google Drive esté compartido con «cualquier persona con el enlace»; el sitio en un celular real; qué publica hoy el proyecto antiguo `bodega-prototipo`; el proyecto `bodega-portal`, que todavía no se crea.

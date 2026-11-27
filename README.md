@@ -20,7 +20,7 @@ Documentación del proyecto:
 - Historias de usuario y criterios de aceptación (Avance 4): [docs/historias.md](docs/historias.md)
 - Wireframes del flujo principal (Avance 4): [docs/wireframes/](docs/wireframes/)
 - Conversación con el usuario (Avance 4): [docs/entrevistas/entrevista_subjefe_bodega.md](docs/entrevistas/entrevista_subjefe_bodega.md)
-- Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app). Sigue publicado en su propio proyecto de Vercel (`bodega-prototipo`) para el video de este README y para la prueba con usuarios; no se rehace y el portal no lo enlaza
+- Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-poc.vercel.app). Se publica en el proyecto de Vercel `bodega-poc`, desde la cuenta de Vercel de Diego, para el video de este README y para la prueba con usuarios; no se rehace y el portal no lo enlaza
 - Portal público para Vercel (una página con un botón hacia el MVP): [portal/LEEME.md](portal/LEEME.md); la dirección del MVP vive en `portal/config.js`
 - Análisis ético del prototipo (Avance 5): [docs/etica.md](docs/etica.md)
 - **Arquitectura y camino delgado de la prueba de concepto (Avance 7): [docs/arquitectura.md](docs/arquitectura.md)**
@@ -68,9 +68,9 @@ Sin emojis en el código; lo vigila `tests/test_sin_emojis.py`.
 
 **Qué hace.** Demuestra una sola acción de punta a punta con piezas reales, **preparar la guía de una orden**. La persona presiona *Preparar guía*, la base de datos vuelve a revisar cada producto contra el inventario, guarda la guía y la pantalla muestra su número interno. Si hay un código que no existe, la guía no se guarda y aparece el mensaje para corregirlo. El diagrama, las piezas y lo que queda fuera están en [docs/arquitectura.md](docs/arquitectura.md).
 
-**Dirección pública.** [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app). Se abre sin iniciar sesión.
+**Dirección pública.** [bodega-poc.vercel.app](https://bodega-poc.vercel.app). Se abre sin iniciar sesión.
 
-**Video (1 a 2 minutos).** Se agrega el enlace cuando esté grabado.
+**Video (2 min 44 s).** [Ver el video en Google Drive](https://drive.google.com/file/d/1B3kULAPBZwG80R2dx-YSNuFwBkI--41n/view?usp=sharing). Recorre el caso exitoso (orden 3001), la guía que sigue guardada después de recargar la página y el caso de error (orden 3002).
 
 **Qué flujo demuestra.**
 
@@ -237,11 +237,11 @@ Es el análisis del inventario real de la bodega (1.617 equipos y 319 extensione
 Streamlit necesita un servidor siempre encendido y no corre en Vercel. Por eso Vercel publica solo una **entrada**: `portal/`, una página estática con el nombre del proyecto, una frase de qué hace y **un único botón**.
 
 - **La dirección del MVP vive en un solo lugar:** `portal/config.js` (`URL_APLICACION`). Mientras esté vacía, el botón aparece desactivado con el texto «Aplicación en despliegue»; con una dirección `https`, pasa a «Abrir la aplicación». Cambiarla es editar esa línea y volver a publicar.
-- **El prototipo no cambia ni se desconecta.** Sigue publicado en `bodega-prototipo.vercel.app`, en su propio proyecto de Vercel (`bodega-prototipo`, con Root Directory = `prototipo` y Build Command = `node generar-config.mjs`), para el video de este README y para la prueba con usuarios. **Ese proyecto no se modifica.** El portal no lo enlaza ni enlaza a su dashboard.
+- **El prototipo no cambia ni se desconecta.** Se publica en `bodega-poc.vercel.app`, en el proyecto de Vercel `bodega-poc` de la cuenta de Vercel de Diego (rama `main`, Root Directory = `prototipo`, Build Command = `node generar-config.mjs` y Output Directory = `.`), para el video de este README y para la prueba con usuarios. **Ese proyecto no se modifica.** El portal no lo enlaza ni enlaza a su dashboard.
 - **Sin dependencias, sin claves y sin Supabase.** La página lleva su propia política de seguridad (no puede conectarse a ninguna red) y `vercel.json` agrega encabezados de seguridad.
-- **Pendiente aparte, que el portal no resuelve:** el proyecto `bodega-prototipo` hoy no está conectado al repositorio correcto. Lo publicado es la versión del 25 de octubre (la de Avance 5: sin conexión a Supabase y sin dashboard). La pauta de la prueba con usuarios supone la versión actual (órdenes 3001 y 3002 y «Reiniciar demo»), que se publica cuando ese proyecto se vuelva a conectar a `main` y tenga sus dos variables (`SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`).
+- **Publicación del prototipo, resuelta:** el proyecto antiguo `bodega-prototipo` no se podía conectar a este repositorio (está en la cuenta de GitHub de Diego) y seguía mostrando la versión del 25 de octubre. Se creó `bodega-poc` en la cuenta de Vercel de Diego, conectado a `main` y con `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`, y ya publica la versión actual que supone la pauta (órdenes 3001 y 3002 y «Reiniciar demo»).
 
-**Crear el proyecto nuevo en Vercel** (lo hace una persona del equipo en el panel; el repositorio no puede hacerlo por sí solo). Es un proyecto **nuevo** de Vercel: **no se modifica `bodega-prototipo`**.
+**Crear el proyecto nuevo en Vercel** (lo hace una persona del equipo en el panel; el repositorio no puede hacerlo por sí solo). Es un proyecto **nuevo** de Vercel: **no se modifica `bodega-poc`**.
 
 1. **Esperar a que el portal esté en `main`.** El proyecto nuevo publica la rama de producción (`main`) y, si `portal/` todavía no existe ahí, su primera publicación falla (la carpeta no está). Por eso se crea después de fusionar el pull request del portal.
 2. En Vercel, en el equipo `automatizacion-de-bodega`: *Add New…* → *Project* → importar el repositorio de GitHub `diegoneves-design/Automatizacion_bodega`. Vercel necesita permiso sobre esa cuenta de GitHub (lo da quien la administra, instalando la aplicación de Vercel en ese repositorio). Según el plan de Vercel puede no permitir repositorios de otra cuenta u organización: si lo rechaza, hay que resolverlo antes de seguir.
@@ -260,7 +260,7 @@ Streamlit necesita un servidor siempre encendido y no corre en Vercel. Por eso V
 - En las herramientas de desarrollo (F12) → *Network*: solo cinco archivos (`index`, `config.js`, `portal.js`, `estilos.css`, `icono.svg`) y ninguna llamada a `supabase`. En los encabezados de la página: `Content-Security-Policy` y `X-Frame-Options: DENY`.
 - En *Deployments*, el registro de construcción (*Build Logs*) no debe ejecutar ningún comando `node` ni mencionar `generar-config.mjs`, y debe terminar sin errores.
 - Abrirlo en el celular: sin desplazamiento horizontal y con el botón visible.
-- **Comprobar que `bodega-prototipo` no cambió:** su dirección sigue abriendo el prototipo y su configuración (Root Directory, Build Command y variables) sigue como estaba.
+- **Comprobar que `bodega-poc` no cambió:** su dirección sigue abriendo el prototipo y su configuración (Root Directory, Build Command y variables) sigue como estaba.
 - Cuando el MVP esté publicado: poner su dirección `https` en `portal/config.js`, pull request, fusión, y comprobar que el botón pasa a azul con «Abrir la aplicación» y lleva al MVP.
 
 ### Prueba guiada (5 minutos)
@@ -348,9 +348,8 @@ La profesora indicó en la retroalimentación del Avance 5 que, mientras la prue
 | Que el equipo verifique y apruebe los criterios de HU-01 a HU-05 de `docs/historias.md` | Se propusieron con ayuda de IA contra el código y la profesora pidió que los escriba el equipo |
 | Confirmar con administración el plazo de conservación de 24 meses | Es una propuesta del equipo (`docs/etica.md`, ficha B2) |
 | Ejecutar `supabase/seed_poc.sql` en Supabase con los RUT de ejemplo nuevos (`11.111.111-1` y `22.222.222-2`) y luego `select public.reiniciar_demo();` | La base real sigue con los RUT anteriores hasta que se vuelva a ejecutar la semilla |
-| Configurar Vercel (variables `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` y comando de construcción) y volver a publicar desde `main` | Hasta entonces el sitio publicado no es la versión conectada a Supabase |
-| Crear el proyecto nuevo `bodega-portal` en Vercel (Root Directory = `portal`) una vez que el portal esté en `main`, y poner la dirección del MVP en `portal/config.js` cuando el MVP esté publicado | Pasos y cómo comprobarlos en «Portal público en Vercel». No se modifica `bodega-prototipo`; reconectarlo al repositorio correcto es la fila anterior. El MVP todavía no tiene dirección publicada |
-| Revisar el Dashboard en la página publicada y confirmar con Oscar o el jefe de bodega los supuestos del análisis (valores numéricos = arrendado, significado de POR HABILITAR y de BAJA) (el inventario real **sí puede mostrarse** en una demo pública: Oscar lo confirmó el 24 de noviembre de 2026, pregunta 4 de `docs/analisis-inventario.md`; los datos personales de clientes, como RUT, dirección, correo y teléfono, siguen fuera de lo público) | `supabase/dashboard.sql` ya se ejecutó en Supabase (la función devuelve 1.617 equipos y 319 extensiones). Falta la respuesta de la bodega sobre los supuestos y publicar el prototipo desde `main` |
+| Crear el proyecto nuevo `bodega-portal` en Vercel (Root Directory = `portal`) una vez que el portal esté en `main`, y poner la dirección del MVP en `portal/config.js` cuando el MVP esté publicado | Pasos y cómo comprobarlos en «Portal público en Vercel». No se modifica `bodega-poc`. El MVP todavía no tiene dirección publicada |
+| Revisar el Dashboard en la página publicada y confirmar con Oscar o el jefe de bodega los supuestos del análisis (valores numéricos = arrendado, significado de POR HABILITAR y de BAJA) (el inventario real **sí puede mostrarse** en una demo pública: Oscar lo confirmó el 24 de noviembre de 2026, pregunta 4 de `docs/analisis-inventario.md`; los datos personales de clientes, como RUT, dirección, correo y teléfono, siguen fuera de lo público) | `supabase/dashboard.sql` ya se ejecutó en Supabase (la función devuelve 1.617 equipos y 319 extensiones). Falta la respuesta de la bodega sobre los supuestos |
 | Elegir dónde se publica el MVP (Streamlit no corre en Vercel), guardar su `DATABASE_URL` como secreto del servicio y, más adelante, agregar inicio de sesión real y políticas por rol | Hoy el MVP corre solo en el computador y no tiene inicio de sesión: cualquiera con acceso opera como el usuario que elija (limitación documentada en «Seguridad de la base en esta etapa») |
 | Volver a ejecutar en Supabase `supabase/probar_en_supabase.py` y probar a mano el flujo de órdenes del MVP contra Supabase | El último resultado informado de `probar_en_supabase.py` (89 OK y 0 FALLAS) es anterior a dos comprobaciones nuevas sobre los clientes (dirección y razón social); `verificar_mvp.sql` ya se ejecutó completo (46 filas OK). El flujo de órdenes todavía no se probó en un navegador contra Supabase |
 
@@ -405,7 +404,7 @@ Para comprobar que quedó bien, desde la raíz del repositorio y con `.env` comp
 **2. El prototipo.** Necesita la dirección del proyecto y la clave **publicable** (empieza con `sb_publishable_`). Nunca uses la clave secreta ni `service_role`: no se necesitan.
 
 - **En el computador:** copia `.env.example` a `.env`, completa `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`, y ejecuta `node prototipo/generar-config.mjs`. Eso crea `prototipo/js/config.js`. Luego, desde la carpeta `prototipo`, abre el sitio con un servidor local, por ejemplo `py -m http.server 8000`, y entra a `http://127.0.0.1:8000`.
-- **En Vercel (proyecto `bodega-prototipo`, que no se modifica para el portal):** en el proyecto, agrega las variables de entorno `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`, y como **Build Command** `node generar-config.mjs` (si la carpeta raíz del proyecto es `prototipo`) o `node prototipo/generar-config.mjs` (si es la raíz del repositorio). Sin eso el sitio muestra «Falta la configuración de la base de datos».
+- **En Vercel (proyecto `bodega-poc`, que no se modifica para el portal):** en el proyecto, agrega las variables de entorno `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`, y como **Build Command** `node generar-config.mjs` (si la carpeta raíz del proyecto es `prototipo`) o `node prototipo/generar-config.mjs` (si es la raíz del repositorio). Sin eso el sitio muestra «Falta la configuración de la base de datos». Con la carpeta raíz `prototipo`, el **Output Directory** debe ser `.`; si queda vacío, la publicación falla.
 
 `.env` y `prototipo/js/config.js` no se suben a git (están en `.gitignore`).
 

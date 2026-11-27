@@ -2,7 +2,7 @@
 
 Grupo 6 · Avance 6
 
-Hasta ahora, todo lo que sabemos del [prototipo](https://bodega-prototipo.vercel.app) lo hemos juzgado nosotros mismos. Uno de nosotros trabaja en la bodega del caso, y eso nos ayuda a entender el problema, pero también nos puede hacer creer que algo se entiende solo porque a nosotros nos parece obvio. Por eso queremos ver qué pasa cuando lo usa alguien que nunca lo ha visto.
+Hasta ahora, todo lo que sabemos del [prototipo](https://bodega-poc.vercel.app) lo hemos juzgado nosotros mismos. Uno de nosotros trabaja en la bodega del caso, y eso nos ayuda a entender el problema, pero también nos puede hacer creer que algo se entiende solo porque a nosotros nos parece obvio. Por eso queremos ver qué pasa cuando lo usa alguien que nunca lo ha visto.
 
 Esta prueba todavía no se hace. Aquí dejamos escrito qué vamos a observar, con quién y qué resultado consideraríamos un fracaso, antes de ver a ningún participante. El guion que se lee en cada sesión está en [docs/pauta-validacion.md](pauta-validacion.md).
 

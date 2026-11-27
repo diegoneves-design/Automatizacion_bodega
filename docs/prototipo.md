@@ -10,7 +10,7 @@ Es un artefacto independiente: vive en [`prototipo/`](../prototipo/) y no usa la
 
 ## Enlace
 
-**[https://bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app)**
+**[https://bodega-poc.vercel.app](https://bodega-poc.vercel.app)**
 
 Se publica en Vercel desde la carpeta `prototipo/` (sitio estático, sin paso de build) y se abre sin iniciar sesión.
 
