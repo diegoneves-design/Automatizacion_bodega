@@ -2,7 +2,7 @@
 
 Grupo 6 · Avance 5, Parte B
 
-El análisis se hace sobre el prototipo publicado en [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app) (detalle en [docs/prototipo.md](prototipo.md)), con lo que contó el subjefe de bodega en la [conversación del Avance 4](entrevistas/entrevista_subjefe_bodega.md) y con los campos de [docs/datos/estructura_datos.md](datos/estructura_datos.md).
+El análisis se hace sobre el prototipo publicado en [bodega-poc.vercel.app](https://bodega-poc.vercel.app) (detalle en [docs/prototipo.md](prototipo.md)), con lo que contó el subjefe de bodega en la [conversación del Avance 4](entrevistas/entrevista_subjefe_bodega.md) y con los campos de [docs/datos/estructura_datos.md](datos/estructura_datos.md).
 
 ## B1 · Mapa de impacto y exclusión
 

@@ -72,7 +72,7 @@ flowchart LR
 
 ## Evidencia
 
-**Dirección pública.** [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app), publicada desde `main`. Debe abrirse sin iniciar sesión, y se revisa en una ventana de incógnito antes de la entrega.
+**Dirección pública.** [bodega-poc.vercel.app](https://bodega-poc.vercel.app), publicada desde `main`. Debe abrirse sin iniciar sesión, y se revisa en una ventana de incógnito antes de la entrega.
 
 **Video.** Se agrega el enlace cuando esté grabado.
 

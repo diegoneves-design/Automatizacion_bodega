@@ -20,7 +20,7 @@ Documentación del proyecto:
 - Historias de usuario y criterios de aceptación (Avance 4): [docs/historias.md](docs/historias.md)
 - Wireframes del flujo principal (Avance 4): [docs/wireframes/](docs/wireframes/)
 - Conversación con el usuario (Avance 4): [docs/entrevistas/entrevista_subjefe_bodega.md](docs/entrevistas/entrevista_subjefe_bodega.md)
-- Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-prototipo.vercel.app). Sigue publicado en su propio proyecto de Vercel (`bodega-prototipo`) para el video de este README y para la prueba con usuarios; no se rehace y el portal no lo enlaza
+- Prototipo navegable (Avance 5): [docs/prototipo.md](docs/prototipo.md) · [abrir el prototipo](https://bodega-poc.vercel.app). Sigue publicado en su propio proyecto de Vercel (`bodega-prototipo`) para el video de este README y para la prueba con usuarios; no se rehace y el portal no lo enlaza
 - Portal público para Vercel (una página con un botón hacia el MVP): [portal/LEEME.md](portal/LEEME.md); la dirección del MVP vive en `portal/config.js`
 - Análisis ético del prototipo (Avance 5): [docs/etica.md](docs/etica.md)
 - **Arquitectura y camino delgado de la prueba de concepto (Avance 7): [docs/arquitectura.md](docs/arquitectura.md)**
@@ -68,7 +68,7 @@ Sin emojis en el código; lo vigila `tests/test_sin_emojis.py`.
 
 **Qué hace.** Demuestra una sola acción de punta a punta con piezas reales, **preparar la guía de una orden**. La persona presiona *Preparar guía*, la base de datos vuelve a revisar cada producto contra el inventario, guarda la guía y la pantalla muestra su número interno. Si hay un código que no existe, la guía no se guarda y aparece el mensaje para corregirlo. El diagrama, las piezas y lo que queda fuera están en [docs/arquitectura.md](docs/arquitectura.md).
 
-**Dirección pública.** [bodega-prototipo.vercel.app](https://bodega-prototipo.vercel.app). Se abre sin iniciar sesión.
+**Dirección pública.** [bodega-poc.vercel.app](https://bodega-poc.vercel.app). Se abre sin iniciar sesión.
 
 **Video (1 a 2 minutos).** Se agrega el enlace cuando esté grabado.
 
@@ -237,7 +237,7 @@ Es el análisis del inventario real de la bodega (1.617 equipos y 319 extensione
 Streamlit necesita un servidor siempre encendido y no corre en Vercel. Por eso Vercel publica solo una **entrada**: `portal/`, una página estática con el nombre del proyecto, una frase de qué hace y **un único botón**.
 
 - **La dirección del MVP vive en un solo lugar:** `portal/config.js` (`URL_APLICACION`). Mientras esté vacía, el botón aparece desactivado con el texto «Aplicación en despliegue»; con una dirección `https`, pasa a «Abrir la aplicación». Cambiarla es editar esa línea y volver a publicar.
-- **El prototipo no cambia ni se desconecta.** Sigue publicado en `bodega-prototipo.vercel.app`, en su propio proyecto de Vercel (`bodega-prototipo`, con Root Directory = `prototipo` y Build Command = `node generar-config.mjs`), para el video de este README y para la prueba con usuarios. **Ese proyecto no se modifica.** El portal no lo enlaza ni enlaza a su dashboard.
+- **El prototipo no cambia ni se desconecta.** Sigue publicado en `bodega-poc.vercel.app`, en su propio proyecto de Vercel (`bodega-prototipo`, con Root Directory = `prototipo` y Build Command = `node generar-config.mjs`), para el video de este README y para la prueba con usuarios. **Ese proyecto no se modifica.** El portal no lo enlaza ni enlaza a su dashboard.
 - **Sin dependencias, sin claves y sin Supabase.** La página lleva su propia política de seguridad (no puede conectarse a ninguna red) y `vercel.json` agrega encabezados de seguridad.
 - **Pendiente aparte, que el portal no resuelve:** el proyecto `bodega-prototipo` hoy no está conectado al repositorio correcto. Lo publicado es la versión del 25 de octubre (la de Avance 5: sin conexión a Supabase y sin dashboard). La pauta de la prueba con usuarios supone la versión actual (órdenes 3001 y 3002 y «Reiniciar demo»), que se publica cuando ese proyecto se vuelva a conectar a `main` y tenga sus dos variables (`SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`).
 
