@@ -70,7 +70,7 @@ Sin emojis en el código; lo vigila `tests/test_sin_emojis.py`.
 
 **Dirección pública.** [bodega-poc.vercel.app](https://bodega-poc.vercel.app). Se abre sin iniciar sesión.
 
-**Video (1 a 2 minutos).** Se agrega el enlace cuando esté grabado.
+**Video (2 min 44 s).** [Ver el video en Google Drive](https://drive.google.com/file/d/1B3kULAPBZwG80R2dx-YSNuFwBkI--41n/view?usp=sharing). Recorre el caso exitoso (orden 3001), la guía que sigue guardada después de recargar la página y el caso de error (orden 3002).
 
 **Qué flujo demuestra.**
 

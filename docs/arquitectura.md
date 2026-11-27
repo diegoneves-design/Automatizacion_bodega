@@ -74,6 +74,6 @@ flowchart LR
 
 **Dirección pública.** [bodega-poc.vercel.app](https://bodega-poc.vercel.app), publicada desde `main`. Debe abrirse sin iniciar sesión, y se revisa en una ventana de incógnito antes de la entrega.
 
-**Video.** Se agrega el enlace cuando esté grabado.
+**Video (2 min 44 s).** [Ver el video en Google Drive](https://drive.google.com/file/d/1B3kULAPBZwG80R2dx-YSNuFwBkI--41n/view?usp=sharing). Recorre el caso exitoso (orden 3001), la guía que sigue guardada después de recargar la página y el caso de error (orden 3002).
 
 **Caso de error probado.** Orden 3002 con `SD-63A20-9999`, guía bloqueada con *"Corrige 1 producto para continuar."* Además, en `supabase/probar_en_supabase.py` se llama a `preparar_guia` sin pasar por la pantalla, con productos sin validar, con un código que no existe y con un usuario que no es jefe de bodega, y la base rechaza los tres sin crear la guía (ver la sección 3 de `docs/poc-supabase.md`).
